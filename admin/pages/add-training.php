@@ -119,10 +119,10 @@
               </select>
               <div id="nigeriaPhysicalFields" style="display:none;">
                 <label class="form-label mt-2">Nigerian Address</label>
-                <select id="state" name="state" class="form-control" required>
+                <select id="state" name="state" class="form-control" >
               <option value="">-Select State-</option>
             </select>
-                <select class="form-control" id="lga" required name="lga">
+                <select class="form-control" id="lga"  name="lga">
             <option value="">-Select LGA-</option>
           </select>
                 <input type="text" class="form-control mb-2" name="nigeria_address" placeholder="Address">
@@ -153,10 +153,10 @@
                 <option value="foreign">Foreign</option>
               </select>
               <div id="nigeriaHybridFields" style="display:none;">
-                    <select id="hybrid_state"  name="hybrid_state" class="form-control" required>
+                    <select id="hybrid_state"  name="hybrid_state" class="form-control">
               <option value="">-Select State-</option>
             </select>
-                <select class="form-control" id="hybrid_lga" required name="hybrid_lga">
+                <select class="form-control" id="hybrid_lga" name="hybrid_lga">
             <option value="">-Select LGA-</option>
           </select>
                 <input type="text" class="form-control mb-2" name="hybrid_country" value="Nigeria" readonly>
