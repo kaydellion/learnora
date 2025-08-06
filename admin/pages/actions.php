@@ -749,13 +749,14 @@ if(isset($_POST['settings'])){
 
     // Update profile picture if a new one is uploaded
     if (!empty($profilePicture)) {
+        $fileName = uniqid() . '_' . basename($profilePicture);
         $logo = handleFileUpload($fileKey, $uploadDir, $fileName);
     } else {
         $logo = $siteimg; // Use the current picture  
     }
 
 
-    $update = mysqli_query($con,"UPDATE " . $siteprefix . "site_settings SET site_name='$name',site_bank='$site_bank', account_name='$account_name', affliate_percentage='$affiliate_percentage', commision_fee='$com_fee', account_number='$account_number', google_map='$google',  site_logo='$logo',  site_keywords='$keywords', site_url='$url', site_description='$description', site_mail='$email', site_number='$number', payment_url='$paymenturl', paystack_key='$apikey' WHERE s=1");
+    $update = mysqli_query($con,"UPDATE " . $siteprefix . "site_settings SET site_name='$name',site_bank='$site_bank', account_name='$account_name', affliate_percentage='$affiliate_percentage', commision_fee='$com_fee', account_number='$account_number', google_map='$google',  site_logo='$fileName',  site_keywords='$keywords', site_url='$url', site_description='$description', site_mail='$email', site_number='$number', payment_url='$paymenturl', paystack_key='$apikey' WHERE s=1");
 
 
     if($update){
