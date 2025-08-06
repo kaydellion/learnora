@@ -389,9 +389,9 @@ if ($instructor_id === 'add_new') {
         $randomImage = $defaultImages[array_rand($defaultImages)];
         $reportImages = [$randomImage];
     }else{
-
+$reportImages= $_FILES['cover_images']['name'];
     // Insert images into the database
-    $fileName = uniqid() . '_' . basename($trailer_video);
+    $fileName = uniqid() . '_' . basename($reportImages);
     $reportImages = handleFileUpload($fileKey, $uploadDir,$fileName);
     }
 
@@ -424,7 +424,7 @@ if ($instructor_id === 'add_new') {
 if ($insertTraining) {
      $message .= "Training added successfully!";
             showSuccessModal('Processed', $message);
-            header("refresh:2; url=trainings.php");
+            header("refresh:2; url=add-training.php");
 } else {
     $message .= "Error adding report: " . mysqli_error($con);
             showErrorModal('Update Failed', $message);
