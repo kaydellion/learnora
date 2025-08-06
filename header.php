@@ -124,7 +124,7 @@ if (in_array($current_page, $excluded_pages)) {
 <script src="https://sandbox.vpay.africa/dropin/v1/initialise.js"></script>
   <!-- Main CSS File -->
   <link href="<?php echo $siteurl; ?>assets/css/main.css" rel="stylesheet">
-
+<?php include 'backend/tinymce.php'; ?>
 </head>
 
 <body class="index-page">
