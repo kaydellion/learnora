@@ -150,7 +150,10 @@ include "header.php";
 
       <!-- Paystack Button -->
        
-   <button type="button" class="btn_1 w-100 text-center paystack-button btn btn-primary">Proceed to Payment</button>
+   <button type="button" class="btn_1 w-100 text-center vpay-button btn btn-primary">
+  Proceed to Payment
+</button>
+
 
 
 

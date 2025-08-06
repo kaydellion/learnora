@@ -150,46 +150,40 @@
 
   <!-- Main JS File -->
   <script src="<?php echo $siteurl; ?>assets/js/main.js"></script>
-<script type="text/javascript">
-  document.querySelector(".paystack-button").addEventListener("click", function (e) {
-    e.preventDefault();
+<script>
+(() => {
+    const vpayButton = document.querySelector(".vpay-button");
+    if (vpayButton) {
+        vpayButton.addEventListener("click", function () {
+            const options = {
+                amount: parseInt(document.getElementById("amount").value), // Use actual value
+                currency: 'NGN',
+                domain: 'sandbox', // Change to 'live' in production
+               key: '<?php echo $apikey; ?>',// Replace with your actual VPay public key
+                email: document.getElementById("email-address").value,
+                transactionref: document.getElementById("ref").value,
+                customer_logo: 'https://www.vpay.africa/static/media/vpayLogo.91e11322.svg',
+                customer_service_channel: '+2348030007000, support@yourcompany.com',
+                txn_charge: 6,
+                txn_charge_type: 'flat',
+                onSuccess: function (response) {
+                    // Redirect to your success page
+                    window.location.href = document.getElementById("refer").value;
+                },
+                onExit: function (response) {
+                    alert("Payment was cancelled.");
+                }
+            };
 
-    const email = document.getElementById("email-address").value;
-    const amountNaira = document.getElementById("amount").value;
-    const mobile = document.getElementById("mobile-number").value;
-    const ref = document.getElementById("ref").value;
-
-    // Convert Naira to Kobo
-    const amountKobo = parseFloat(amountNaira) * 100;
-
-    const options = {
-      amount: amountKobo,
-      currency: 'NGN',
-      domain: 'sandbox', // use 'live' in production
-      key: '916b35ac-6705-4769-ad2b-c4dc00d0d92f', // replace with your VPay public key
-      email: email,
-      transactionref: ref,
-      customer_logo: 'https://www.vpay.africa/static/media/vpayLogo.91e11322.svg',
-      customer_service_channel: '+2348030007000, support@org.com',
-      txn_charge: 6,
-      txn_charge_type: 'flat',
-      onSuccess: function(response) {
-        console.log('Payment Success:', response.message);
-        window.location.href = document.getElementById("refer").value;
-      },
-      onExit: function(response) {
-        console.log('Payment Cancelled:', response.message);
-        alert("Payment was not completed.");
-      }
-    };
-
-    if (window.VPayDropin) {
-      const { open, exit } = VPayDropin.create(options);
-      open();
-    } else {
-      alert("VPay is not loaded. Try again later.");
+            if (window.VPayDropin) {
+                const { open, exit } = VPayDropin.create(options);
+                open();
+            } else {
+                alert("VPayDropin library not loaded.");
+            }
+        });
     }
-  });
+})();
 </script>
 
 </body>

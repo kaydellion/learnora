@@ -66,10 +66,10 @@ if ($result) {
 document.addEventListener("DOMContentLoaded", function () {
     let payButtons = document.querySelectorAll(".payButton");
 
-    payButtons.forEach(function(button) {
+    payButtons.forEach(function (button) {
         button.addEventListener("click", function () {
             let planId = button.dataset.planId;
-            let amount = parseFloat(button.dataset.amount) * 100; // Convert to kobo
+            let amount = parseFloat(button.dataset.amount); // VPay accepts amount in Naira, no need to multiply by 100
             let planName = button.dataset.planName;
             let userId = button.dataset.userId;
             let email = button.dataset.email;
@@ -79,31 +79,35 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
 
-            var handler = PaystackPop.setup({
-                key: '<?php echo $apikey; ?>', // Replace with live key in production
-                email: email,
+            const ref = 'VP-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+            const siteurl = document.getElementById('siteurl').value;
+
+            const options = {
                 amount: amount,
                 currency: 'NGN',
-                ref: 'PH-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
-                metadata: {
-                    custom_fields: [{
-                        display_name: "Plan Name",
-                        variable_name: "plan_name",
-                        value: planName
-                    }]
+                domain: 'sandbox', // change to 'live' when you go live
+                key: '<?php echo $apikey; ?>', // your VPay public key
+                email: email,
+                transactionref: ref,
+                customer_logo: 'https://www.vpay.africa/static/media/vpayLogo.91e11322.svg',
+                customer_service_channel: '+2348030007000, support@yourcompany.com',
+                txn_charge: 6,
+                txn_charge_type: 'flat',
+                onSuccess: function (response) {
+                    window.location.href = siteurl + 'backend/verify_payment.php?action=verify_payment&reference=' + ref + '&plan_id=' + planId + '&user_id=' + userId;
                 },
-                callback: function (response) {
-               var siteurl = document.getElementById('siteurl').value;
-                window.location.href = siteurl + 'backend/verify_payment.php?action=verify_payment&reference=' + response.reference + '&plan_id=' + planId + '&user_id=' + userId;
-                },
-                onClose: function () {
-                    alert('Payment was canceled.');
+                onExit: function (response) {
+                    alert("Payment was canceled.");
                 }
-            });
-            handler.openIframe();
+            };
+
+            if (window.VPayDropin) {
+                const { open } = VPayDropin.create(options);
+                open();
+            } else {
+                alert("VPayDropin library not loaded.");
+            }
         });
     });
 });
-
 </script>
-

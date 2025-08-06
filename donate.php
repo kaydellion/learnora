@@ -50,34 +50,50 @@ document.getElementById("donateForm").addEventListener("submit", function(e) {
   e.preventDefault();
 
   const email = document.getElementById("emails").value;
-  const amount = document.getElementById("amounts").value;
+  const amount = parseFloat(document.getElementById("amounts").value);
   const user_id = document.getElementById("user_ids").value;
   const training_id = document.getElementById("training_ids").value;
-  const order_id = "ORDER_" + Math.floor(Math.random() * 1000000000);
   const affiliate_id = document.getElementById("affiliate_ids").value;
   const siteurl = "<?php echo $siteurl; ?>";
 
-  const handler = PaystackPop.setup({
-    key: '<?php echo $apikey; ?>', // Your Paystack public key
+  if (!email || isNaN(amount) || amount <= 0) {
+    alert("Please enter a valid email and amount.");
+    return;
+  }
+
+  const order_id = "ORDER_" + Math.floor(Math.random() * 1000000000);
+
+  const options = {
+    amount: amount, // VPay expects Naira (not Kobo)
+    currency: 'NGN',
+    domain: 'sandbox', // change to 'live' in production
+    key: '<?php echo $apikey; ?>',
     email: email,
-    amount: amount * 100, // in Kobo
-    ref: order_id,
-    callback: function(response) {
-      // On successful payment, send data to donate_payment.php
+    transactionref: order_id,
+    customer_logo: 'https://www.vpay.africa/static/media/vpayLogo.91e11322.svg',
+    customer_service_channel: '+2348030007000, support@yourcompany.com',
+    txn_charge: 6,
+    txn_charge_type: 'flat',
+    onSuccess: function(response) {
       window.location.href = siteurl + "backend/donate_payment?" +
         "order_id=" + encodeURIComponent(order_id) +
         "&user_id=" + encodeURIComponent(user_id) +
         "&amount=" + encodeURIComponent(amount) +
         "&training_id=" + encodeURIComponent(training_id) +
         "&affiliate_id=" + encodeURIComponent(affiliate_id) +
-        "&ref=" + encodeURIComponent(response.reference);
+        "&ref=" + encodeURIComponent(order_id); // VPay uses your ref
     },
-    onClose: function() {
-      alert('Transaction was cancelled.');
+    onExit: function(response) {
+      alert("Transaction was cancelled.");
     }
-  });
+  };
 
-  handler.openIframe();
+  if (window.VPayDropin) {
+    const { open } = VPayDropin.create(options);
+    open();
+  } else {
+    alert("VPayDropin library not loaded.");
+  }
 });
 </script>
 

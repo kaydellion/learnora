@@ -196,7 +196,7 @@ $desc_short = implode(' ', array_slice($desc_words, 0, 30));
 $isLongDesc = count($desc_words) > 30;
 ?>
 <p>
-  <span class="desc-short"><?php echo htmlspecialchars($desc_short); ?><?php if ($isLongDesc) echo '...'; ?></span>
+  <span class="desc-short"><?php echo $desc_short; ?><?php if ($isLongDesc) echo '...'; ?></span>
   <?php if ($isLongDesc): ?>
     <span class="desc-full" style="display:none;"><?php echo $course_description; ?></span>
     <br>
@@ -462,10 +462,10 @@ $all_reviews = $all_reviews_result->fetch_all(MYSQLI_ASSOC);
     $isLong = str_word_count($description) > 10;
     ?>
 
-    <span class="short-description"><?php echo htmlspecialchars($shortDesc); ?><?php if ($isLong) echo '...'; ?></span>
+    <span class="short-description"><?php echo $shortDesc; ?><?php if ($isLong) echo '...'; ?></span>
 
     <?php if ($isLong): ?>
-        <span class="full-description" style="display: none;"><?php echo nl2br(htmlspecialchars($description)); ?></span>
+        <span class="full-description" style="display: none;"><?php echo $description; ?></span>
         <br>
         <button type="button" class="btn btn-link btn-sm p-0 read-more-btn" style="text-decoration: none;">Read More</button>
         <button type="button" class="btn btn-link btn-sm p-0 read-less-btn" style="text-decoration: none; display:none;">Read Less</button>
@@ -537,7 +537,7 @@ $all_reviews = $all_reviews_result->fetch_all(MYSQLI_ASSOC);
             $ticket_name = $row['ticket_name'];
             $amount = floatval($row['price']);
             $seatremain = intval($row['seatremain']);
-            $benefits = htmlspecialchars($row['benefits']); // safe for output
+            $benefits = $row['benefits']; // safe for output
 
             $isSoldOut = $seatremain <= 0;
       ?>
