@@ -101,11 +101,11 @@
                                 </div>
   <div class="form-group">
    
-    <textarea class="form-control editor" name="skills" id="skills" placeholder="List your skills and hobbies" hidden></textarea>
+    <textarea class="form-control" name="skills" id="skills" placeholder="List your skills and hobbies" hidden></textarea>
   </div>
 
 
-      <input type="text" name="language" class="form-control" id="language" placeholder="Language" hdden>
+      <input type="hidden" name="language" class="form-control" id="language" placeholder="Language" hidden>
     </div>
 
       <select name="proficiency" class="form-control" id="proficiency" hidden>
@@ -140,7 +140,7 @@
   <!-- Nigerian Office -->
   <div class="form-group">
     
-    <textarea hidden name="nigeria-office" class="form-control editor"  placeholder="Full address in Nigeria"></textarea>
+    <textarea hidden name="nigeria-office" class="form-control"  placeholder="Full address in Nigeria"></textarea>
   </div>
 
   
