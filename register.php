@@ -43,19 +43,18 @@
 
   <div class="form-group mt-3">
     <label for="profile">Tell Us About Yourself</label>
-    <textarea class="form-control" name="profile" id="profile" placeholder="Your Profile" required></textarea>
+    <textarea class="form-control editor" name="profile" id="profile" placeholder="Your Profile" required></textarea>
   </div>
 
   <div class="row mt-3">
-    <div class="col-md-4 form-group">
+    <div class="col-md-6 form-group">
       <label for="photo">Photo</label>
       <input type="file" name="photo" class="form-control" id="photo" required>
     </div>
-    <div class="col-md-4 form-group">
-      <label for="age">Age</label>
-      <input type="number" name="age" class="form-control" id="age" placeholder="" required >
-    </div>
-    <div class="col-md-4 form-group">
+  
+      <input type="hidden" name="age" class="form-control" id="age" placeholder="" >
+
+    <div class="col-md-6 form-group">
       <label for="gender">Gender</label>
       <select class="form-control" id="gender" name="gender" required>
         <option value="">-Select Gender-</option>
@@ -99,38 +98,86 @@
                                     </div>
                                   </div>
                                 </div>
+<div class="row mt-3">
+  <div class="col-md-6 form-group">
+    <label>Are you a Nigerian company?</label><br>
+    <div class="form-check form-check-inline">
+      <input class="form-check-input" type="radio" name="is_nigerian" id="nigeriaYes" value="yes" required>
+      <label class="form-check-label" for="nigeriaYes">Yes</label>
+    </div>
+    <div class="form-check form-check-inline">
+      <input class="form-check-input" type="radio" name="is_nigerian" id="nigeriaNo" value="no">
+      <label class="form-check-label" for="nigeriaNo">No</label>
+    </div>
+  </div>
+</div>
+    
+<div id="nigeria-address-fields" style="display:none;">
 
-                                  <div class="row mt-3">
+  <div class="row mt-3">
+      <div class="col-md-12 form-group mt-3">
+    <label for="full_address_ng">Full Address</label>
+    <textarea class="form-control" name="full_address_ng" id="full_address_ng" placeholder="Full Address"></textarea>
+  </div>
     <div class="col-md-4 form-group">
       <label for="state">State</label>
-      <input type="text" name="state" class="form-control" id="state" placeholder="State">
+      <select id="state" name="state" class="form-control">
+        <option value="">-Select State-</option>
+      </select>
     </div>
     <div class="col-md-4 form-group">
       <label for="lga">LGA</label>
-      <input type="text" name="lga" class="form-control" id="lga" placeholder="Local Government Area">
+      <select class="form-control" id="lga" name="lga">
+        <option value="">-Select LGA-</option>
+      </select>
     </div>
     <div class="col-md-4 form-group">
-      <label for="country">Country</label>
-      <input type="text" name="country" class="form-control" id="country" placeholder="Country">
+      <label for="country_ng">Country</label>
+      <input type="text" class="form-control" id="country_ng" name="country_ng" value="Nigeria" readonly>
     </div>
   </div>
+</div>
+ 
+
+
+
+<div id="foreign-address-fields" style="display:none;">
+  <div class="form-group mt-3">
+    <label for="full_address_foreign">Full Address</label>
+    <input type="text" class="form-control" name="full_address_foreign" id="full_address_foreign" placeholder="Full Address">
+  </div>
+  <div class="row mt-3">
+ <div class="col-md-6 form-group">
+  <label for="country_foreign">Country</label>
+  <select class="form-control" id="country_foreign" name="country_foreign">
+    <option value="">-Select Country-</option>
+    <?php
+    $countryRes = mysqli_query($con, "SELECT name,nicename FROM ln_country ORDER BY name ASC");
+    while ($countryRow = mysqli_fetch_assoc($countryRes)) {
+      echo '<option value="'.htmlspecialchars($countryRow['nicename']).'">'.htmlspecialchars($countryRow['name']).'</option>';
+    }
+    ?>
+  </select>
+</div>
+  </div>
+</div>
 
                                 <div class="row mt-3">
     <div class="col-md-3 form-group">
       <label for="facebook">Facebook</label>
-      <input type="text" name="facebook" class="form-control" id="facebook" placeholder="Facebook profile URL">
+      <input type="url" name="facebook" class="form-control" id="facebook" placeholder="Facebook profile URL">
     </div>
     <div class="col-md-3 form-group">
       <label for="twitter">Twitter</label>
-      <input type="text" name="twitter" class="form-control" id="twitter" placeholder="Twitter profile URL">
+      <input type="url" name="twitter" class="form-control" id="twitter" placeholder="Twitter profile URL">
     </div>
     <div class="col-md-3 form-group">
       <label for="instagram">Instagram</label>
-      <input type="text" name="instagram" class="form-control" id="instagram" placeholder="Instagram profile URL">
+      <input type="url" name="instagram" class="form-control" id="instagram" placeholder="Instagram profile URL">
     </div>
     <div class="col-md-3 form-group">
       <label for="linkedin">LinkedIn</label>
-      <input type="text" name="linkedin" class="form-control" id="linkedin" placeholder="LinkedIn profile URL">
+      <input type="url" name="linkedin" class="form-control" id="linkedin" placeholder="LinkedIn profile URL">
     </div>
   </div>
                                 <div class="text-end mt-4">
@@ -143,4 +190,60 @@
                                 </div>
 								</div>
 </section>
+
+
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  function setRequired(selectorList, required) {
+    selectorList.forEach(function(sel) {
+      document.querySelectorAll(sel).forEach(function(el) {
+        if (required) {
+          el.setAttribute('required', 'required');
+        } else {
+          el.removeAttribute('required');
+        }
+      });
+    });
+  }
+
+  function toggleAddressFields() {
+    const isNigerian = document.querySelector('input[name="is_nigerian"]:checked');
+    const ngFields = document.getElementById('nigeria-address-fields');
+    const foreignFields = document.getElementById('foreign-address-fields');
+
+    if (isNigerian && isNigerian.value === 'yes') {
+      ngFields.style.display = '';
+      foreignFields.style.display = 'none';
+      setRequired([
+        '#full_address_ng', '#state', '#lga'
+      ], true);
+      setRequired([
+        '#full_address_foreign', '#country_foreign'
+      ], false);
+    } else if (isNigerian && isNigerian.value === 'no') {
+      ngFields.style.display = 'none';
+      foreignFields.style.display = '';
+      setRequired([
+        '#full_address_ng', '#state', '#lga'
+      ], false);
+      setRequired([
+        '#full_address_foreign', '#country_foreign'
+      ], true);
+    } else {
+      ngFields.style.display = 'none';
+      foreignFields.style.display = 'none';
+      setRequired([
+        '#full_address_ng', '#state', '#lga', '#full_address_foreign', '#country_foreign'
+      ], false);
+    }
+  }
+
+  document.querySelectorAll('input[name="is_nigerian"]').forEach(function(radio) {
+    radio.addEventListener('change', toggleAddressFields);
+  });
+  toggleAddressFields();
+});
+</script>
                                 <?php include "footer.php"; ?>

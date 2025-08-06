@@ -29,11 +29,12 @@
 }
 </style>
 <section>
-<div class="container-xxl flex-grow-1 container-p-y">
-  <div class="row">
-    <div class="col-xl">
-      <div class="card mb-4">
-        <div class="card-header d-flex justify-content-between align-items-center">
+<div class="d-flex justify-content-center">
+  <div class="container-xxl flex-grow-1 container-p-y" style="max-width: 800px;">
+    <div class="row">
+      <div class="col-xl">
+        <div class="card mb-4">
+          <div class="card-header d-flex justify-content-between align-items-center">
           <h4 class="mb-0">Add New Training Listings</h4>
         </div>
         <div class="card-body">
@@ -54,11 +55,11 @@
             </div>
             <div class="mb-3">
               <label class="form-label">Description</label>
-              <textarea class="form-control" name="description" required></textarea>
+              <textarea class="form-control editor" name="description" required></textarea>
             </div>
             <div class="mb-3">
               <label class="form-label">Who Should Attend</label>
-              <input type="text" class="form-control" name="who_should_attend" placeholder="E.g. Beginners, Entrepreneurs, etc.">
+              <input type="hidden" class="form-control" name="who_should_attend" placeholder="E.g. Beginners, Entrepreneurs, etc.">
             </div>
             <div class="mb-3">
               <label class="form-label">Event Dates & Times</label>
@@ -108,8 +109,7 @@
                 <option value="physical">Physical (In-person)</option>
                 <option value="online">Online (Webinar/Virtual)</option>
                 <option value="hybrid">Hybrid (Physical & Online)</option>
-                <option value="video">Video</option>
-                <option value="text">Text</option>
+              
               </select>
             </div> 
             <!-- Physical Address Fields -->
@@ -162,11 +162,11 @@
             <h6>Course Content Details</h6>
             <div class="mb-3">
               <label class="form-label">Course Description</label>
-              <textarea class="form-control" name="course_description" rows="4"></textarea>
+              <textarea class="form-control editor" name="course_description" rows="4"></textarea>
             </div>
             <div class="mb-3">
               <label class="form-label">Learning Objectives / Outcomes</label>
-              <textarea class="form-control" name="learning_objectives" rows="3" placeholder="List what the learner will be able to do after completing the course."></textarea>
+              <textarea class="form-control editor" name="learning_objectives" rows="3" placeholder="List what the learner will be able to do after completing the course."></textarea>
             </div>
             <div class="mb-3">
               <label class="form-label">Target Audience</label>
@@ -174,7 +174,7 @@
             </div>
             <div class="mb-3">
               <label class="form-label">Course Requirements / Prerequisites</label>
-              <textarea class="form-control" name="prerequisites" rows="2" placeholder="Any knowledge, tools, or skills needed before starting."></textarea>
+              <textarea class="form-control editor" name="prerequisites" rows="2" placeholder="Any knowledge, tools, or skills needed before starting."></textarea>
             </div>
 
             <h6>Course Content Uploads</h6>
@@ -202,7 +202,7 @@
         <!-- Option 1: Text Entry -->
         <div id="quizText" style="display:none;">
           <label>Text Entry:</label>
-          <textarea name="quiz_text[]" placeholder="e.g., Write a short essay on the impact of AI on job markets..." class="form-control"></textarea>
+          <textarea name="quiz_text[]" placeholder="e.g., Write a short essay on the impact of AI on job markets..." class="form-control editor"></textarea>
         </div>
 
         <!-- Option 2: File Upload -->
@@ -224,7 +224,7 @@
     <div id="quizBuilderModal">
       <div class="mb-3">
         <label>Instructions:</label>
-        <textarea name="quiz_instructions" placeholder="Quiz Instructions" class="form-control mb-2"></textarea>
+        <textarea name="quiz_instructions" placeholder="Quiz Instructions" class="form-control mb-2 editor"></textarea>
       </div>
       <div class="question-block">
         <div class="mb-3">
@@ -309,36 +309,65 @@
 <!-- Paid Ticket Fields -->
 <div class="mb-3" id="paidFields" style="display:none;">
   <label class="form-label">Ticket Name</label>
-  <input type="text" class="form-control mb-2" name="ticket_name" placeholder="e.g. General Admission">
+  <input type="text" class="form-control mb-2" name="ticket_name[]" placeholder="e.g. General Admission">
   <label class="form-label">Benefits</label>
-  <input type="text" class="form-control mb-2" name="ticket_benefits" placeholder="e.g. Certificate, Lunch, Materials">
+  <input type="text" class="form-control mb-2" name="ticket_benefits[]" placeholder="e.g. Certificate, Lunch, Materials">
   <label class="form-label">Price</label>
-  <input type="number" class="form-control mb-2" name="ticket_price" min="0" step="0.01" placeholder="e.g. 5000">
+  <input type="number" class="form-control mb-2" name="ticket_price[]" min="0" step="0.01" placeholder="e.g. 5000">
   <label class="form-label">Number of Seats Available</label>
-  <input type="number" class="form-control" name="ticket_seats" min="1" placeholder="e.g. 100">
+  <input type="number" class="form-control" name="ticket_seats[]" min="1" placeholder="e.g. 100">
+
+    <div class="mb-3" id="ticketWrapper">
+
+              </div>
+  <!-- Add Another Ticket Button -->
+<button type="button" id="addTicketBtn" class="btn btn-secondary">Add Another Ticket</button>
 </div>
 
+                      
                          <div class="mb-3">
-                        <select class="form-select" name="category" aria-label="Default select example" required>
-                          <option selected>- Select Category -</option>
-                          <?php
-                    $sql = "SELECT * FROM " . $siteprefix . "categories WHERE parent_id IS NULL ";
-                     $sql2 = mysqli_query($con, $sql);
-                     while ($row = mysqli_fetch_array($sql2)) {
-                     echo '<option value="' . $row['id'] . '">' . $row['category_name'] . '</option>'; }?>
-                        </select>
-                        </div>
+                          <label>Category</label>
+                      <div class="custom-select-wrapper" id="category-wrapper">
+  <div class="custom-select-display" onclick="toggleDropdown('category')">
+    <div class="custom-select-tags" id="category-tags"></div>
+  </div>
+  <div class="custom-select-dropdown" id="category-dropdown">
+    <input type="search" class="form-control" placeholder="Search categories..." onkeyup="filterOptions(this, 'category-options')">
+    <div id="category-options">
+      <?php
+        $sql = "SELECT * FROM " . $siteprefix . "categories WHERE parent_id IS NULL";
+        $res = mysqli_query($con, $sql);
+        while ($row = mysqli_fetch_assoc($res)) {
+          echo '<div class="custom-option">
+                  <label>
+                    <input type="checkbox" name="category[]" value="' . $row['id'] . '" onchange="updateTags(this, \'category\')">
+                    ' . htmlspecialchars($row['category_name']) . '
+                  </label>
+                </div>';
+        }
+      ?>
+    </div>
+  </div>
+</div>
 
-                        <div class="mb-3" id="subcategory-container" style="display:none;">
-                          <select class="form-select" name="subcategory" id="subcategory-select" required>
-                            <option selected>- Select Subcategory -</option>
-                          </select>
+<label>Subcategory</label>
+<div class="custom-select-wrapper" id="subcategory-wrapper" style="margin-top: 20px; display: none;">
+  <div class="custom-select-display" onclick="toggleDropdown('subcategory')">
+    <div class="custom-select-tags" id="subcategory-tags"></div>
+  </div>
+  <div class="custom-select-dropdown" id="subcategory-dropdown">
+    <input class="form-control" type="search" placeholder="Search subcategories..." onkeyup="filterOptions(this, 'subcategory-options')">
+    <div id="subcategory-options">
+      <!-- Subcategory checkboxes inserted dynamically -->
+    </div>
+  </div>
+</div>
                         </div>
 
                             <?php
     // Fetch instructors from the database
     $instructors = [];
-    $instructorQuery = mysqli_query($con, "SELECT s, name, photo FROM {$siteprefix}instructors");
+    $instructorQuery = mysqli_query($con, "SELECT s, name, photo FROM {$siteprefix}instructors WHERE user='$user_id'");
     while ($row = mysqli_fetch_assoc($instructorQuery)) {
         $instructors[] = $row;
     }
@@ -372,12 +401,13 @@
 <div class="mb-3" id="addInstructorFields" style="display:none;">
   <label class="form-label">Instructor Name</label>
   <input type="text" class="form-control mb-2" name="new_instructor_name" placeholder="Enter instructor name">
-   <label class="form-label">Instructor Email</label>
-  <input type="email" class="form-control mb-2" name="new_instructor_email" placeholder="Enter instructor email">
-  <label class="form-label">Instructor Bio</label>
-  <textarea class="form-control mb-2" name="new_instructor_bio" placeholder="Enter instructor bio"></textarea>
+ <!---  <label class="form-label">Instructor Email</label>--->
+  <input type="hidden" class="form-control mb-2" name="new_instructor_email" placeholder="Enter instructor email">
+  <label class="form-label">Instructor Bio</label> 
+  <textarea class="form-control mb-2 editor" name="new_instructor_bio" placeholder="Enter instructor bio"></textarea>
   <label class="form-label">Instructor Photo</label>
   <input type="file" class="form-control" name="new_instructor_photo" accept="image/*">
+  <input type="hidden" name="user_id" value="<?php echo $user_id; ?>">
 </div>
 
 <div class="mb-3">
@@ -387,7 +417,7 @@
 
 <div class="mb-3">
   <label class="form-label">Additional Instructions or Notes</label>
-  <textarea class="form-control" name="additional_notes" rows="3"></textarea>
+  <textarea class="form-control editor" name="additional_notes" rows="3"></textarea>
 </div>
 
 
@@ -422,31 +452,71 @@
 
 
           
-                        <script>
-                        document.querySelector('select[name="category"]').addEventListener('change', function() {
-                          let parentId = this.value;
-                          let subSelect = document.getElementById('subcategory-container');
-                          let subcategorySelect = document.getElementById('subcategory-select');
-                          
-                          fetch(`get_subcategories.php?parent_id=${parentId}`)
-                            .then(response => response.json())
-                            .then(data => {
-                              console.log('Received data:', data);
-                              if (data.length > 0) {
-                                subcategorySelect.innerHTML = '<option selected>- Select Subcategory -</option>';
-                                data.forEach(cat => {
-                                  console.log('Processing category:', cat);
-                                  subcategorySelect.innerHTML += `<option value="${cat.s}">${cat.title}</option>`;
-                                });
-                                subSelect.style.display = 'block';
-                              } else {
-                                console.log('No subcategories found');
-                                subSelect.style.display = 'none';
-                              }
-                            })
-                            .catch(error => {
-                              console.error('Error fetching subcategories:', error);
-                            });
-                        });
-                        </script>
+   <script>
+function toggleDropdown(type) {
+  document.getElementById(`${type}-dropdown`).classList.toggle('show');
+}
+
+function filterOptions(input, containerId) {
+  const filter = input.value.toLowerCase();
+  const options = document.getElementById(containerId).getElementsByClassName('custom-option');
+  for (let i = 0; i < options.length; i++) {
+    const text = options[i].innerText.toLowerCase();
+    options[i].style.display = text.includes(filter) ? '' : 'none';
+  }
+}
+
+function updateTags(checkbox, type) {
+  const tagContainer = document.getElementById(`${type}-tags`);
+  const tagId = `${type}-tag-${checkbox.value}`;
+  const existingTag = document.getElementById(tagId);
+
+  if (checkbox.checked && !existingTag) {
+    const tag = document.createElement('span');
+    tag.id = tagId;
+    tag.className = 'custom-tag';
+    tag.textContent = checkbox.parentElement.innerText.trim();
+    tagContainer.appendChild(tag);
+  } else if (!checkbox.checked && existingTag) {
+    existingTag.remove();
+  }
+
+  if (type === 'category') fetchSubcategories();
+}
+
+function fetchSubcategories() {
+  const selectedCategories = Array.from(document.querySelectorAll('input[name="category[]"]:checked')).map(cb => cb.value);
+  const subWrapper = document.getElementById('subcategory-wrapper');
+  const subOptions = document.getElementById('subcategory-options');
+
+  subOptions.innerHTML = '';
+
+  if (selectedCategories.length === 0) {
+    subWrapper.style.display = 'none';
+    return;
+  }
+
+  fetch(`get_subcategories.php?parent_ids=${selectedCategories.join(',')}`)
+    .then(res => res.json())
+    .then(data => {
+      if (data.length > 0) {
+        subWrapper.style.display = 'block';
+        data.forEach(sub => {
+          const div = document.createElement('div');
+          div.className = 'custom-option';
+          div.innerHTML = `
+            <label>
+              <input type="checkbox" name="subcategory[]" value="${sub.s}" onchange="updateTags(this, 'subcategory')">
+              ${sub.title}
+            </label>
+          `;
+          subOptions.appendChild(div);
+        });
+      } else {
+        subWrapper.style.display = 'none';
+      }
+    });
+}
+</script>
+
             <?php include "footer.php"; ?>

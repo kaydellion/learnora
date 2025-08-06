@@ -64,54 +64,60 @@ include "header.php";
           </div>
 
   <div class="col-lg-5">
-            <!-- Order Summary -->
-                      <?php 
-        // Initialize
-        $is_free_order = false;
-        $item_count = 0;
+  
+  <!-- Order Summary -->
+  <?php 
+    $is_free_order = false;
+    $item_count = 0;
 
-        $sql = "SELECT oi.*,  t.title as training_title, t.pricing, oi.price, ti.picture 
-                FROM ".$siteprefix."order_items oi
-                JOIN ".$siteprefix."training t ON oi.training_id = t.training_id
-                LEFT JOIN ".$siteprefix."training_images ti ON t.training_id = ti.training_id
-                WHERE oi.order_id = ? 
-                GROUP BY oi.s";
+    $sql = "SELECT oi.*, t.title as training_title, t.pricing, oi.price, ti.picture 
+            FROM {$siteprefix}order_items oi
+            JOIN {$siteprefix}training t ON oi.training_id = t.training_id
+            LEFT JOIN {$siteprefix}training_images ti ON t.training_id = ti.training_id
+            WHERE oi.order_id = ? 
+            GROUP BY oi.s";
 
-        $stmt = mysqli_prepare($con, $sql);
-        mysqli_stmt_bind_param($stmt, 's', $order_id);
-        mysqli_stmt_execute($stmt);
-        $result = mysqli_stmt_get_result($stmt);
+    $stmt = mysqli_prepare($con, $sql);
+    mysqli_stmt_bind_param($stmt, 's', $order_id);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
 
-        while ($item = mysqli_fetch_assoc($result)):
-          $item_count++;
-          if ($item['pricing'] == 'free') {
+    // Prepare for count summary
+    $items = [];
+    while ($item = mysqli_fetch_assoc($result)) {
+        $items[] = $item;
+        $item_count++;
+        if ($item['pricing'] === 'free') {
             $is_free_order = true;
-          }
-      ?>
-             
-            <div class="order-summary" data-aos="fade-left" data-aos-delay="200">
-              <div class="order-summary-header">
-                <h3>Order Summary</h3>
-                <span class="item-count"><span class="item-count"><?php echo $item_count; ?> Item<?php echo ($item_count == 1) ? '' : 's'; ?></span></span>
-              </div>
+        }
+    }
+    mysqli_stmt_close($stmt);
+  ?>
 
-              <div class="order-summary-content">
-                <div class="order-items">
-                      <div class="order-item">
-                    <div class="order-item-image">
-                      <img src="<?php echo htmlspecialchars($imagePath.$item['picture']); ?>" alt="Product" class="img-fluid">
-                    </div>
-                    <div class="order-item-details">
-                      <h4><?php echo htmlspecialchars($item['training_title']); ?></h4>
-                     
-                      <div class="order-item-price">
-                        <span class="quantity">1 ×</span>
-                        <span class="price"><?php echo $sitecurrency; echo formatNumber($item['price'], 2); ?></span> 
-                      </div>
-                    </div>
-                  </div>
-            <?php endwhile; mysqli_stmt_close($stmt); ?>
-                    </div>
+  <?php if (!empty($items)): ?>
+    <div class="order-summary" data-aos="fade-left" data-aos-delay="200">
+      <div class="order-summary-header">
+        <h3>Order Summary</h3>
+        <span class="item-count"><?php echo $item_count; ?> Item<?php echo ($item_count == 1) ? '' : 's'; ?></span>
+      </div>
+
+      <div class="order-summary-content">
+        <div class="order-items">
+          <?php foreach ($items as $item): ?>
+            <div class="order-item">
+              <div class="order-item-image">
+                <img src="<?php echo htmlspecialchars($imagePath . $item['picture']); ?>" alt="Product" class="img-fluid">
+              </div>
+              <div class="order-item-details">
+                <h4><?php echo htmlspecialchars($item['training_title']); ?></h4>
+                <div class="order-item-price">
+                  <span class="quantity">1 ×</span>
+                  <span class="price"><?php echo $sitecurrency . formatNumber($item['price'], 2); ?></span> 
+                </div>
+              </div>
+            </div>
+          <?php endforeach; ?>
+        </div>
 
                      <div class="order-totals">
                   <div class="order-subtotal d-flex justify-content-between">
@@ -134,7 +140,7 @@ include "header.php";
         <h4>Select Payment Method</h4>
         <div class="form-check">
           <input class="form-check-input" type="radio" name="payment_method" id="paystack" value="paystack" checked>
-          <label class="form-check-label" for="paystack">Pay with Paystack</label>
+          <label class="form-check-label" for="paystack">Pay with VPay</label>
         </div>
         <div class="form-check">
           <input class="form-check-input" type="radio" name="payment_method" id="manual" value="manual">
@@ -144,7 +150,9 @@ include "header.php";
 
       <!-- Paystack Button -->
        
-      <button class="btn_1 w-100 text-center paystack-button btn btn-primary" onClick="payWithPaystack()">Proceed to Payment</button>
+   <button type="button" class="btn_1 w-100 text-center paystack-button btn btn-primary">Proceed to Payment</button>
+
+
 
      <button type="button" class="btn_1 w-100 text-center manual-button btn btn-primary" data-bs-toggle="modal" data-bs-target="#manualPaymentModal" style="display: none;">
   Proceed with Manual Payment
@@ -164,6 +172,7 @@ include "header.php";
                 </div>
               </div>
             </div>
+			  <?php endif; ?>
           </div>
         </div>
 

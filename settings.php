@@ -102,19 +102,18 @@ checkActiveLog($active_log);
 
   <div class="form-group mt-3">
     <label for="profile">Tell Us About Yourself</label>
-    <textarea class="form-control" name="profile" id="profile" placeholder="Your Profile" required><?php echo $biography; ?></textarea>
+    <textarea class="form-control editor" name="profile" id="profile" placeholder="Your Profile" required><?php echo $biography; ?></textarea>
   </div>
 
   <div class="row mt-3">
-    <div class="col-md-4 form-group">
+    <div class="col-md-6 form-group">
       <label for="photo">Photo</label>
       <input type="file" name="photo" class="form-control" id="photo">
     </div>
-    <div class="col-md-4 form-group">
-      <label for="age">Age</label>
-      <input type="number" name="age" class="form-control" id="age" placeholder="Must be 18 years and above" required min="18" value="<?php echo $age; ?>">
-    </div>
-    <div class="col-md-4 form-group">
+
+      <input type="hidden" name="age" class="form-control" id="age" placeholder="Must be 18 years and above"  >
+
+    <div class="col-md-6 form-group">
       <label for="gender">Gender</label>
       <select class="form-control" id="gender" name="gender" required>
                                     <option value="">-Select Gender-</option>
@@ -160,18 +159,13 @@ checkActiveLog($active_log);
                                 </div>
   <div class="form-group mt-3">
     <label for="skills">Skills and Hobbies</label>
-    <textarea class="form-control" name="skills" id="skills" placeholder="List your skills and hobbies" required><?php echo $skills_hobbies; ?></textarea>
+    <textarea class="form-control" name="skills" id="skills" placeholder="List your skills and hobbies" hidden><?php echo $skills_hobbies; ?></textarea>
   </div>
 
   <!-- LANGUAGE SECTION -->
-  <div class="row mt-3">
-    <div class="col-md-6 form-group">
-      <label for="language">Language</label>
-      <input type="text" name="language" class="form-control" id="language" placeholder="Language" value="<?php echo $language; ?>">
-    </div>
-    <div class="col-md-6 form-group">
-      <label for="proficiency">Proficiency</label>
-      <select name="proficiency" class="form-control" id="proficiency">
+      <input type="hidden" name="language" class="form-control" id="language" placeholder="Language" value="<?php echo $language; ?>" hidden>
+
+      <select name="proficiency" class="form-control" id="proficiency" hidden>
           <option value="">Select Option</option>
         <option value="Unspecified" <?php echo ($proficiency == 'Unspecified') ? 'selected' : ''; ?>>Unspecified</option>
         <option value="Basic" <?php echo ($proficiency == 'Basic') ? 'selected' : ''; ?>>Basic</option>
@@ -179,83 +173,153 @@ checkActiveLog($active_log);
         <option value="Fluent" <?php echo ($proficiency == 'Fluent') ? 'selected' : ''; ?>>Fluent</option>
         <option value="Native/Bilingual" <?php echo ($proficiency == 'Native/Bilingual') ? 'selected' : ''; ?>>Native/Bilingual</option>
       </select>
-    </div>
-  </div>
+  
 
   <!-- COMPANY DETAILS -->
   <hr class="mt-5 mb-4">
   <h5>Company Details</h5>
 
-  <div class="form-group mt-3">
-    <label for="company-name">Company Name</label>
-    <input type="text" name="company-name" class="form-control" id="company-name" placeholder="Company Name" value="<?php echo $company_name; ?>" required>
-  </div>
+<div class="form-group mt-3">
+  <label for="company-name">Company Name</label>
+  <input type="text" name="company-name" class="form-control" id="company-name" placeholder="Company Name" value="<?php echo $company_name; ?>">
+</div>
 
-  <div class="form-group mt-3">
-    <label for="company-profile">Company Profile</label>
-    <textarea name="company-profile" class="form-control" id="company-profile" placeholder="Tell us about the company"><?php echo $company_profile; ?></textarea>
-  </div>
+<div class="form-group mt-3">
+  <label for="company-profile">Company Profile</label>
+  <textarea name="company-profile" class="form-control editor" id="company-profile" placeholder="Tell us about the company"><?php echo $company_profile; ?></textarea>
+</div>
 
-  <div class="form-group mt-3">
-    <label for="company-logo">Company Logo</label>
-    <input type="file" name="company_profile_picture" class="form-control" id="company-logo">
-  </div>
+<div class="form-group mt-3">
+  <label for="company-logo">Company Logo</label>
+  <input type="file" name="company_profile_picture" class="form-control" id="company-logo">
+</div>
 
-  <!-- Nigerian Office -->
+    <textarea name="nigeria-office" hidden class="form-control"  placeholder="Full address in Nigeria"><?php echo $n_office_address; ?></textarea>
+
+
+<div class="form-group mt-3">
+  <label>Are you a Nigerian company?</label><br>
+  <div class="form-check form-check-inline">
+    <input class="form-check-input" type="radio" name="is_nigerian" id="nigeriaYes" value="yes" 
+      <?php echo ($country == 'Nigeria') ? 'checked' : ''; ?>>
+    <label class="form-check-label" for="nigeriaYes">Yes</label>
+  </div>
+  <div class="form-check form-check-inline">
+    <input class="form-check-input" type="radio" name="is_nigerian" id="nigeriaNo" value="no"
+      <?php echo ($country != 'Nigeria') ? 'checked' : ''; ?>>
+    <label class="form-check-label" for="nigeriaNo">No</label>
+  </div>
+</div>
+
+<div id="nigeria-address-fields" style="display:none;">
   <div class="form-group mt-3">
     <label for="nigeria-office">Nigerian Office Address</label>
-    <textarea name="nigeria-office" class="form-control" id="nigeria-office" placeholder="Full address in Nigeria"><?php echo $n_office_address; ?></textarea>
+    <textarea name="nigeria-office" class="form-control editor" id="nigeria-office" placeholder="Full address in Nigeria"><?php echo $address; ?></textarea>
   </div>
-
   <div class="row mt-3">
     <div class="col-md-4 form-group">
       <label for="state">State</label>
-      <input type="text" name="state" class="form-control" id="state" placeholder="State" value="<?php echo $state; ?>">
+      <input type="text" name="state" class="form-control" id="state" placeholder="State" value="<?php echo htmlspecialchars($state); ?>">
     </div>
     <div class="col-md-4 form-group">
       <label for="lga">LGA</label>
-      <input type="text" name="lga" class="form-control" id="lga" placeholder="Local Government Area" value="<?php echo $lga; ?>">
+      <input type="text" name="lga" class="form-control" id="lga" placeholder="Local Government Area" value="<?php echo htmlspecialchars($lga); ?>">
     </div>
     <div class="col-md-4 form-group">
       <label for="country">Country</label>
-      <input type="text" name="country" class="form-control" id="country" placeholder="Country" value="<?php echo $country; ?>">
+      <input type="text" name="country" class="form-control" id="country_ng" value="Nigeria" readonly>
+    </div>
+  </div>
+</div>
+
+<div id="foreign-address-fields" style="display:none;">
+  <div class="form-group mt-3">
+    <label for="foreign-office">Foreign Office Address</label>
+    <textarea name="foreign-office" class="form-control editor" id="foreign-office" placeholder="Full address of foreign office (if any)"><?php echo $address; ?></textarea>
+  </div>
+  <div class="row mt-3">
+    <div class="col-md-6 form-group">
+      <label for="country_foreign">Country</label>
+      <select class="form-control" id="country_foreign" name="country_foreign">
+        <option value="">-Select Country-</option>
+        <?php
+        $countryRes = mysqli_query($con, "SELECT name,nicename FROM ln_country ORDER BY name ASC");
+        while ($countryRow = mysqli_fetch_assoc($countryRes)) {
+          $selected = ($country == $countryRow['nicename'] || $country == $countryRow['name']) ? 'selected' : '';
+          echo '<option value="'.htmlspecialchars($countryRow['nicename']).'" '.$selected.'>'.htmlspecialchars($countryRow['name']).'</option>';
+        }
+        ?>
+      </select>
+    </div>
+  </div>
+</div>
+
+<textarea name="foreign-office" class="form-control" placeholder="Full address of foreign office (if any)" hidden><?php echo $f_office_address; ?></textarea>
+<?php
+$selected_categories = explode(',', $category);
+$selected_subcategories = explode(',', $subcategory);
+
+?>
+<div class="mb-3">
+  <label>Areas of Specialization & Expertise</label>
+  <div class="custom-select-wrapper" id="category-wrapper">
+    <div class="custom-select-display" onclick="toggleDropdown('category')">
+      <div class="custom-select-tags" id="category-tags">
+        <?php
+          foreach ($selected_categories as $cat_id) {
+            $cat_id = trim($cat_id);
+            $cat_query = mysqli_query($con, "SELECT category_name FROM " . $siteprefix . "categories WHERE id = '$cat_id'");
+            if ($row = mysqli_fetch_assoc($cat_query)) {
+              echo '<span class="custom-tag" id="category-tag-' . $cat_id . '">' . htmlspecialchars($row['category_name']) . '</span>';
+            }
+          }
+        ?>
+      </div>
+    </div>
+    <div class="custom-select-dropdown" id="category-dropdown">
+      <input type="search" class="form-control" placeholder="Search categories..." onkeyup="filterOptions(this, 'category-options')">
+      <div id="category-options">
+        <?php
+          $sql = "SELECT * FROM " . $siteprefix . "categories WHERE parent_id IS NULL";
+          $res = mysqli_query($con, $sql);
+          while ($row = mysqli_fetch_assoc($res)) {
+            $checked = in_array($row['id'], $selected_categories) ? 'checked' : '';
+            echo '<div class="custom-option">
+                    <label>
+                      <input type="checkbox" name="category[]" value="' . $row['id'] . '" onchange="updateTags(this, \'category\')" ' . $checked . '>
+                      ' . htmlspecialchars($row['category_name']) . '
+                    </label>
+                  </div>';
+          }
+        ?>
+      </div>
     </div>
   </div>
 
-  <!-- Foreign Office -->
-  <div class="form-group mt-3">
-    <label for="foreign-office">Foreign Office Address</label>
-    <textarea name="foreign-office" class="form-control" id="foreign-office" placeholder="Full address of foreign office (if any)"><?php echo $f_office_address; ?></textarea>
+  <label>Subcategory</label>
+  <div class="custom-select-wrapper" id="subcategory-wrapper" style="margin-top: 20px; display: none;">
+    <div class="custom-select-display" onclick="toggleDropdown('subcategory')">
+      <div class="custom-select-tags" id="subcategory-tags">
+        <?php
+          foreach ($selected_subcategories as $sub_id) {
+            $sub_id = trim($sub_id);
+            $sub_query = mysqli_query($con, "SELECT category_name FROM " . $siteprefix . "categories WHERE id = '$sub_id'");
+            if ($row = mysqli_fetch_assoc($sub_query)) {
+              echo '<span class="custom-tag" id="subcategory-tag-' . $sub_id . '">' . htmlspecialchars($row['category_name']) . '</span>';
+            }
+          }
+        ?>
+      </div>
+    </div>
+    <div class="custom-select-dropdown" id="subcategory-dropdown">
+      <input class="form-control" type="search" placeholder="Search subcategories..." onkeyup="filterOptions(this, 'subcategory-options')">
+      <div id="subcategory-options">
+        <!-- JS will inject matching subcategories -->
+      </div>
+    </div>
   </div>
-
-  <div class="form-group mt-3">
-      <div class="row mt-3">
-    <div class="col-md-6 form-group">
-    <label for="specialization">Areas of Specialization & Expertise</label>
-                         <select class="form-control" name="category" aria-label="Default select example" required>
-    <option value="">- Select Category -</option>
-    <?php
-    $sql = "SELECT * FROM " . $siteprefix . "categories WHERE parent_id IS NULL ";
-    $sql2 = mysqli_query($con, $sql);
-    while ($row = mysqli_fetch_array($sql2)) {
-        $selected = ($category == $row['id']) ? 'selected' : '';
-        echo '<option value="' . $row['id'] . '" ' . $selected . '>' . htmlspecialchars($row['category_name']) . '</option>';
-    }
-    ?>
-</select> 
-  
-    </div>  
-     <div class="col-md-6 form-group">
-         <label for="subcategory">Subcategory</label>
-
- <select class="form-control" name="subcategory" id="subcategory-select" required>
-                            <option selected>- Select Subcategory -</option>
-                          
-                        </select>
-
-     </div>   
-  </div>     
 </div>
+
 		</div> <input type="hidden" name="user_id" value="<?php echo $user_id; ?>">
     <div class="row mt-3">
        <div class="col-md-6 form-group p_star mb-3">
@@ -272,19 +336,19 @@ checkActiveLog($active_log);
   <div class="row mt-3">
     <div class="col-md-3 form-group">
       <label for="facebook">Facebook</label>
-      <input type="text" name="facebook" class="form-control" id="facebook" placeholder="Facebook profile" value="<?php echo $facebook; ?>">
+      <input type="url" name="facebook" class="form-control" id="facebook" placeholder="Facebook profile" value="<?php echo $facebook; ?>">
     </div>
     <div class="col-md-3 form-group">
       <label for="twitter">Twitter</label>
-      <input type="text" name="twitter" class="form-control" id="twitter" placeholder="Twitter profile" value="<?php echo $twitter; ?>">
+      <input type="url" name="twitter" class="form-control" id="twitter" placeholder="Twitter profile" value="<?php echo $twitter; ?>">
     </div>
     <div class="col-md-3 form-group">
       <label for="instagram">Instagram</label>
-      <input type="text" name="instagram" class="form-control" id="instagram" placeholder="Instagram profile" value="<?php echo $instagram; ?>">
+      <input type="url" name="instagram" class="form-control" id="instagram" placeholder="Instagram profile" value="<?php echo $instagram; ?>">
     </div>
     <div class="col-md-3 form-group">
       <label for="linkedin">LinkedIn</label>
-      <input type="text" name="linkedin" class="form-control" id="linkedin" placeholder="LinkedIn profile" value="<?php echo $linkedin; ?>">
+      <input type="url" name="linkedin" class="form-control" id="linkedin" placeholder="LinkedIn profile" value="<?php echo $linkedin; ?>">
     </div>
   </div>
   <?php 
@@ -307,38 +371,158 @@ checkActiveLog($active_log);
         </div>
       </div>
     </section>
+
+
+    <script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const checkbox = document.getElementById("register_as_trainer");
+    const nameInput = document.getElementById("company-name");
+    const profileInput = document.getElementById("company-profile");
+    const logoInput = document.getElementById("company-logo");
+
+    function toggleRequiredFields() {
+      const isChecked = checkbox.checked;
+      nameInput.required = isChecked;
+      profileInput.required = isChecked;
+      logoInput.required = isChecked;
+    }
+
+    // Initial check on page load
+    toggleRequiredFields();
+
+    // Listen for change
+    checkbox.addEventListener("change", toggleRequiredFields);
+  });
+</script>
+
+ 
+
 <script>
-var currentSubcategory = "<?php echo isset($subcategory) ? $subcategory : ''; ?>";
-
-document.querySelector('select[name="category"]').addEventListener('change', function() {
-  let parentId = this.value;
-  let subSelect = document.getElementById('subcategory-container');
-  let subcategorySelect = document.getElementById('subcategory-select');
-
-  fetch('get_subcategories.php?parent_id=' + parentId)
-    .then(response => response.json())
-    .then(data => {
-      subcategorySelect.innerHTML = '<option selected>- Select Subcategory -</option>';
-      let found = false;
-      data.forEach(cat => {
-        let selected = (cat.s == currentSubcategory) ? 'selected' : '';
-        if (selected) found = true;
-        subcategorySelect.innerHTML += `<option value="${cat.s}" ${selected}>${cat.title}</option>`;
-      });
-      subSelect.style.display = data.length > 0 ? 'block' : 'none';
-      // If editing and the category matches, set the subcategory
-      if (found) subcategorySelect.value = currentSubcategory;
-    })
-    .catch(error => {
-      console.error('Error fetching subcategories:', error);
-    });
+document.addEventListener('DOMContentLoaded', function() {
+  // Trigger fetch after DOM loads
+  fetchSubcategories();
 });
 
-// On page load, if editing, trigger the change event to load subcategories
-window.addEventListener('DOMContentLoaded', function() {
-  if (currentSubcategory) {
-    document.querySelector('select[name="category"]').dispatchEvent(new Event('change'));
+function toggleDropdown(type) {
+  document.getElementById(`${type}-dropdown`).classList.toggle('show');
+}
+
+function filterOptions(input, containerId) {
+  const filter = input.value.toLowerCase();
+  const options = document.getElementById(containerId).getElementsByClassName('custom-option');
+  for (let i = 0; i < options.length; i++) {
+    const text = options[i].innerText.toLowerCase();
+    options[i].style.display = text.includes(filter) ? '' : 'none';
   }
+}
+
+function updateTags(checkbox, type) {
+  const tagContainer = document.getElementById(`${type}-tags`);
+  const tagId = `${type}-tag-${checkbox.value}`;
+  const existingTag = document.getElementById(tagId);
+
+  if (checkbox.checked && !existingTag) {
+    const tag = document.createElement('span');
+    tag.id = tagId;
+    tag.className = 'custom-tag';
+    tag.textContent = checkbox.parentElement.innerText.trim();
+    tagContainer.appendChild(tag);
+  } else if (!checkbox.checked && existingTag) {
+    existingTag.remove();
+  }
+
+  if (type === 'category') fetchSubcategories();
+}
+
+function fetchSubcategories() {
+  const selectedCategories = Array.from(document.querySelectorAll('input[name="category[]"]:checked')).map(cb => cb.value);
+  const subWrapper = document.getElementById('subcategory-wrapper');
+  const subOptions = document.getElementById('subcategory-options');
+
+  subOptions.innerHTML = '';
+
+  if (selectedCategories.length === 0) {
+    subWrapper.style.display = 'none';
+    return;
+  }
+
+  fetch(`get_subcategories.php?parent_ids=${selectedCategories.join(',')}`)
+    .then(res => res.json())
+    .then(data => {
+      if (data.length > 0) {
+        subWrapper.style.display = 'block';
+        const selectedSub = <?= json_encode($selected_subcategories) ?>;
+
+        data.forEach(sub => {
+          const isChecked = selectedSub.includes(sub.s);
+          const div = document.createElement('div');
+          div.className = 'custom-option';
+          div.innerHTML = `
+            <label>
+              <input type="checkbox" name="subcategory[]" value="${sub.s}" onchange="updateTags(this, 'subcategory')" ${isChecked ? 'checked' : ''}>
+              ${sub.title}
+            </label>
+          `;
+          subOptions.appendChild(div);
+        });
+      } else {
+        subWrapper.style.display = 'none';
+      }
+    });
+}
+</script>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  function setRequired(selectorList, required) {
+    selectorList.forEach(function(sel) {
+      document.querySelectorAll(sel).forEach(function(el) {
+        if (required) {
+          el.setAttribute('required', 'required');
+        } else {
+          el.removeAttribute('required');
+        }
+      });
+    });
+  }
+
+  function toggleAddressFields() {
+    const isNigerian = document.querySelector('input[name="is_nigerian"]:checked');
+    const ngFields = document.getElementById('nigeria-address-fields');
+    const foreignFields = document.getElementById('foreign-address-fields');
+
+    if (isNigerian && isNigerian.value === 'yes') {
+      ngFields.style.display = '';
+      foreignFields.style.display = 'none';
+      setRequired([
+        '#nigeria-office', '#state', '#lga'
+      ], true);
+      setRequired([
+        '#foreign-office', '#country_foreign'
+      ], false);
+    } else if (isNigerian && isNigerian.value === 'no') {
+      ngFields.style.display = 'none';
+      foreignFields.style.display = '';
+      setRequired([
+        '#nigeria-office', '#state', '#lga'
+      ], false);
+      setRequired([
+        '#foreign-office', '#country_foreign'
+      ], true);
+    } else {
+      ngFields.style.display = 'none';
+      foreignFields.style.display = 'none';
+      setRequired([
+        '#nigeria-office', '#state', '#lga', '#foreign-office', '#country_foreign'
+      ], false);
+    }
+  }
+
+  document.querySelectorAll('input[name="is_nigerian"]').forEach(function(radio) {
+    radio.addEventListener('change', toggleAddressFields);
+  });
+  toggleAddressFields();
 });
 </script>
 

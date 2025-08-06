@@ -51,7 +51,7 @@ if ($row) {
                         </div>
                         <div class="mb-3">
                             <label class="form-label" for="plan-description">Description</label>
-                            <textarea id="plan-description" name="description" class="form-control"><?php echo $description; ?></textarea>
+                            <textarea id="plan-description" name="description" class="form-control editor"><?php echo $description; ?></textarea>
                         </div>
                         <div class="mb-3">
                             <label class="form-label" for="plan-price">Price</label>

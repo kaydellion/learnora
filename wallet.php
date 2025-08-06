@@ -114,7 +114,9 @@
     <div class="card-bottom pt-3 px-4 mb-3">
       <div class="d-flex flex-row justify-content-between text-align-center">
         <div class="d-flex flex-column text-white"><span>Balance amount</span><p> &#8358;<span class="text-white"><?php echo $wallet; ?></span></p></div>
-        <button class="btn btn-secondary" data-toggle="modal" data-target="#withDraw">Withdraw <i class="fa fa-download text-white"></i></button>
+          <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#withDraw">
+    Withdraw <i class="fa fa-download text-white"></i>
+</button>
       </div>
       <div class="pt-1 pb-3">
       <a href="withdrawhistory.php" class="btn btn-secondary" >View Withdrawal History</a>
@@ -187,33 +189,41 @@ echo' <tr>
 </main><!-- End #main -->
 
 <!-- Modal -->
-<div class="modal fade" id="withDraw" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered" role="document">
+<div class="modal fade" id="withDraw" tabindex="-1" aria-labelledby="withdrawModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLongTitle">Withraw from wallet</h5>
-      </div>
-      <div class="modal-body">
-        <p><b>Amount Available for withdrawal:  <span class="text-primary">&#8358;<?php echo $wallet; ?></span></b></p>
-        <form method="post" action="" onsubmit="return confirm('Proceed with withdrawal?');"  >
-        <?php  $disable=""; if($bank_name=="" || $bank_accname=="" || $bank_number==""){ $disable="disabled"; ?>
-        <p class="text-danger"><a href="payment.php" class="btn btn-danger">Update Payment Details</a><br>
-        <i>This is a required detail to be eligible to withdraw</i></p>
-        <?php } else{ ?>
-       <p>Your Bank Details</p>
-       <p><input type="text" name="bank" class="form-control" value="<?php echo $bank_name; ?>"  placeholder="Enter bank name" required/><br>
-       <input type="text" name="bankname" class="form-control" value="<?php echo $bank_accname; ?>" placeholder="Enter bank account name"  required/><br>
-       <input type="number" name="bankno" class="form-control" value="<?php echo $bank_number; ?>" placeholder="Enter bank account number"  required/></p>
-       <?php } ?>
-       <p class="pt-3"><input type="number" name="amount" class="form-control"  max="<?php echo $wallet; ?>" min="500" placeholder="Enter Amount to withdraw" required/>
-       <span class="text-small text-primary">Minimum withdrawal is &#8358;500</span></p>
-       
-      </div>
-      <div class="modal-footer">
-        <button type="submit" value="withdraw" name="withdraw" class="btn btn-primary" <?php echo $disable; ?>>Withdraw</button></form>
-      </div>
+      <form method="post" action="" onsubmit="return confirm('Proceed with withdrawal?');">
+        <div class="modal-header">
+          <h5 class="modal-title" id="withdrawModalLabel">Withdraw from Wallet</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p><b>Amount Available for withdrawal: <span class="text-primary">&#8358;<?php echo $wallet; ?></span></b></p>
+          <?php  $disable=""; if($bank_name=="" || $bank_accname=="" || $bank_number==""){ $disable="disabled"; ?>
+            <p class="text-danger">
+              <a href="settings" class="btn btn-danger">Update Payment Details</a><br>
+              <i>This is a required detail to be eligible to withdraw</i>
+            </p>
+          <?php } else { ?>
+            <p>Your Bank Details</p>
+            <p>
+              <input type="text" name="bank" class="form-control mb-2" value="<?php echo $bank_name; ?>" placeholder="Enter bank name" required />
+              <input type="text" name="bankname" class="form-control mb-2" value="<?php echo $bank_accname; ?>" placeholder="Enter bank account name" required />
+              <input type="number" name="bankno" class="form-control mb-2" value="<?php echo $bank_number; ?>" placeholder="Enter bank account number" required />
+            </p>
+          <?php } ?>
+          <p class="pt-3">
+            <input type="number" name="amount" class="form-control" max="<?php echo $wallet; ?>" min="500" placeholder="Enter Amount to withdraw" required />
+            <span class="text-small text-primary">Minimum withdrawal is &#8358;500</span>
+          </p>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" value="withdraw" name="withdraw" class="btn btn-primary" <?php echo $disable; ?>>Withdraw</button>
+        </div>
+      </form>
     </div>
   </div>
 </div>
+
 
 <?php include 'footer.php'; ?>

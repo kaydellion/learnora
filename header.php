@@ -37,6 +37,7 @@ if (mysqli_affected_rows($con) == 0) {
     $phone_number         = $row['phone_number'];
     $skills_hobbies       = $row['skills_hobbies'];
     $language             = $row['language'];
+    $address              = $row['address'];
     $bank_name = $row['bank_name'];
     $bank_accname = $row['bank_accname'];
     $bank_number = $row['bank_number'];
@@ -119,7 +120,8 @@ if (in_array($current_page, $excluded_pages)) {
   <link href="<?php echo $siteurl; ?>assets/vendor/aos/aos.css" rel="stylesheet">
   <link href="<?php echo $siteurl; ?>assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
   <link href="<?php echo $siteurl; ?>assets/vendor/drift-zoom/drift-basic.css" rel="stylesheet">
-
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://sandbox.vpay.africa/dropin/v1/initialise.js"></script>
   <!-- Main CSS File -->
   <link href="<?php echo $siteurl; ?>assets/css/main.css" rel="stylesheet">
 

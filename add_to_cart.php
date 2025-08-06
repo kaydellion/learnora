@@ -16,7 +16,10 @@ $training_id = $_POST['trainingId'];
 $user_id = $_POST['userId'];
 $order_id = $_POST['orderId'];
 $affliate = $_POST['affliateId'];
+$variation_ids_raw = isset($_POST['variation_ids']) ? trim($_POST['variation_ids']) : '';
 
+$variation_ids = $variation_ids_raw ? explode(',', $variation_ids_raw) : [];
+ $file_id = 'free';
 // Debugging: Log POST data
 $debug['post_data'] = $_POST;
 
@@ -47,10 +50,9 @@ $debug['loyalty_check'] = [
 ];
 
 // Get price from reports table
-$sql = "SELECT t.*, t.pricing, tt.price
-        FROM {$siteprefix}training t
-        LEFT JOIN {$siteprefix}training_tickets tt ON t.training_id = tt.training_id
-        WHERE t.training_id = '$training_id'";
+$sql = "SELECT *
+        FROM {$siteprefix}training
+        WHERE training_id = '$training_id'";
 
 $result = $con->query($sql);
 if (!$result || $result->num_rows == 0) {
@@ -62,30 +64,65 @@ $row = $result->fetch_assoc();
 $pricing = $row['pricing'];
 if ($pricing === "free") {
     $price = 0;
-} else {
-    $price = floatval($row['price']);
-}
-$original_price = $price;
+} 
 
 // Debugging: Log price query and result
 $debug['queries'][] = $sql;
 $debug['results']['pricing'] = $pricing;
-$debug['results']['price'] = $price;
+
 $report_loyalty = $row['loyalty'];
 
 
 
-// Check if price is valid (for paid only)
-if ($pricing !== "free" && ($price === "" || !is_numeric($row['price']))) {
-    $debug['errors'][] = "Invalid price value: " . $price;
-    echo json_encode(['success' => false, 'message' => 'Invalid price value', 'debug' => $debug]);
+
+
+$sql_count = "SELECT COUNT(*) as count FROM {$siteprefix}order_items WHERE  training_id = '$training_id' AND order_id = '$order_id' AND item_id = '$file_id'";
+$result_count = mysqli_query($con, $sql_count);
+$row_count = mysqli_fetch_assoc($result_count);
+if ($pricing === 'free') {
+    // Use default file_id for free items
+    $file_id = 'free';
+    
+    // Check if item already exists in cart
+    $sql_count = "SELECT COUNT(*) as count FROM {$siteprefix}order_items WHERE training_id = '$training_id' AND order_id = '$order_id' AND item_id = '$file_id'";
+    $result_count = mysqli_query($con, $sql_count);
+    $row_count = mysqli_fetch_assoc($result_count);
+
+    if ($row_count['count'] > 0) {
+        echo json_encode(['success' => true, 'message' => 'Already added to cart', 'cartCount' => $cart_count, 'debug' => $debug]);
+        exit();
+    }
+
+    // Insert free item
+    $sql = "INSERT INTO {$siteprefix}order_items (item_id, training_id, price, original_price, loyalty_id, affiliate_id, order_id, date) 
+            VALUES ('$file_id', '$training_id', 0, 0, 0, '$affliate', '$order_id', CURRENT_TIMESTAMP)";
+    $con->query($sql);
+    $debug['queries'][] = $sql;
+
+    // Update cart count
+    $cart_count++;
+
+    // No need to update order total (price is zero)
+    echo json_encode(['success' => true, 'message' => 'Free training added to cart', 'order_id' => $order_id, 'cartCount' => $cart_count, 'debug' => $debug]);
     exit();
 }
 
-$sql_count = "SELECT COUNT(*) as count FROM {$siteprefix}order_items WHERE  training_id = '$training_id' AND order_id = '$order_id'";
-$result_count = mysqli_query($con, $sql_count);
-$row_count = mysqli_fetch_assoc($result_count);
+else{
+foreach ($variation_ids as $file_id_raw) {
+    $file_id = mysqli_real_escape_string($con, trim($file_id_raw));
+    if ($file_id === '') continue;
 
+    $sql = "SELECT price FROM ln_training_tickets WHERE s = '$file_id' LIMIT 1";
+    $res = mysqli_query($con, $sql);
+    $debug['queries'][] = $sql;
+
+    if (!$res || mysqli_num_rows($res) === 0) {
+        $debug['errors'][] = "Variation not found: $file_id";
+        continue;
+    }
+
+    $row = mysqli_fetch_assoc($res);
+    $original_price = $price = floatval($row['price']);
 // Apply loyalty discount if applicable
 if ($loyalty > 0 && $report_loyalty > 0) {
 //select loyalty discount
@@ -180,7 +217,7 @@ $debug['results']['final_price'] = $price;
 
 // Check if item already exists in order
 if ($row_count['count'] > 0) {
-    $sql = "UPDATE {$siteprefix}order_items SET price = $price, original_price = $original_price, loyalty_id = '$loyalty' WHERE training_id = '$training_id' AND order_id = '$order_id'";
+    $sql = "UPDATE {$siteprefix}order_items SET price = $price, original_price = $original_price, loyalty_id = '$loyalty' WHERE training_id = '$training_id' AND order_id = '$order_id' AND item_id = '$file_id'";
     mysqli_query($con, $sql);
     
     // Debugging: Log item update query
@@ -191,8 +228,8 @@ if ($row_count['count'] > 0) {
 }
 
 // Insert order item
-$sql = "INSERT INTO {$siteprefix}order_items (training_id, price, original_price, loyalty_id, affiliate_id, order_id, date) 
-        VALUES ('$training_id', $price, $original_price, $loyalty, '$affliate', '$order_id', CURRENT_TIMESTAMP)";
+$sql = "INSERT INTO {$siteprefix}order_items (item_id,training_id, price, original_price, loyalty_id, affiliate_id, order_id, date) 
+        VALUES ($file_id, '$training_id',  $price, $original_price, $loyalty, '$affliate', '$order_id', CURRENT_TIMESTAMP)";
 $con->query($sql);
 
 // Debugging: Log insert order item query
@@ -202,6 +239,8 @@ $debug['queries'][] = $sql;
 $sql = "UPDATE {$siteprefix}orders SET total_amount = total_amount + $price WHERE order_id = '$order_id'";
 $con->query($sql);
 
+}
+}
 // Debugging: Log update order total query
 $debug['queries'][] = $sql;
 

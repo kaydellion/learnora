@@ -99,8 +99,8 @@ $user_review = $existing_review_result->fetch_assoc();
                     <div class="col-6">
                         <h6>Created by: </h6>
                       <div class="user_info mb-1 d-flex">
-                    <img src="<?php echo $siteurl . $imagePath . $siteimg; ?>" alt="<?php echo $sitename; ?>" class="user-image rounded-circle me-2" width="32" height="32">
-                    <span class="mt-3"><?php echo $sitename; ?></span>
+                   <a href="<?php echo $siteurl . 'trainer-store?seller_id=' . $seller_id; ?>"><img src="<?php echo $siteurl . $seller_photo; ?>" alt="<?php echo $seller_name; ?>" class="user-image rounded-circle me-2" width="32" height="32">
+                    <span class="mt-3"><?php echo $seller_name; ?></span></a>
                 </div>
              </div>
                 <div class="col-6">
@@ -478,7 +478,7 @@ $all_reviews = $all_reviews_result->fetch_all(MYSQLI_ASSOC);
                   <span class="current-price">
             <?php
                 if ($pricing === 'paid') {
-                echo $sitecurrency . $price;
+                  echo '<span id="paidPrice"></span>'; // Empty placeholder for JS
                 } elseif ($pricing === 'free') {
                 echo 'Free';
                 } elseif ($pricing === 'donation') {
@@ -487,51 +487,132 @@ $all_reviews = $all_reviews_result->fetch_all(MYSQLI_ASSOC);
             ?>
             </span>
               </div>
-             <div class="mb-1">
-                 <?php if ($loyalty == 1): ?>
-				 
-        <span class="badge text-light bg-danger mb-1">Loyalty Material</span>
-
-        <?php endif; ?>
-        <?php if ($loyalty_id < 1 && $price > 0 ): ?>
-        <h6>Buy for Less – <a href="<?php echo $siteurl;?>loyalty-program.php">Sign up</a> as a loyalty member today!</h6>
-       <div class="product-loyalty-container mb-4">
-            
-             <?php
-// Fetch all loyalty plans
-$loyalty_query = "SELECT name, discount FROM {$siteprefix}subscription_plans WHERE status = 'active'";
-$loyalty_result = mysqli_query($con, $loyalty_query);
-
-if ($loyalty_result && mysqli_num_rows($loyalty_result) > 0) {
-    $loyalty_badges = [];
-    while ($row = mysqli_fetch_assoc($loyalty_result)) {
-        $plan_name = $row['name'];
-        $discount = $row['discount']; // Discount percentage
-        $discounted_price = $price - ($price * ($discount / 100)); // Calculate discounted price
-        // Add a data-discount attribute for JS
-        ?>
-        <span class="badge text-light bg-primary me-1 loyalty-badge"
-              data-discount="<?php echo $discount; ?>"
-              data-plan="<?php echo htmlspecialchars($plan_name); ?>">
-            <a href="<?php echo $siteurl;?>loyalty-program.php" class="text-white text-decoration-none">
-                <span class="loyalty-plan-name"><?php echo $plan_name; ?></span> - ₦
-                <span class="loyalty-price"><?php echo formatNumber($discounted_price, 2); ?></span>
-            </a>
-        </span>
-        <?php
-    }
-} ?>
-          </div>
-
+           
+  <div class="mb-1">
+    <!-- Loyalty Display -->
+    <?php if ($loyalty == 1): ?>
+      <span class="badge text-light bg-danger mb-1">Loyalty Material</span>
     <?php endif; ?>
+<?php foreach ($ticket_list as $ticket): ?>
+    <?php 
+      $ticket_price = floatval($ticket['price']); // Get ticket price safely
+    ?>
+<?php endforeach; ?>
+    <?php if ($loyalty_id < 1): ?>
+  <h6>Buy for Less – <a href="<?php echo $siteurl; ?>loyalty-program.php">Sign up</a> as a loyalty member today!</h6>
+  <div class="product-loyalty-container mb-3" style="display:none;">
+    <?php
+      $loyalty_query = "SELECT name, discount FROM {$siteprefix}subscription_plans WHERE status = 'active'";
+      $loyalty_result = mysqli_query($con, $loyalty_query);
+
+      if ($loyalty_result && mysqli_num_rows($loyalty_result) > 0) {
+        while ($row = mysqli_fetch_assoc($loyalty_result)) {
+            $plan_name = $row['name'];
+            $discount = $row['discount'];
+            ?>
+            <span class="badge text-light bg-primary me-1 loyalty-badge"
+                  data-discount="<?php echo $discount; ?>"
+                  data-plan="<?php echo htmlspecialchars($plan_name); ?>">
+              <a href="<?php echo $siteurl; ?>loyalty-program.php" class="text-white text-decoration-none">
+                <span class="loyalty-plan-name"><?php echo $plan_name; ?></span> - ₦
+                <span class="loyalty-price">0.00</span>
+              </a>
+            </span>
+    <?php } } ?>
+  </div>
+<?php endif; ?>
+
+          <!-- Action Buttons -->
+              <?php if ($pricing === 'paid'): ?>
+  <div class="mb-3">
+    <label><strong>Select Tickets:</strong></label><br>
+    <div class="btn-group mb-1 flex-wrap" role="group" aria-label="Variation checkbox group">
+      <?php 
+        $sql = "SELECT * FROM {$siteprefix}training_tickets WHERE training_id = '$training_id' ORDER BY price ASC";
+        $sql2 = mysqli_query($con, $sql);
+        if (!$sql2) { die("Query failed: " . mysqli_error($con)); }
+
+        while ($row = mysqli_fetch_array($sql2)) {
+            $ticket_id = $row['s'];
+            $ticket_name = $row['ticket_name'];
+            $amount = floatval($row['price']);
+            $seatremain = intval($row['seatremain']);
+            $benefits = htmlspecialchars($row['benefits']); // safe for output
+
+            $isSoldOut = $seatremain <= 0;
+      ?>
+        <div class="m-1 position-relative">
+          <input 
+              type="checkbox"
+              class="btn-check variation-checkbox"
+              value="<?php echo $ticket_id; ?>"
+              name="variation_ids[]"
+              id="ticket<?php echo $ticket_id; ?>"
+              data-price="<?php echo $amount; ?>"
+              <?php if ($isSoldOut) echo 'disabled'; ?>
+              autocomplete="off">
+
+          <!-- Label with tooltip -->
+          <label 
+              class="btn btn-outline-<?php echo $isSoldOut ? 'secondary' : 'primary'; ?>" 
+              for="ticket<?php echo $ticket_id; ?>"
+              <?php if ($isSoldOut): ?>
+                title="Ticket Sold Out. Please select another."
+              <?php endif; ?>
+          >
+            <?php echo htmlspecialchars($ticket_name); ?> 
+            (₦<?php echo number_format($amount, 2); ?>)
+            <?php if ($isSoldOut): ?>
+              <span class="text-danger fw-bold"> - Sold Out</span>
+            <?php endif; ?>
+          </label>
+
+          <!-- Hidden inputs for JS -->
+          <input type="hidden" id="seat-<?php echo $ticket_id; ?>" value="<?php echo $seatremain; ?>">
+          <input type="hidden" id="benefits-<?php echo $ticket_id; ?>" value="<?php echo $benefits; ?>">
+
+          <!-- JS output area -->
+          <div class="ticket-info mt-1 small text-muted" id="info-<?php echo $ticket_id; ?>" style="display:none;"></div>
+        </div>
+      <?php } ?>
+    </div>
+  </div>
+
+  <!-- JavaScript -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const checkboxes = document.querySelectorAll('.variation-checkbox');
+
+      checkboxes.forEach(function (checkbox) {
+        checkbox.addEventListener('change', function () {
+          const ticketId = this.value;
+          const infoDiv = document.getElementById('info-' + ticketId);
+          const seatRemain = document.getElementById('seat-' + ticketId).value;
+          const benefits = document.getElementById('benefits-' + ticketId).value;
+
+          if (this.checked) {
+            let html = `
+              <strong>Remaining Seat:</strong> ${seatRemain}<br>
+              <strong>Benefits:</strong> ${benefits}
+            `;
+            infoDiv.innerHTML = html;
+            infoDiv.style.display = 'block';
+          } else {
+            infoDiv.style.display = 'none';
+          }
+        });
+      });
+    });
+  </script>
+<?php endif; ?>
 </div>
             
 
-              <!-- Action Buttons -->
+    
 
 <div class="product-actions">
     <?php if ($event_passed): ?>
-        <span class="badge bg-danger">Event Passed</span>
+        <a class="btn btn-danger">Event Passed</a>
     <?php elseif ($user_purchased): ?>
         <a href="<?php echo $siteurl; ?>dashboard.php" class="btn btn-success">
             <i class="bi bi-person"></i> Go to Dashboard
@@ -543,6 +624,7 @@ if ($loyalty_result && mysqli_num_rows($loyalty_result) > 0) {
                     <i class="bi bi-cart-check"></i> View Cart
                 </a>
             <?php else: ?>
+              <input type="hidden" name="pricing" id="pricing" value="<?php echo $pricing; ?>">
                 <input type="hidden" name="affliate_id" id="affliate_id" value="<?php echo $affliate_id; ?>">
                 <input type="hidden" name="training_id" id="current_training_id" value="<?php echo $training_id; ?>">
                 <button class="btn btn-primary add-to-cart-btn" data-report="<?php echo $training_id; ?>" name="add" id="addCart">
@@ -564,16 +646,27 @@ if ($loyalty_result && mysqli_num_rows($loyalty_result) > 0) {
             <i class="bi bi-heart"></i>
         </button>
     <?php endif; ?>
-    
+
+        <!-- Report Product Button -->
+               <?php if ($active_log == 1): ?>
+       <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#reportProductModal">
+  <i class="bi bi-flag"></i> Report
+</button>
+
+    <?php else: ?>
+        <button class="btn btn-secondary" disabled>
+            <i class="bi bi-flag"></i> Report
+        </button>
+     <?php endif; ?>
 </div>
 
 <div class="inhouse-proposal my-3 p-3 border rounded bg-light">
-    <h6 class="mb-2"><i class="bi bi-building"></i> REQUEST AN IN-HOUSE PROPOSAL</h6>
+    <h6 class="mb-2"><i class="bi bi-building"></i>Request an In-House Training Proposal</h6>
     <p class="mb-1">
-        Want this Seminar for your Organization? Please let us know if you wish to conduct this seminar on an in-house basis.
+      Interested in hosting this training & event at your organization? Let us know if you’d like to arrange a customized in-house session for your team.
     </p>
     <a href="<?php echo $siteurl; ?>inhouse-proposal.php?training_id=<?php echo $training_id; ?>" class="btn btn-outline-primary btn-sm">
-        Request In-House Proposal
+        Request Now
     </a>
 </div>
 
@@ -589,6 +682,8 @@ if ($loyalty_result && mysqli_num_rows($loyalty_result) > 0) {
       </div>
 	    </div>
       </div>
+
+           
 	  
 	  <div class="col-12 mb-3" data-aos="fade-left" data-aos-delay="300">
        <!-- Language and Event Dates/Times Table (Borderless) -->
@@ -645,13 +740,14 @@ if ($loyalty_result && mysqli_num_rows($loyalty_result) > 0) {
     <div class="collapsible-section mb-4">
       <h6>Visa Requirement</h6>
       <?php
-      $visa_text = "<strong>Nigerian Trainings:</strong> If you do not live in Nigeria and wish to attend one of our conferences, you may need to secure a visitor visa. Advance travel planning and early visa application are important, since applications are subject to a greater degree of scrutiny than in the past.
+$visa_text = '
 
-You can download a letter of invitation if needed. <strong>Please Note:</strong> we do not provide personalized letters of invitation. Attendees who are citizens of Visa Waiver Program participating countries generally do not need a letter of invitation.
+<strong>For Trainings in Nigeria:</strong><br>
+If you reside outside Nigeria and plan to attend one of our trainings, a visitor visa may be required. We recommend applying early, as visa processing can take time. Citizens of Visa Waiver Program countries may not need an invitation letter. For full details and application guidance, visit: <a href="https://portal.immigration.gov.ng/pages/welcome" target="_blank">https://portal.immigration.gov.ng/pages/welcome</a>.<br><br>
 
-Visit <a href=\"https://portal.immigration.gov.ng/pages/welcome\" target=\"_blank\">https://portal.immigration.gov.ng/pages/welcome</a> for complete information on how to apply for a visitor visa.
+<strong>For Trainings Outside Nigeria:</strong><br>
+Participants attending training sessions abroad will need to obtain a visa independently. Learnora (Kyneli Business Support Services) does not process visas on behalf of trainees. Please contact the appropriate embassy for visa requirements specific to your destination country.';
 
-<strong>Foreign Trainings:</strong> If you want to attend the training outside Nigeria, you would need a visa. 365 Market Research Reports does not secure visa on behalf of trainees. Please visit the embassy of the country where the training will take place for your visa.";
       $visa_words = explode(' ', strip_tags($visa_text));
       $visa_short = implode(' ', array_slice($visa_words, 0, 30));
       $visa_long = $visa_text;
@@ -672,12 +768,9 @@ Visit <a href=\"https://portal.immigration.gov.ng/pages/welcome\" target=\"_blan
     <div class="collapsible-section">
       <h6>Cancellation Policy</h6>
       <?php
-      $cancel_text = "All cancellations must be received in writing. Cancellations made after three (3) days to the event date will result in full registration fee.
+$cancel_text = "All cancellations must be submitted in writing to <a href=\"mailto:hello@learnora.ng\">hello@learnora.ng</a> at least three (3) days before the event. A twenty percent (20%) administrative fee applies to all cancellations. Substitutions are permitted at any time at no extra cost. For inquiries, you may also call <a href=\"tel:+2348033782777\">+234 (0) 803 3782 777</a> or <a href=\"tel:+23412952413\">+234 (01) 29 52 413</a>.";
 
-Cancellations would attract twenty percent (20%) of the ticket price as penalty. Persons who sign up for the training but do not attend will be charged the full registration price.
-
-Substitutions or name changes can be made at any time. Cancellation requests can be sent by email to <a href=\"mailto:hello@learnora.ng\">hello@learnora.ng</a> or by call to <a href=\"tel:+2348033782777\">+234 (0) 803 3782 777</a> or <a href=\"tel:+23412952413\">+234 (01) 29 52 413</a>.";
-      $cancel_words = explode(' ', strip_tags($cancel_text));
+$cancel_words = explode(' ', strip_tags($cancel_text));
       $cancel_short = implode(' ', array_slice($cancel_words, 0, 30));
       $cancel_long = $cancel_text;
       $cancel_is_long = count($cancel_words) > 30;
@@ -699,10 +792,290 @@ Substitutions or name changes can be made at any time. Cancellation requests can
 </div>
 	    </div>
       </div>
-
      
 
     </section><!-- /Product Details Section -->
+
+
+        <!-- Best Sellers Section -->
+    <section id="best-sellers" class="best-sellers section">
+
+      <!-- Section Title -->
+      <div class="container section-title" data-aos="fade-up">
+        <h2>Related Events</h2>
+        <p>Explore events that complement your learning journey. Connect with industry experts and fellow learners.</p>
+      </div><!-- End Section Title -->
+
+      <div class="container" data-aos="fade-up" data-aos-delay="100">
+
+        <div class="row g-4">
+          <!-- Product 1 -->
+          <?php
+$categoryIDs = explode(',', $category);
+$subcategoryIDs = explode(',', $subcategory);
+
+$escapedCategoryIDs = array_map('intval', $categoryIDs);
+$escapedSubcategoryIDs = array_map('intval', $subcategoryIDs);
+
+$categoryIDList = implode(',', $escapedCategoryIDs);
+$subcategoryIDList = implode(',', $escapedSubcategoryIDs);
+
+
+$query = "SELECT t.*, u.name as display_name, tt.price, u.photo as profile_picture, 
+          l.category_name AS category, sc.category_name AS subcategory, ti.picture 
+    FROM {$siteprefix}training t
+    LEFT JOIN {$siteprefix}categories l ON FIND_IN_SET(l.id, t.category)
+    LEFT JOIN {$siteprefix}categories sc ON FIND_IN_SET(sc.id, t.subcategory)
+    LEFT JOIN {$siteprefix}instructors u ON t.instructors = u.s
+    LEFT JOIN {$siteprefix}training_tickets tt ON t.training_id = tt.training_id
+    LEFT JOIN {$siteprefix}training_images ti ON t.training_id = ti.training_id
+    WHERE (FIND_IN_SET(l.id, '$categoryIDList') 
+        OR FIND_IN_SET(sc.id, '$subcategoryIDList'))
+      AND t.training_id != '$training_id'
+      AND t.status = 'approved'
+    GROUP BY t.training_id
+    LIMIT 4";
+$result = mysqli_query($con, $query);
+if ($result && mysqli_num_rows($result) > 0) {
+    while ($row = mysqli_fetch_assoc($result)) {
+        $training_id = $row['training_id'];
+        $title = $row['title'];
+        $alt_title = $row['alt_title'];
+        $description = $row['description'];
+        $category = $row['category'];
+        $subcategory = $row['subcategory'];
+        $pricing = $row['pricing'];
+        $price = $row['price'];
+        $tags = $row['tags'];
+        $user = $row['display_name'];
+        $user_picture = $imagePath.$row['profile_picture'];
+        $created_date = $row['created_at'];
+        $status = $row['status'];
+        $image_path = $imagePath.$row['picture'];
+        $slug = $alt_title;
+        $event_type = $row['event_type'] ?? '';
+    
+
+           // Fetch price variations for this report
+    $priceSql = "SELECT price FROM {$siteprefix}training_tickets WHERE training_id = '$training_id'";
+    $priceRes = mysqli_query($con, $priceSql);
+    $prices = [];
+    while ($priceRow = mysqli_fetch_assoc($priceRes)) {
+        $prices[] = floatval($priceRow['price']);
+    }
+
+    // Determine price display
+   if (count($prices) === 1) {
+        $priceDisplay = $sitecurrency . number_format($prices[0], 2);
+        $price = $prices[0];
+    } if (count($prices) > 1) {
+        $minPrice = min($prices);
+        $maxPrice = max($prices);
+        $priceDisplay = $sitecurrency . number_format($minPrice, 2) . ' - ' . $sitecurrency . number_format($maxPrice, 2);
+        $price = $minPrice; // Use min price for sorting or other logic
+    }
+
+            $sql_resource_type = "SELECT name FROM {$siteprefix}event_types WHERE s = $event_type";
+            $result_resource_type = mysqli_query($con, $sql_resource_type);
+
+            while ($typeRow = mysqli_fetch_assoc($result_resource_type)) {
+                $resourceTypeNames = $typeRow['name'];
+            }
+$rating_data = calculateRating($training_id, $con, $siteprefix);
+    $average_rating = $rating_data['average_rating'];
+    $review_count = $rating_data['review_count'];
+        include "event-card.php"; // Include the product card template
+        }
+      
+     
+?>
+       </div>
+  <div class="text-center mt-1" data-aos="fade-up">
+		  
+		  <?php } else { echo '<div class="alert alert-warning" role="alert">
+    No related products found. <a href="'.$siteurl.'marketplace.php" class="alert-link">View more reports in marketplace</a>
+      </div>';
+       }?>
+        </div>
+      </div>
+
+    </section><!-- /Related Products Section -->
+
+
+ <!-- Recent Reports Swiper Section -->
+    <section id="best-sellers" class="best-sellers section">
+  <div class="container" data-aos="fade-up" data-aos-delay="100">
+    <div class="section-title text-center mb-4">
+      <h2>Last Purchased Events</h2>
+      <p>Stay up to date with the latest workshops, trainings, and learning sessions.</p>
+    </div>
+    <div class="recent-reports-slider swiper init-swiper">
+      <script type="application/json" class="swiper-config">
+        {
+          "loop": true,
+          "autoplay": {
+            "delay": 4000,
+            "disableOnInteraction": false
+          },
+          "grabCursor": true,
+          "speed": 600,
+          "slidesPerView": "auto",
+          "spaceBetween": 20,
+          "navigation": {
+            "nextEl": ".recent-swiper-button-next",
+            "prevEl": ".recent-swiper-button-prev"
+          },
+          "breakpoints": {
+            "320": {
+              "slidesPerView": 2,
+              "spaceBetween": 10
+            },
+            "576": {
+              "slidesPerView": 2,
+              "spaceBetween": 15
+            },
+            "768": {
+              "slidesPerView": 3,
+              "spaceBetween": 20
+            },
+            "992": {
+              "slidesPerView": 4,
+              "spaceBetween": 20
+            }
+          }
+        }
+      </script>
+      <div class="swiper-wrapper">
+          <?php
+    $query = "SELECT DISTINCT 
+                            t.*, 
+                            ti.picture, 
+                            u.display_name, tt.price, 
+                            u.profile_photo as profile_picture,
+                            l.category_name AS category,
+                            sc.category_name AS subcategory
+                        FROM ".$siteprefix."orders o
+                        JOIN ".$siteprefix."order_items oi ON o.order_id = oi.order_id
+                        JOIN ".$siteprefix."training t ON t.training_id= oi.training_id
+                        LEFT JOIN ".$siteprefix."training_images ti ON t.training_id = ti.training_id
+                        LEFT JOIN ".$siteprefix."users u ON t.user = u.s
+                        LEFT JOIN ".$siteprefix."categories l ON t.category = l.id
+                        LEFT JOIN ".$siteprefix."training_tickets tt ON t.training_id= tt.training_id
+                        LEFT JOIN ".$siteprefix."categories sc ON t.subcategory = sc.id
+                        WHERE o.status = 'paid' AND t.status = 'approved'
+                        GROUP BY t.training_id
+                        ORDER BY o.date DESC LIMIT 10
+                    ";
+$result = mysqli_query($con, $query);
+if ($result) {
+while ($row = mysqli_fetch_assoc($result)) {
+        $training_id = $row['training_id'];
+        $title = $row['title'];
+        $alt_title = $row['alt_title'];
+        $description = $row['description'];
+        $category = $row['category'];
+        $subcategory = $row['subcategory'];
+        $pricing = $row['pricing'];
+        $price = $row['price'];
+        $tags = $row['tags'];
+        $user = $row['display_name'];
+        $user_picture = $imagePath.$row['profile_picture'];
+        $created_date = $row['created_at'];
+        $status = $row['status'];
+        $image_path = $imagePath.$row['picture'];
+        $slug = $alt_title;
+        $event_type = $row['event_type'] ?? '';
+    
+
+           // Fetch price variations for this report
+    $priceSql = "SELECT price FROM {$siteprefix}training_tickets WHERE training_id = '$training_id'";
+    $priceRes = mysqli_query($con, $priceSql);
+    $prices = [];
+    while ($priceRow = mysqli_fetch_assoc($priceRes)) {
+        $prices[] = floatval($priceRow['price']);
+    }
+
+    // Determine price display
+   if (count($prices) === 1) {
+        $priceDisplay = $sitecurrency . number_format($prices[0], 2);
+        $price = $prices[0];
+    } if (count($prices) > 1) {
+        $minPrice = min($prices);
+        $maxPrice = max($prices);
+        $priceDisplay = $sitecurrency . number_format($minPrice, 2) . ' - ' . $sitecurrency . number_format($maxPrice, 2);
+        $price = $minPrice; // Use min price for sorting or other logic
+    }
+
+            $sql_resource_type = "SELECT name FROM {$siteprefix}event_types WHERE s = $event_type";
+            $result_resource_type = mysqli_query($con, $sql_resource_type);
+
+            while ($typeRow = mysqli_fetch_assoc($result_resource_type)) {
+                $resourceTypeNames = $typeRow['name'];
+            }
+$rating_data = calculateRating($training_id, $con, $siteprefix);
+    $average_rating = $rating_data['average_rating'];
+    $review_count = $rating_data['review_count'];
+        // Each slide
+            include "swiper-card.php"; // Use your existing product card template
+          }
+        }
+        ?>
+      </div>
+      <div class="recent-swiper-button-next swiper-button-next"></div>
+      <div class="recent-swiper-button-prev swiper-button-prev"></div>
+    </div>
+  </div>
+</section>
+ 
+    
+           <!-- Report Product Modal -->
+<div class="modal fade" id="reportProductModal" tabindex="-1" aria-labelledby="reportProductModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <form id="reportForm" method="POST">
+        <div class="modal-header">
+          <h5 class="modal-title" id="reportProductModalLabel">Event <?php echo htmlspecialchars($title); ?></h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" name="product_id" value="<?php echo htmlspecialchars($training_id); ?>">
+          <input type="hidden" name="user_id" value="<?php echo htmlspecialchars($user_id); ?>">
+          <div class="mb-1">
+            <label for="reason" class="form-label">Reason for Reporting</label>
+            <select class="form-select" name="reason" id="reason" required>
+              <option value="Inappropriate Content">Inappropriate Content</option>
+              <option value="Copyright Violation">Copyright Violation</option>
+              <option value="Spam or Misleading">Spam or Misleading</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="mb-1" id="customReasonContainer" style="display: none;">
+            <label for="custom_reason" class="form-label">Custom Reason</label>
+            <textarea class="form-control" name="custom_reason" id="custom_reason" rows="3"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" name="submit_report" class="btn btn-danger">Submit Report</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const reasonSelect = document.getElementById("reason");
+        const customReasonContainer = document.getElementById("customReasonContainer");
+
+        reasonSelect.addEventListener("change", function () {
+            if (this.value === "Other") {
+                customReasonContainer.style.display = "block";
+            } else {
+                customReasonContainer.style.display = "none";
+            }
+        });
+    });
+</script>
 
 <script>
 
@@ -720,6 +1093,9 @@ document.getElementById('webShareBtn').addEventListener('click', function() {
 
 
 </script>
+
+
+  
 
 
 

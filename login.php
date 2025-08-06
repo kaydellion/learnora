@@ -40,7 +40,7 @@ $show="none"; $textshow="none";
 
               <form method="post">
                 <div class="alert alert-success alert-dismissible mb-3 fade show" id="myAlert" role="alert" style="display:<?php echo $show; ?>">
-                        Congratulations! Your account has been successfully created. Thank you for registering! <span style="display: <?php echo $textshow;?>"> your email to verify your account.</span></div>
+                       Congratulations! Your Account Has Been Successfully Created. Thank you for registering with us! To complete your registration, please check your email and click the verification link to activate your account.</div>
                 <div class="mb-4">
                   <label for="email" class="form-label">Email</label>
                   <input type="email" class="form-control" id="email" placeholder="Enter your email" name="email" required="" autocomplete="email">

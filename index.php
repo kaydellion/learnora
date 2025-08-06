@@ -103,8 +103,8 @@
 
       <!-- Section Title -->
       <div class="container section-title" data-aos="fade-up">
-        <h2>Best Events</h2>
-        <p>Join trending events, sharpen your skills, and connect with the best in your field.</p>
+        <h2>Top Trainings</h2>
+        <p>Advance your career with the latest training programs. Build in-demand skills, stay current with industry trends, and connect with top professionals in your field.</p>
       </div><!-- End Section Title -->
 
       <div class="container" data-aos="fade-up" data-aos-delay="100">
@@ -141,6 +141,25 @@ while ($row = mysqli_fetch_assoc($result)) {
         $event_type = $row['event_type'] ?? '';
     
 
+           // Fetch price variations for this report
+    $priceSql = "SELECT price FROM {$siteprefix}training_tickets WHERE training_id = '$training_id'";
+    $priceRes = mysqli_query($con, $priceSql);
+    $prices = [];
+    while ($priceRow = mysqli_fetch_assoc($priceRes)) {
+        $prices[] = floatval($priceRow['price']);
+    }
+
+    // Determine price display
+   if (count($prices) === 1) {
+        $priceDisplay = $sitecurrency . number_format($prices[0], 2);
+        $price = $prices[0];
+    } if (count($prices) > 1) {
+        $minPrice = min($prices);
+        $maxPrice = max($prices);
+        $priceDisplay = $sitecurrency . number_format($minPrice, 2) . ' - ' . $sitecurrency . number_format($maxPrice, 2);
+        $price = $minPrice; // Use min price for sorting or other logic
+    }
+
             $sql_resource_type = "SELECT name FROM {$siteprefix}event_types WHERE s = $event_type";
             $result_resource_type = mysqli_query($con, $sql_resource_type);
 
@@ -158,7 +177,7 @@ $rating_data = calculateRating($training_id, $con, $siteprefix);
   <div class="text-center mt-5" data-aos="fade-up">
           <a href="<?php echo $siteurl; ?>marketplace" class="view-all-btn">View All Events <i class="bi bi-arrow-right"></i></a>
 
-		  <?php } else {  debug('No reports not found.'); }?>
+		  <?php } else {  echo 'No Events found.'; }?>
         </div>
 
 

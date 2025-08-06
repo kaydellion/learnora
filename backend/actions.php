@@ -117,16 +117,35 @@ if(isset($_POST['register-user'])){
     $companyName = mysqli_real_escape_string($con, $_POST['company-name'] ?? '');
     $companyProfile = mysqli_real_escape_string($con, $_POST['company-profile'] ?? '');
     $nigeriaOffice = mysqli_real_escape_string($con, $_POST['nigeria-office'] ?? '');
-    $state = mysqli_real_escape_string($con, $_POST['state'] ?? '');
-    $lga = mysqli_real_escape_string($con, $_POST['lga'] ?? '');
-    $country = mysqli_real_escape_string($con, $_POST['country'] ?? '');
+
     $foreignOffice = mysqli_real_escape_string($con, $_POST['foreign-office'] ?? '');
-    $category = mysqli_real_escape_string($con, $_POST['category'] ?? '');
-    $subcategory = mysqli_real_escape_string($con, $_POST['subcategory'] ?? '');
+    $category = isset($_POST['category']) && is_array($_POST['category']) ? implode(',', $_POST['category']) : '';
+$subcategory = isset($_POST['subcategory']) && is_array($_POST['subcategory']) ? implode(',', $_POST['subcategory']) : '';
     $profile_picture = $_FILES['photo']['name'];
     $password = $_POST['password'];
     $retypePassword = $_POST['retypePassword'];
     
+
+     // Address logic
+    $is_nigerian = $_POST['is_nigerian'] ?? '';
+    $full_address_ng = mysqli_real_escape_string($con, $_POST['full_address_ng'] ?? '');
+    $state = mysqli_real_escape_string($con, $_POST['state'] ?? '');
+    $lga = mysqli_real_escape_string($con, $_POST['lga'] ?? '');
+    $country_ng = mysqli_real_escape_string($con, $_POST['country_ng'] ?? 'Nigeria');
+    $full_address_foreign = mysqli_real_escape_string($con, $_POST['full_address_foreign'] ?? '');
+    $country_foreign = mysqli_real_escape_string($con, $_POST['country_foreign'] ?? '');
+
+    // Determine which address/country to use
+    if ($is_nigerian === 'yes') {
+        $address = $full_address_ng;
+        $country = $country_ng;
+    } else {
+        $address = $full_address_foreign;
+        $country = $country_foreign;
+        $state = '';
+        $lga = '';
+    }
+
     //profile picture
     $status = 'inactive';
     $date = date('Y-m-d H:i:s');
@@ -181,12 +200,19 @@ if(isset($_POST['register-user'])){
       $statusMessage="Password do not match!";
       showErrorModal($statusAction, $statusMessage);
   }
-
+   else if (
+        ($is_nigerian === 'yes' && (empty($full_address_ng) || empty($state) || empty($lga))) ||
+        ($is_nigerian === 'no' && (empty($full_address_foreign) || empty($country_foreign)))
+    ) {
+        $statusAction="Ooops!";
+        $statusMessage="Please fill all required address fields.";
+        showErrorModal($statusAction, $statusMessage);
+    }
        else {
        $password=hashPassword($password);
             $query = "INSERT INTO ".$siteprefix."users (
-        title, display_name, first_name, middle_name, last_name, company_name, company_profile, company_logo, biography, profile_photo, age, gender, email_address, phone_number, skills_hobbies, language, proficiency, n_office_address, f_office_address, category, subcategory, facebook, instagram, twitter, linkedin, state, lga, country, type,status, trainer,password, last_login, created_date, reset_token, reset_token_expiry,affliate,loyalty,downloads,wallet,bank_name,bank_accname,bank_number
-    ) VALUES ('$title','$display_name','$firstName','$middleName','$lastName','$companyName','$companyProfile','$company_logo','$biography','$profile_photo','$age','$gender','$email','$phone','$skills','$language','$proficiency','$nigeriaOffice','$foreignOffice','$category','$subcategory','$facebook','$instagram','$twitter','$linkedin','$state','$lga','$country','$type', '$status', '$trainer','$password','$last_login','$created_date','$reset_token','$reset_token_expiry','','','','','','',''
+        title, display_name, first_name, middle_name, last_name, company_name, company_profile, company_logo, biography, profile_photo, age, gender, email_address, phone_number, skills_hobbies, language, proficiency, n_office_address, f_office_address, category, subcategory, facebook, instagram, twitter, linkedin, state, lga, country,address, type,status, trainer,password, last_login, created_date, reset_token, reset_token_expiry,affliate,loyalty,downloads,wallet,bank_name,bank_accname,bank_number
+    ) VALUES ('$title','$display_name','$firstName','$middleName','$lastName','$companyName','$companyProfile','$company_logo','$biography','$profile_photo','$age','$gender','$email','$phone','$skills','$language','$proficiency','$nigeriaOffice','$foreignOffice','$category','$subcategory','$facebook','$instagram','$twitter','$linkedin','$state','$lga','$country','$address','$type', '$status', '$trainer','$password','$last_login','$created_date','$reset_token','$reset_token_expiry','','','','','','',''
     )";
 
         if (mysqli_query($con, $query)) {
@@ -211,9 +237,6 @@ if(isset($_POST['register-newuser'])){
     $middleName = mysqli_real_escape_string($con, $_POST['middle-name'] ?? '');
     $lastName = mysqli_real_escape_string($con, $_POST['last-name'] ?? '');
     $profile = mysqli_real_escape_string($con, $_POST['profile'] ?? '');
-     $state = mysqli_real_escape_string($con, $_POST['state'] ?? '');
-    $lga = mysqli_real_escape_string($con, $_POST['lga'] ?? '');
-    $country = mysqli_real_escape_string($con, $_POST['country'] ?? '');
     $age = mysqli_real_escape_string($con, $_POST['age'] ?? '');
     $gender = mysqli_real_escape_string($con, $_POST['gender'] ?? '');
     $email = mysqli_real_escape_string($con, $_POST['email'] ?? '');
@@ -236,6 +259,27 @@ if(isset($_POST['register-newuser'])){
     $biography = $profile;
     $profile_photo = $profile_picture;
    
+
+        // Address logic
+    $is_nigerian = $_POST['is_nigerian'] ?? '';
+    $full_address_ng = mysqli_real_escape_string($con, $_POST['full_address_ng'] ?? '');
+    $state = mysqli_real_escape_string($con, $_POST['state'] ?? '');
+    $lga = mysqli_real_escape_string($con, $_POST['lga'] ?? '');
+    $country_ng = mysqli_real_escape_string($con, $_POST['country_ng'] ?? 'Nigeria');
+    $full_address_foreign = mysqli_real_escape_string($con, $_POST['full_address_foreign'] ?? '');
+    $country_foreign = mysqli_real_escape_string($con, $_POST['country_foreign'] ?? '');
+
+    // Determine which address/country to use
+    if ($is_nigerian === 'yes') {
+        $address = $full_address_ng;
+        $country = $country_ng;
+    } else {
+        $address = $full_address_foreign;
+        $country = $country_foreign;
+        $state = '';
+        $lga = '';
+    }
+
    
     $reset_token = '';
     $reset_token_expiry = '';
@@ -268,12 +312,20 @@ if(isset($_POST['register-newuser'])){
       $statusMessage="Password do not match!";
       showErrorModal($statusAction, $statusMessage);
   }
+    else if (
+        ($is_nigerian === 'yes' && (empty($full_address_ng) || empty($state) || empty($lga))) ||
+        ($is_nigerian === 'no' && (empty($full_address_foreign) || empty($country_foreign)))
+    ) {
+        $statusAction="Ooops!";
+        $statusMessage="Please fill all required address fields.";
+        showErrorModal($statusAction, $statusMessage);
+    }
 
        else {
        $password=hashPassword($password);
-            $query = "INSERT INTO ".$siteprefix."users (
-        title, display_name, first_name, middle_name, last_name, company_name, company_profile, company_logo, biography, profile_photo, age, gender, email_address, phone_number, skills_hobbies, language, proficiency, n_office_address, f_office_address, category, subcategory, facebook, instagram, twitter, linkedin, state, lga, country, type,status, trainer,password, last_login, created_date, reset_token, reset_token_expiry,affliate,loyalty,downloads,wallet,bank_name,bank_accname,bank_number
-    ) VALUES ('$title','$display_name','$firstName','$middleName','$lastName','','','','','$profile_photo','','','$email','$phone','','','','','','','','$facebook','$instagram','$twitter','$linkedin','$state','$lga','$country','$type', '', '','$password','$last_login','$created_date','$reset_token','$reset_token_expiry','','','','','','',''
+                     $query = "INSERT INTO ".$siteprefix."users (
+        title, display_name, first_name, middle_name, last_name, company_name, company_profile, company_logo, biography, profile_photo, age, gender, email_address, phone_number, skills_hobbies, language, proficiency, n_office_address, f_office_address, category, subcategory, facebook, instagram, twitter, linkedin, state, lga, country, address, type,status, trainer,password, last_login, created_date, reset_token, reset_token_expiry,affliate,loyalty,downloads,wallet,bank_name,bank_accname,bank_number
+    ) VALUES ('$title','$display_name','$firstName','$middleName','$lastName','','','','$profile','$profile_photo','','$gender','$email','$phone','','','','','','','','$facebook','$instagram','$twitter','$linkedin','$state','$lga','$country','$address', '$type', '', '','$password','$last_login','$created_date','$reset_token','$reset_token_expiry','','','','','','',''
     )";
 
         if (mysqli_query($con, $query)) {
@@ -307,7 +359,85 @@ if(isset($_POST['register-newuser'])){
     }
 }
 
+// Handle Report Product Submission
+if (isset($_POST['submit_report'])) {
+    $product_id = mysqli_real_escape_string($con, $_POST['product_id']);
+    $user_id = mysqli_real_escape_string($con, $_POST['user_id']);
+    $reason = mysqli_real_escape_string($con, $_POST['reason']);
+    $custom_reason = isset($_POST['custom_reason']) ? mysqli_real_escape_string($con, trim($_POST['custom_reason'])) : null;
 
+    // Use custom reason if "Other" is selected
+    if ($reason === "Other" && !empty($custom_reason)) {
+        $reason = $custom_reason;
+    }
+
+    $date = date('Y-m-d H:i:s');
+
+    // Fetch the product title
+    $product_query = "SELECT title,alt_title FROM " . $siteprefix . "training WHERE training_id = '$product_id'";
+    $product_result = mysqli_query($con, $product_query);
+
+    if ($product_result && mysqli_num_rows($product_result) > 0) {
+        $product = mysqli_fetch_assoc($product_result);
+        $product_title = $product['title'];
+        $product_alt_title = $product['alt_title'];
+    } else {
+        $statusAction = "Error!";
+        $statusMessage = "Product not found.";
+        showErrorModal($statusAction, $statusMessage);
+        header("refresh:2; url=events.php/$product_alt_title");
+        exit();
+    }
+
+    // Insert the report into the database
+    $insert_query = "INSERT INTO " . $siteprefix . "product_reports (product_id, user_id, reason, report_date) 
+                     VALUES ('$product_id', '$user_id', '$reason', '$date')";
+
+    if (mysqli_query($con, $insert_query)) {
+        // Fetch admin email
+        $admin_email = $siteMail; // Replace with your admin email variable
+       
+        // Fetch user details
+        $user_query = "SELECT display_name, email_address FROM " . $siteprefix . "users WHERE s = '$user_id'";
+        $user_result = mysqli_query($con, $user_query);
+
+        if ($user_result && mysqli_num_rows($user_result) > 0) {
+            $user = mysqli_fetch_assoc($user_result);
+            $user_name = $user['display_name'];
+            $user_email = $user['email_address'];
+        } else {
+            $user_name = "Unknown User";
+            $user_email = "Unknown Email";
+        }
+
+        // Email content
+        $emailSubject = "New Product Report Submitted";
+        $emailMessage = "
+            <p>A new product report has been submitted:</p>
+            <p><strong>Product Title:</strong> $product_title</p>
+            <p><strong>User:</strong> $user_name ($user_email)</p>
+            <p><strong>Reason:</strong> $reason</p>
+            <p><strong>Date:</strong> $date</p>
+        ";
+
+        // Send email to admin
+      //  sendEmail($siteMail, $adminName, $siteName, $siteMail, $emailMessage, $emailSubject);
+
+        // Success message
+        $statusAction = "Success!";
+        $statusMessage = "Your report for <strong>$product_title</strong> has been submitted successfully.";
+        showSuccessModal($statusAction, $statusMessage);
+        header("refresh:2; url=events/$product_alt_title");
+
+    } else {
+        // Error message
+        $statusAction = "Error!";
+        $statusMessage = "An error occurred while submitting your report. Please try again.";
+        showErrorModal($statusAction, $statusMessage);
+        header("refresh:2; url=events/$product_alt_title");
+
+    }
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit-message'])) {
     $name = mysqli_real_escape_string($con, $_POST['name'] ?? '');
@@ -344,6 +474,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit-message'])) {
     }
 }
 
+
+//folow category
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['follow_category_submit'])) {
+    $user_id = $_POST['user_id']; // Logged-in user ID
+    $category_id = $_POST['category_id']; // Category ID
+    $subcategory_id = $_POST['subcategory_id']; // Subcategory ID (can be empty)
+    $actioning = isset($_POST['actioning']) ? $_POST['actioning'] : null; // Action: follow or unfollow
+
+    if (empty($user_id) || empty($category_id)) {
+        echo "<script>alert('Invalid request.');</script>";
+        exit();
+    }
+
+    if ($actioning === "follow_category") {
+        // Add a new follow record for the category
+        $insertQuery = "INSERT INTO ".$siteprefix."followers (user_id, seller_id, followed_at, category_id, subcategory_id) VALUES (?, '', NOW(), ?, ?)";
+        $stmt = $con->prepare($insertQuery);
+        $stmt->bind_param("iis", $user_id, $category_id, $subcategory_id);
+        if ($stmt->execute()) {
+            echo "<script>alert('You are now following this category.');</script>";
+        } else {
+            echo "<script>alert('Failed to follow the category.');</script>";
+        }
+    } elseif ($actioning === "unfollow_category") {
+        // Remove the follow record for the category
+        $deleteQuery = "DELETE FROM ".$siteprefix."followers WHERE user_id = ? AND category_id = ? AND subcategory_id = ?";
+        $stmt = $con->prepare($deleteQuery);
+        $stmt->bind_param("iis", $user_id, $category_id, $subcategory_id);
+        if ($stmt->execute()) {
+            echo "<script>alert('You have unfollowed this category.');</script>";
+        } else {
+            echo "<script>alert('Failed to unfollow the category.');</script>";
+        }
+    }
+}
 
 // Blog Comment Submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['post_comment'])) {
@@ -441,12 +606,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_event'])) {
     $trainingId = mysqli_real_escape_string($con, $_POST['id']);
     $title = mysqli_real_escape_string($con, $_POST['title']);
      $description = mysqli_real_escape_string($con, $_POST['description']);
-    $category = mysqli_real_escape_string($con, $_POST['category']);
+ $category = isset($_POST['category']) && is_array($_POST['category']) ? implode(',', $_POST['category']) : '';
+$subcategory = isset($_POST['subcategory']) && is_array($_POST['subcategory']) ? implode(',', $_POST['subcategory']) : '';
     $event_type = mysqli_real_escape_string($con, $_POST['event_type']);
     $attendee = mysqli_real_escape_string($con, $_POST['who_should_attend']);
     $loyalty = isset($_POST['loyalty']) ? 1 : 0;
     $user = mysqli_real_escape_string($con, $_POST['user']);
-    $subcategory = isset($_POST['subcategory']) ? mysqli_real_escape_string($con, $_POST['subcategory']) : null;
     $training_id = mysqli_real_escape_string($con, $_POST['id']);
     $language = mysqli_real_escape_string($con, $_POST['language']);
     $certification = mysqli_real_escape_string($con, $_POST['certification']);
@@ -598,11 +763,22 @@ $stmt->close();
 }
 
         if ($_POST['pricing'] === 'paid') {
-        $ticket_name = mysqli_real_escape_string($con, $_POST['ticket_name']);
-        $ticket_benefits = mysqli_real_escape_string($con, $_POST['ticket_benefits']);
-        $ticket_price = floatval($_POST['ticket_price']);
-        $ticket_seats = intval($_POST['ticket_seats']);
-        mysqli_query($con, "INSERT INTO " . $siteprefix . "training_tickets (training_id, ticket_name, benefits, price, seats) VALUES ('$training_id', '$ticket_name', '$ticket_benefits', '$ticket_price', '$ticket_seats')");
+            $ticket_names = $_POST['ticket_name'];
+$ticket_benefits = $_POST['ticket_benefits'];
+$ticket_prices = $_POST['ticket_price'];
+$ticket_seats = $_POST['ticket_seats'];
+
+foreach ($ticket_names as $index => $name) {
+    $name = mysqli_real_escape_string($con, $name);
+    $benefits = mysqli_real_escape_string($con, $ticket_benefits[$index]);
+    $price = floatval($ticket_prices[$index]);
+    $seats = intval($ticket_seats[$index]);
+
+    // Insert into database
+    mysqli_query($con, "INSERT INTO " . $siteprefix . "training_tickets 
+        (training_id, ticket_name, benefits, price, seats, seatremain)
+        VALUES ('$training_id', '$name', '$benefits', '$price', '$seats', '$seats')");
+}
     }
 
         //  Handle Instructor
@@ -613,6 +789,7 @@ if ($instructor_id === 'add_new') {
     $new_name = mysqli_real_escape_string($con, $_POST['new_instructor_name']);
     $new_bio = mysqli_real_escape_string($con, $_POST['new_instructor_bio']);
     $new_email = mysqli_real_escape_string($con, $_POST['new_instructor_email']);
+    $adduser = mysqli_real_escape_string($con, $_POST['user_id']);
 
     $instructor_photo = ''; // initialize photo filename
     $photo_path = '';       // full path for saving file
@@ -627,8 +804,8 @@ if ($instructor_id === 'add_new') {
         }
     }
 
-    mysqli_query($con, "INSERT INTO {$siteprefix}instructors (name, email_address, bio, photo) 
-                        VALUES ('$new_name', '$new_email', '$new_bio', '$instructor_photo')");
+    mysqli_query($con, "INSERT INTO {$siteprefix}instructors (name, email_address, bio, photo, user) 
+                        VALUES ('$new_name', '$new_email', '$new_bio', '$instructor_photo', '$adduser')");
 
     $instructor_id = mysqli_insert_id($con);
 }
@@ -717,7 +894,7 @@ if ($instructor_id === 'add_new') {
 if ($insertTraining) {
      $message .= "Training added successfully!";
             showSuccessModal('Processed', $message);
-            header("refresh:2; url=trainings.php");
+            header("refresh:2; url=dashboard.php");
 } else {
     $message .= "Error adding report: " . mysqli_error($con);
             showErrorModal('Update Failed', $message);
@@ -727,6 +904,42 @@ if ($insertTraining) {
 
 }
 
+
+//follow seller
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['follow_seller_submit'])) {
+   
+
+    $user_id = $_POST['user_id']; // Replace with your session variable for user ID
+    $seller_id = $_POST['seller_id'];
+    $actioning = isset($_POST['actioning']) ? $_POST['actioning'] : null;
+
+    if (empty($user_id) || empty($seller_id)) {
+        echo "<script>alert('Invalid request.');</script>";
+        exit();
+    }
+
+    if ($actioning === "follow") {
+        // Add a new follow record
+        $insertQuery = "INSERT INTO ".$siteprefix."followers (user_id, seller_id, followed_at, category_id, subcategory_id) VALUES (?, ?, NOW(), '', '')";
+        $stmt = $con->prepare($insertQuery);
+        $stmt->bind_param("ii", $user_id, $seller_id);
+        if ($stmt->execute()) {
+            echo "<script>alert('You are now following the seller.');</script>";
+        } else {
+            echo "<script>alert('Failed to follow the seller.');</script>";
+        }
+    } elseif ($actioning === "unfollow") {
+        // Remove the follow record
+        $deleteQuery = "DELETE FROM ".$siteprefix."followers WHERE user_id = ? AND seller_id = ?";
+        $stmt = $con->prepare($deleteQuery);
+        $stmt->bind_param("ii", $user_id, $seller_id);
+        if ($stmt->execute()) {
+            echo "<script>alert('You have unfollowed the seller.');</script>";
+        } else {
+            echo "<script>alert('Failed to unfollow the seller.');</script>";
+        }
+    }
+}
 
 
 // Affiliate Registration
@@ -809,10 +1022,10 @@ if (isset($_POST['register-affiliate'])) {
     // Insert affiliate details into the database
    // Insert for company
 $query = "INSERT INTO " . $siteprefix . "users (
-    title, display_name, first_name, middle_name, last_name, company_name, company_profile, company_logo, biography, profile_photo, age, gender, email_address, phone_number, skills_hobbies, language, proficiency, n_office_address, f_office_address, category, subcategory, facebook, instagram, twitter, linkedin, state, lga, country, type, status, trainer, password, last_login, created_date, reset_token, reset_token_expiry,affliate,loyalty,downloads,wallet,bank_name,bank_accname,bank_number
+    title, display_name, first_name, middle_name, last_name, company_name, company_profile, company_logo, biography, profile_photo, age, gender, email_address, phone_number, skills_hobbies, language, proficiency, n_office_address, f_office_address, category, subcategory, facebook, instagram, twitter, linkedin, state, lga, country, address, type, status, trainer, password, last_login, created_date, reset_token, reset_token_expiry,affliate,loyalty,downloads,wallet,bank_name,bank_accname,bank_number
 ) VALUES (
     '', '$first_name $last_name', '$first_name', '$middle_name', '$last_name',
-    '', '', '', '', '', '', '$gender', '$email', '$phone', '', '', '', '$address', '', '', '', '', '', '', '', '', '', '$country',
+    '', '', '', '', '', '', '$gender', '$email', '$phone', '', '', '', '$address', '', '', '', '', '', '', '', '', '', '$country','',
     '$type', '$status', '0', '$hashedPassword', '$date', '$date', '', '', '$affiliate', '','','', '', '', ''
 )";
 
@@ -1344,15 +1557,34 @@ if(isset($_POST['update-profile'])){
     $companyName = mysqli_real_escape_string($con, $_POST['company-name'] ?? '');
     $companyProfile = mysqli_real_escape_string($con, $_POST['company-profile'] ?? '');
     $nigeriaOffice = mysqli_real_escape_string($con, $_POST['nigeria-office'] ?? '');
-    $state = mysqli_real_escape_string($con, $_POST['state'] ?? '');
-    $lga = mysqli_real_escape_string($con, $_POST['lga'] ?? '');
-    $country = mysqli_real_escape_string($con, $_POST['country'] ?? '');
     $foreignOffice = mysqli_real_escape_string($con, $_POST['foreign-office'] ?? '');
-    $category = mysqli_real_escape_string($con, $_POST['category'] ?? '');
-    $subcategory = mysqli_real_escape_string($con, $_POST['subcategory'] ?? '');
+    $category = isset($_POST['category']) && is_array($_POST['category']) ? implode(',', $_POST['category']) : '';
+    $subcategory = isset($_POST['subcategory']) && is_array($_POST['subcategory']) ? implode(',', $_POST['subcategory']) : '';
     $password = $_POST['password'];
     $retypePassword = $_POST['retypePassword'];
 
+
+        // Address logic
+    $is_nigerian = $_POST['is_nigerian'] ?? '';
+    $nigeriaOffice = mysqli_real_escape_string($con, $_POST['nigeria-office'] ?? '');
+    $state = mysqli_real_escape_string($con, $_POST['state'] ?? '');
+    $lga = mysqli_real_escape_string($con, $_POST['lga'] ?? '');
+    $country_ng = mysqli_real_escape_string($con, $_POST['country_ng'] ?? 'Nigeria');
+    $foreignOffice = mysqli_real_escape_string($con, $_POST['foreign-office'] ?? '');
+    $country_foreign = mysqli_real_escape_string($con, $_POST['country_foreign'] ?? '');
+
+    // Determine which address/country to use
+    if ($is_nigerian === 'yes') {
+        $n_office_address = $nigeriaOffice;
+        $f_office_address = '';
+        $country = $country_ng;
+    } else {
+        $n_office_address = '';
+        $f_office_address = $foreignOffice;
+        $country = $country_foreign;
+        $state = '';
+        $lga = '';
+    }
 
     // Password change
     $password = !empty($_POST['password']) ? trim($_POST['password']) : null;
@@ -1452,9 +1684,11 @@ $update_query = "UPDATE {$siteprefix}users SET
     instagram = '$instagram',
     twitter = '$twitter',
     linkedin = '$linkedin',
-    state = '$state',
-    lga = '$lga',
-    country = '$country' WHERE s = '$user_id'";
+     state = '$state',
+        lga = '$lga',
+        country = '$country',
+        address = '$address'
+   WHERE s = '$user_id'";
 
  if (mysqli_query($con, $update_query)) {
      if($trainers == 1){

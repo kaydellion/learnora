@@ -24,9 +24,9 @@ while ($imgRow = mysqli_fetch_assoc($result_images)) {
                 <h4 class="product-title"><a href="<?php echo $siteurl; ?>events/<?php echo $alt_title; ?>"><?php echo $title; ?></a></h4>
                 <div class="product-meta">
               <div class="product-price">
-    <?php
+   <?php
       if ($pricing === 'paid') {
-        echo $sitecurrency.$price;
+        echo $priceDisplay;
       } elseif ($pricing === 'free') {
         echo 'Free';
       } elseif ($pricing === 'donation') {

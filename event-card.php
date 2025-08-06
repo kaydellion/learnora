@@ -24,7 +24,7 @@ while ($imgRow = mysqli_fetch_assoc($result_images)) {
               <div class="product-price">
     <?php
       if ($pricing === 'paid') {
-        echo $sitecurrency.$price;
+        echo $priceDisplay;
       } elseif ($pricing === 'free') {
         echo 'Free';
       } elseif ($pricing === 'donation') {

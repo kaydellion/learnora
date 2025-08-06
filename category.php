@@ -101,7 +101,37 @@ $total_pages = ceil($total_reports / $limit);
               <!-- Filter and Sort Options -->
               <div class="filter-container mb-4" data-aos="fade-up" data-aos-delay="100">
                 <div class="row g-3">
-                  <div class="col-12 col-md-6 col-lg-4">
+                            <div class="col-7 col-md-3 col-lg-3">
+             <?php if ($active_log != "0"): ?>
+                <form method="POST" class="d-inline">
+                    <?php
+                    $followCategoryQuery = "SELECT * FROM ".$siteprefix."followers WHERE user_id = '$user_id' AND category_id = '$id'";
+                    $followCategoryResult = mysqli_query($con, $followCategoryQuery);
+                    $isFollowingCategory = mysqli_num_rows($followCategoryResult) > 0;
+                    ?>
+                    <?php if ($isFollowingCategory): ?>
+                      <div class="filter-item">
+                      <label class="form-label">Unfollow Now:</label><br>
+                        <button type="submit" name="actioning" value="unfollow_category" class="btn btn-outline-danger ">
+                            unfollow Category
+                        </button>
+                    </div>
+                    <?php else: ?>
+                      <div class="filter-item">
+                      <label class="form-label">follow Now:</label><br>
+                        <button type="submit" name="actioning" value="follow_category" class="btn btn-outline-primary">
+                            Follow Category
+                        </button>
+                    </div>
+                    <?php endif; ?>
+                    <input type="hidden" name="user_id" value="<?php echo $user_id; ?>">
+                    <input type="hidden" name="category_id" value="<?php echo $id; ?>">
+                    <input type="hidden" name="subcategory_id" value="">
+                    <input type="hidden" name="follow_category_submit" value="1">
+                </form>
+            <?php endif; ?>
+            </div>
+                  <div class="col-6 col-md-5 col-lg-5">
 				    <div class="filter-item">
                       <label for="priceRange" class="form-label">filter By Subcategory</label>
                    <select id="subcategory-select" class="form-select" onchange="filterBySubcategory(this.value)">
@@ -122,7 +152,7 @@ $total_pages = ceil($total_reports / $limit);
                   </div>
 				    </div>
 
-                      <div class="col-12 col-md-6 col-lg-6">
+                      <div class="col-6 col-md-4 col-lg-4">
                     <div class="filter-item">
                       <label for="sortBy" class="form-label">Sort By</label>
                       <select id="sort-select" class="form-select" onchange="sortReports(this.value)">
@@ -141,7 +171,7 @@ $total_pages = ceil($total_reports / $limit);
                     
                       <div class="filter-tags">
                        
-                        <button class="clear-all-btn">Found <?php echo $report_count; ?> report(s)</button>
+                        <button class="clear-all-btn">Found <?php echo $report_count; ?> event(s)</button>
                       </div>
                     </div>
                   </div>
@@ -179,6 +209,27 @@ $total_pages = ceil($total_reports / $limit);
         $event_type = $row['event_type'] ?? '';
     
 
+        
+           // Fetch price variations for this report
+    $priceSql = "SELECT price FROM {$siteprefix}training_tickets WHERE training_id = '$training_id'";
+    $priceRes = mysqli_query($con, $priceSql);
+    $prices = [];
+    while ($priceRow = mysqli_fetch_assoc($priceRes)) {
+        $prices[] = floatval($priceRow['price']);
+    }
+
+    // Determine price display
+   if (count($prices) === 1) {
+        $priceDisplay = $sitecurrency . number_format($prices[0], 2);
+        $price = $prices[0];
+    } if (count($prices) > 1) {
+        $minPrice = min($prices);
+        $maxPrice = max($prices);
+        $priceDisplay = $sitecurrency . number_format($minPrice, 2) . ' - ' . $sitecurrency . number_format($maxPrice, 2);
+        $price = $minPrice; // Use min price for sorting or other logic
+    }
+
+
             $sql_resource_type = "SELECT name FROM {$siteprefix}event_types WHERE s = $event_type";
             $result_resource_type = mysqli_query($con, $sql_resource_type);
 
@@ -191,7 +242,7 @@ $rating_data = calculateRating($training_id, $con, $siteprefix);
         include "event-card.php"; // Include the product card template
     }
 } else {
-    echo "<p>No reports found.</p>";
+    echo "<p>No events found.</p>";
 }
 ?>
             </div>

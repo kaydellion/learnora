@@ -12,21 +12,30 @@ if (isset($_GET['slug'])) {
         $id = $slug_row['training_id'];
 
         // Fetch all data including event dates
-        $sql = "SELECT t.*, u.name AS display_name, tv.video_path, et.name AS event_types, tt.price, 
-                       u.photo AS profile_picture, l.category_name AS category, 
-                       sc.category_name AS subcategory, ti.picture AS event_image,
-                       tem.event_date, tem.start_time, tem.end_time
-                FROM {$siteprefix}training t
-                LEFT JOIN {$siteprefix}categories l ON t.category = l.id 
-                LEFT JOIN {$siteprefix}instructors u ON t.instructors = u.s
-                LEFT JOIN {$siteprefix}categories sc ON t.subcategory = sc.id 
-                LEFT JOIN {$siteprefix}training_tickets tt ON t.training_id = tt.training_id
-                LEFT JOIN {$siteprefix}training_images ti ON t.training_id = ti.training_id 
-                LEFT JOIN {$siteprefix}training_videos tv ON t.training_id = tv.training_id AND tv.video_type = 'promo'
-                LEFT JOIN {$siteprefix}event_types et ON t.event_type = et.s
-                LEFT JOIN {$siteprefix}training_event_dates tem ON t.training_id = tem.training_id
-                WHERE t.status = 'approved' AND t.training_id = '$id'
-                ORDER BY tem.event_date, tem.start_time";
+      $sql = "SELECT 
+            t.*, 
+          GROUP_CONCAT(DISTINCT l.category_name SEPARATOR ', ') AS category_name,
+            GROUP_CONCAT(DISTINCT sc.category_name SEPARATOR ', ') AS subcategory_name,
+            u.name AS display_name, 
+            u.photo AS profile_picture, us.display_name AS user_name, us.s AS user_id, us.profile_photo AS user_photo, 
+            tv.video_path, 
+            et.name AS event_types, 
+            ti.picture AS event_image,
+            tem.event_date, tem.start_time, tem.end_time,
+            tt.ticket_name, tt.price AS ticket_price, tt.seatremain
+        FROM {$siteprefix}training t
+        LEFT JOIN {$siteprefix}instructors u ON t.instructors = u.s
+        LEFT JOIN {$siteprefix}users us ON t.user = us.s
+        LEFT JOIN {$siteprefix}training_images ti ON t.training_id = ti.training_id 
+        LEFT JOIN {$siteprefix}training_videos tv ON t.training_id = tv.training_id AND tv.video_type = 'promo'
+        LEFT JOIN {$siteprefix}event_types et ON t.event_type = et.s
+        LEFT JOIN {$siteprefix}training_event_dates tem ON t.training_id = tem.training_id
+        LEFT JOIN {$siteprefix}training_tickets tt ON t.training_id = tt.training_id
+       LEFT JOIN " . $siteprefix . "categories l ON FIND_IN_SET(l.id, t.category)
+        LEFT JOIN " . $siteprefix . "categories sc ON FIND_IN_SET(sc.id, t.subcategory)
+        WHERE t.status = 'approved' AND t.training_id = '$id'
+        ORDER BY tem.event_date, tem.start_time";
+
 
         $result = mysqli_query($con, $sql);
         if (!$result) {
@@ -40,7 +49,10 @@ if (isset($_GET['slug'])) {
 
         // Initialize
         $event_dates = [];
+        $ticket_list = [];
         $rowCounter = 0;
+
+
 
         // Loop through all results (for event dates)
         while ($row = mysqli_fetch_assoc($result)) {
@@ -52,10 +64,10 @@ if (isset($_GET['slug'])) {
                 $description = $row['description'];
                 $category = $row['category'];
                 $subcategory = $row['subcategory'];
+                $categoryname = $row['category_name'];
+                $subcategoryname = $row['subcategory_name'];
                 $loyalty = $row['loyalty'];
                 $pricing = $row['pricing'];
-               
-                $price = $row['price'];
                 $tags = $row['tags'];
                 $level = $row['level'];
                 $language = $row['Language'];
@@ -63,6 +75,9 @@ if (isset($_GET['slug'])) {
                 $instructor_picture =  $imagePath .$row['profile_picture'];
                 $target_audience = $row['target_audience'];
                 $created_date = $row['created_at'];
+                $seller_id = $row['user_id'];
+                $seller_name = $row['user_name'];
+                $seller_photo = !empty($row['user_photo']) ? $imagePath . $row['user_photo'] : 'default-avatar.png';
                 $status = $row['status'];
                 $course_requirrement = $row['course_requirrement'];
                 $course_description = $row['course_description'];
@@ -74,6 +89,19 @@ if (isset($_GET['slug'])) {
             }
 
             $delivery_details = '';
+
+               // Tickets
+    if (!empty($row['ticket_name'])) {
+        $ticket_key = $row['ticket_name'] . $row['ticket_price'];
+        $ticket_list[$ticket_key] = [
+            'ticket_name' => $row['ticket_name'],
+            'price'       => $row['ticket_price'],
+            'seatremain'  => $row['seatremain']
+        ];
+    }
+
+   
+
 
 if ($format === 'Physical') {
     $fields = [

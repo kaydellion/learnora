@@ -33,7 +33,7 @@ if ($result_buyer && mysqli_num_rows($result_buyer) > 0) {
 }
 
 // Get order items
-$sql_items = "SELECT oi.*, t.title as resource_title
+$sql_items = "SELECT oi.*, t.title as resource_title , t.pricing
               FROM ".$siteprefix."order_items oi
               JOIN ".$siteprefix."training t ON oi.training_id = t.training_id
               WHERE oi.order_id = '$ref'";   
@@ -51,8 +51,39 @@ if (mysqli_affected_rows($con) > 0) {
         $date = $row_item['date'];   
         $resourceTitle = $row_item['resource_title']; // Fetch the resource title
       
+// Initialize ticket information
+$ticket_name = '';
+$ticket_benefit = '';
 
-      
+// Get training pricing again (already fetched as $row_item)
+$pricing_type = $row_item['pricing'];
+
+if ($pricing_type === 'paid') {
+    // Get the ticket details
+    $sql_ticket = "SELECT ticket_name, benefits FROM {$siteprefix}training_tickets WHERE s = '$s' LIMIT 1";
+    $ticket_result = mysqli_query($con, $sql_ticket);
+    if ($ticket_result && mysqli_num_rows($ticket_result) > 0) {
+        $ticket = mysqli_fetch_assoc($ticket_result);
+        $ticket_name = $ticket['ticket_name'];
+        $ticket_benefit = $ticket['benefits'];
+    }
+
+
+
+} elseif ($pricing_type === 'free') {
+    $ticket_name = 'Free';
+} else if ($pricing_type === 'donate') {
+    $ticket_name = 'Donate';
+}
+// Initialize email message body
+$emailMessageBody = '';
+ if (!empty($ticket_benefit) AND $pricing_type === 'paid') {
+    $emailMessageBody .= "<p><strong>Benefit:</strong> $ticket_benefit</p>";
+}
+else  {
+$emailMessageBody .= " ";
+}
+    
 
         // Check if the item has an affiliate
         if ($affiliate_id != 0) {
@@ -140,10 +171,12 @@ if (mysqli_affected_rows($con) > 0) {
 $emailSubject = "New Sale on Project Report Hub. Let's Keep the Momentum Going!";
 $emailMessage = "<p>Great news! A new sale has just been made on $siteurl.</p>
 <p><strong>Title of Resource:</strong> $resourceTitle</p>
+<p><strong>Ticket:</strong> $ticket_name</p>
 <p><strong>Price:</strong> $sitecurrencyCode$price</p>
+$emailMessageBody
 <p><strong>Earning:</strong> $sitecurrencyCode$seller_amount</p>
 <p>This is a win for our community and a reminder that students and researchers are actively exploring and purchasing resources from our platform every day.</p>
-<p>If you havenâ€™t updated your listings recently, now is a great time to:</p>
+<p>If you havenÃ¢â‚¬â„¢t updated your listings recently, now is a great time to:</p>
 <ol>
     <li>Refresh your content and pricing</li>
     <li>Promote your reports on social media</li>
@@ -161,7 +194,42 @@ sendEmail($vendorEmail, $vendorName, $siteName, $siteMail, $emailMessage, $email
 
 // Update order status to paid
 $sql_update_order = "UPDATE ".$siteprefix."orders SET status = 'paid',date='$currentdatetime' WHERE order_id = '$ref'";
-mysqli_query($con, $sql_update_order);
+if (mysqli_query($con, $sql_update_order)) {
+
+    // Get all items in the order
+    $sql_items = "SELECT oi.*, t.pricing 
+                  FROM ".$siteprefix."order_items oi
+                  JOIN ".$siteprefix."training t ON oi.training_id = t.training_id
+                  WHERE oi.order_id = '$ref'";
+    $sql_items_result = mysqli_query($con, $sql_items);
+
+    if (mysqli_num_rows($sql_items_result) > 0) {
+        while ($row_item = mysqli_fetch_assoc($sql_items_result)) {
+            $training_id = $row_item['training_id'];
+            $pricing = $row_item['pricing'];
+
+            // Only proceed if the training is paid
+            if ($pricing == 'paid') {
+                // Fetch current seatremain
+                $seat_sql = "SELECT seatremain FROM ".$siteprefix."training_tickets WHERE training_id = '$training_id' LIMIT 1";
+                $seat_result = mysqli_query($con, $seat_sql);
+
+                if ($seat_result && mysqli_num_rows($seat_result) > 0) {
+                    $seat_data = mysqli_fetch_assoc($seat_result);
+                    $current_seats = (int)$seat_data['seatremain'];
+
+                    // Subtract 1 seat
+                    $new_seats = max(0, $current_seats - 1); // Prevent negative seats
+
+                    // Update seatremain
+                    $update_seat_sql = "UPDATE ".$siteprefix."training_tickets SET seatremain = '$new_seats' WHERE training_id = '$training_id'";
+                    mysqli_query($con, $update_seat_sql);
+                }
+            }
+        }
+    }
+
+}
 
 // Send order confirmation email
 $subject = "Order Confirmation";
@@ -199,9 +267,9 @@ while ($row = mysqli_fetch_assoc($sql_items_result)) {
         $last = end($event_dates);
         $date_str = date('M d, Y', strtotime($first['event_date']));
         if (count($event_dates) > 1 && $last['event_date'] !== $first['event_date']) {
-            $date_str .= ' – ' . date('M d, Y', strtotime($last['event_date']));
+            $date_str .= ' - ' . date('M d, Y', strtotime($last['event_date']));
         }
-        $time_str = date('h:i A', strtotime($first['start_time'])) . ' – ' . date('h:i A', strtotime($first['end_time']));
+        $time_str = date('h:i A', strtotime($first['start_time'])) . ' - ' . date('h:i A', strtotime($first['end_time']));
     }
     $format = ucfirst($row['delivery_format']);
     $details = '';
@@ -238,7 +306,17 @@ while ($row = mysqli_fetch_assoc($sql_items_result)) {
         }
     }
     $training_title = $row['title'];
-    $ticket_name = $row['ticket_name'];
+    $ticket_name="";
+    $amount_paid ="";
+
+    if (!empty($row['ticket_name'])) {
+        $ticket_name = $row['ticket_name'];
+    } elseif ($row['pricing'] === 'free') {
+    $ticket_name = 'Free';
+} elseif ($row['pricing'] === 'donate') {
+    $ticket_name = 'Donate';
+}
+
     $amount_paid = number_format($row['price'], 2);
     $emailDetails[] = [
         'training_title' => $training_title,
@@ -255,18 +333,18 @@ $emailMessage = "<p>Hi $user_first_name,</p>";
 $emailMessage .= "<p>Thank you for registering for:</p>";
 foreach ($emailDetails as $ed) {
     $emailMessage .= "<ul>
-        <li>🎓 <strong>Training:</strong> {$ed['training_title']}</li>
-        <li>📅 <strong>Date(s):</strong> {$ed['date_str']}</li>
-        <li>🕓 <strong>Time:</strong> {$ed['time_str']}</li>
-        <li>📍 <strong>Format:</strong> {$ed['format']}</li>
-        <li>🎟️ <strong>Ticket:</strong> {$ed['ticket_name']}</li>
-        <li>💰 <strong>Amount Paid:</strong> ₦{$ed['amount_paid']}</li>
+        <li><strong>Training:</strong> {$ed['training_title']}</li>
+        <li><strong>Date(s):</strong> {$ed['date_str']}</li>
+        <li><strong>Time:</strong> {$ed['time_str']}</li>
+        <li><strong>Format:</strong> {$ed['format']}</li>
+        <li><strong>Ticket:</strong> {$ed['ticket_name']}</li>
+        <li><strong>Amount Paid:</strong> {$ed['amount_paid']}</li>
     </ul>
-    <p>Here’s what to expect:</p>
+    <p>Here's what to expect:</p>
     <ul>
         {$ed['details']}
-        <li>You’ll get a reminder 24 hours before the event.</li>
-        <li>Save this email — it contains your access details.</li>
+        <li>You'll get a reminder 24 hours before the event.</li>
+        <li>Save this email, it contains your access details.</li>
     </ul>
     <hr>";
 }
@@ -289,7 +367,7 @@ sendEmail2($email, $username, $siteName, $siteMail, $emailMessage, $subject, $at
             <h5 class="card-title">Order processed successfully.</h5>
             <a href="my_orders.php" class="btn btn-primary mt-4"> Back to My Orders</a>
         </div>
-        <div class="card-footer text-muted">We appreciate your business! ðŸ’–</div>
+        <div class="card-footer text-muted">We appreciate your patronage!</div>
     </div>
     <!-- Table of Purchased Reports -->
 <div class="mt-5">
@@ -297,31 +375,75 @@ sendEmail2($email, $username, $siteName, $siteMail, $emailMessage, $subject, $at
     <table class="table table-bordered">
         <thead>
             <tr>
-                <th>Training Title</th>
+               <th>Training Title</th>
+                <th>Price</th>
+                <th>Ticket</th>
+                 <th></th>
             </tr>
         </thead>
-        <tbody>
-            <?php
-            $sql_items = "SELECT t.title 
-                          FROM {$siteprefix}order_items oi
-                          JOIN {$siteprefix}training t ON oi.training_id = t.training_id
-                          WHERE oi.order_id = '$ref'";
-            $sql_items_result = mysqli_query($con, $sql_items);
+       <tbody>
+<?php
+$sql_items = "SELECT oi.*, t.title, t.pricing
+              FROM {$siteprefix}order_items oi
+              JOIN {$siteprefix}training t ON oi.training_id = t.training_id
+              WHERE oi.order_id = '$ref'";
+$sql_items_result = mysqli_query($con, $sql_items);
 
-            if (mysqli_num_rows($sql_items_result) > 0) {
-                while ($row_item = mysqli_fetch_assoc($sql_items_result)) {
-                    $training_title = $row_item['title'];
-                    echo "<tr><td>$training_title</td></tr>";
-                }
+if (mysqli_num_rows($sql_items_result) > 0) {
+    while ($row_item = mysqli_fetch_assoc($sql_items_result)) {
+        $training_title = htmlspecialchars($row_item['title']);
+        $pricing_type = strtolower($row_item['pricing']);
+        $training_id = $row_item['training_id'];
+        $item_id = $row_item['item_id'];
+        $order_id = $row_item['order_id'];
+        $price = number_format($row_item['price'], 2);
+
+        // Default ticket info
+        $ticket_name = '';
+        $ticket_benefit = '';
+
+        if ($pricing_type === 'paid') {
+            // Get ticket name and benefit using item_id as ticket_id
+            $sql_ticket = "SELECT ticket_name, benefits FROM {$siteprefix}training_tickets WHERE s= '$item_id' LIMIT 1";
+            $ticket_result = mysqli_query($con, $sql_ticket);
+            if ($ticket_result && mysqli_num_rows($ticket_result) > 0) {
+                $ticket = mysqli_fetch_assoc($ticket_result);
+                $ticket_name = htmlspecialchars($ticket['ticket_name']);
+                $ticket_benefit = htmlspecialchars($ticket['benefits']);
             } else {
-                echo "<tr><td>No trainings found.</td></tr>";
+                $ticket_name = 'Paid Ticket';
             }
-            ?>
-        </tbody>
+        } elseif ($pricing_type === 'free') {
+            $ticket_name = 'Free';
+        } elseif ($pricing_type === 'donate') {
+            $ticket_name = 'Donate';
+        }
+
+        echo "<tr>";
+        echo "<td><strong>$training_title</strong></td>";
+        echo "<td>₦$price</td>";
+        echo "<td>";
+        echo "<strong>$ticket_name</strong>";
+        if (!empty($ticket_benefit)) {
+            echo "<br><small>Benefit: $ticket_benefit</small>";
+        }
+        echo "</td>";
+        echo "<td>
+                <a href='view-tickets.php?training_id=$training_id&item_id=$item_id&order_id=$order_id' class='btn btn-sm btn-success' target='_blank'>View Ticket</a>
+              </td>";
+        echo "</tr>";
+    }
+} else {
+    echo "<tr><td colspan='4'>No trainings found.</td></tr>";
+}
+?>
+</tbody>
+
     </table>
        <div class="alert alert-info mt-3">
         Please check your email for your event access details and confirmation.<br>
         You can also go to your <a href="dashboard.php" class="btn btn-primary btn-sm">Dashboard</a> to view your trainings.
     </div>
+</div>
 </div>
 <?php include "footer.php"; ?>

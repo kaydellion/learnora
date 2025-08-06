@@ -10,7 +10,12 @@ include "header.php";
 if (isset($_GET['blogslug'])) {
     // Convert slug back to title-style for DB lookup
     $raw_slug = $_GET['blogslug'];
- $shareUrl = $siteurl . 'view-blog/' . urlencode($raw_slug); // Clean URL
+
+    // Increase the view count
+$updateViews = "UPDATE ln_forum_posts SET views = views + 1 WHERE slug = '$raw_slug'";
+mysqli_query($con, $updateViews);
+
+    $shareUrl = $siteurl . 'view-blog/' . urlencode($raw_slug); // Clean URL
 
     $title = mysqli_real_escape_string($con, $raw_slug); // Updated to use $raw_slug
 
@@ -119,7 +124,7 @@ else {
                     </ul>
                   </div>
   <div class="content">
-    <?php echo nl2br(str_replace(["\\r\\n", "\\n", "\\r"], "\n", $current_article)); ?>
+    <?php echo str_replace(["\\r\\n", "\\n", "\\r"], "\n", $current_article); ?>
 </div>
 
                   <div class="meta-bottom">
@@ -129,7 +134,7 @@ $like_query = mysqli_query($con, "SELECT COUNT(*) as total FROM {$siteprefix}blo
 $like_data = mysqli_fetch_assoc($like_query);
 $like_count = $like_data['total'] ?? 0;
     ?>
-<div class="like-section mt-3 mb-2">
+<div class="like-section mt-3">
   <button class="btn btn-outline-danger" id="likeBtn"
           data-blog-id="<?php echo $blog_id; ?>"
           data-like-url="<?php echo $siteurl; ?>like-blog.php">
@@ -191,6 +196,8 @@ if ($active_log == 1){
                     </div>
                   </div>
 
+                
+             
                   <div class="col-12">
                     <div class="input-group">
                       <label for="comment">Your Comment *</label>
@@ -230,7 +237,7 @@ if ($active_log == 1){
         // Fetch main comments (parent_comment_id is '' or '0')
         $mainComments = mysqli_query($con, "SELECT * FROM ln_comments WHERE blog_id='$forum_id' AND (parent_comment_id='' OR parent_comment_id='0') ORDER BY commented_time DESC");
         while ($comment = mysqli_fetch_assoc($mainComments)) {
-            $userRes = mysqli_query($con, "SELECT display_name, profile_photo FROM {$siteprefix}users WHERE s='{$comment['user_id']}' LIMIT 1");
+            $userRes = mysqli_query($con, "SELECT display_name, profile_photo  FROM {$siteprefix}users WHERE s='{$comment['user_id']}' LIMIT 1");
             $user = mysqli_fetch_assoc($userRes);
             $avatar = !empty($user['profile_photo']) ? $imagePath . $user['profile_photo'] : $imagePath . 'user-avatar.png';
             $username = $user['display_name'] ?? 'User';
@@ -241,8 +248,8 @@ if ($active_log == 1){
           <div class="comment-box">
             <div class="comment-wrapper">
               <div class="avatar-wrapper">
-                <img src="<?php echo htmlspecialchars($avatar); ?>" alt="Avatar" loading="lazy">
-                
+                <img src="<?php echo $siteurl . htmlspecialchars($avatar); ?>" alt="Avatar" loading="lazy">
+
               </div>
               <div class="comment-content">
                 <div class="comment-header">
@@ -363,7 +370,6 @@ if ($active_log == 1){
 
                 </div>
 
-      
 
 </main>
 

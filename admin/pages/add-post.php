@@ -1,9 +1,5 @@
 
  <?php include "header.php";  ?>
-
-
-
-
 <div class="container-xxl flex-grow-1 container-p-y">
     <div class="card">
         <div class="card-body">
@@ -20,8 +16,8 @@
     
    <div class="col-sm-12">
    <div class="form-group mb-3">
-   <label class="form-label" for="first_name">Enter Forum Title</label>
-   <input placeholder="Enter First Name" id="first_name" type="text" class="form-control" name="title" required>
+   <label class="form-label" for="first_name">Title</label>
+   <input placeholder="Enter Title" id="first_name" type="text" class="form-control" name="title" required>
    </div></div>
           
             <div class="col-md-12 form-group">
@@ -40,7 +36,7 @@
 
    <div class="col-sm-12">
    <div class="form-group">
-    <label class="form-label" for="editor">Enter Forum Details</label><textarea class="form-control" id="editor" name="article"></textarea>
+    <label class="form-label" for="editor">Article Content</label><textarea class="form-control editor" id="editor" name="article"></textarea>
    </div></div>
 
   <input type="hidden" name="user" value="<?php echo $user_id; ?>">
@@ -48,7 +44,7 @@
     
   <div class="col-lg-12 text-center mt-1" id="messages"></div> 
   <div class="col-lg-12 col-md-12 col-sm-12">
-  <button type="submit" id="submitBtn"  class="btn btn-primary w-100" name="addforum">Create Forum Topic</button>
+  <button type="submit" id="submitBtn"  class="btn btn-primary w-100" name="addforum">Create Topic</button>
   </div></div>
                                 
                                 

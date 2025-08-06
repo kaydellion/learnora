@@ -90,7 +90,7 @@
         <div class="row gy-3 align-items-center">
           <div class="col-lg-6 col-md-12">
             <div class="copyright">
-              <p>© <span>Copyright</span> <strong class="sitename"><?php echo $sitename; ?></strong>. All Rights Reserved.</p>
+              <p>© <span>Copyright </span> <strong class="sitename"><?php echo $sitename; ?></strong>. All Rights Reserved. The website is a property of Kyneli Business Support Services.</p>
             </div>
             <div class="credits mt-1">
               <!-- All the links in the footer should remain intact. -->
@@ -108,7 +108,7 @@
                   <i class="bi bi-credit-card" aria-label="Credit Card"></i>
                   <i class="bi bi-paypal" aria-label="PayPal"></i>
                   <i class="bi bi-apple" aria-label="Apple Pay"></i>
-                  <i class="bi bi-google" aria-label="Google Pay"></i>
+                  <i class="bi bi-paystack" aria-label="Paystack"></i>
                   <i class="bi bi-shop" aria-label="Shop Pay"></i>
                   <i class="bi bi-cash" aria-label="Cash on Delivery"></i>
                 </div>
@@ -134,7 +134,8 @@
   <div id="preloader"></div>
 
   <!-- Vendor JS Files -->
-      <script src="https://js.paystack.co/v1/inline.js"></script> 
+
+
    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
   <script src="<?php echo $siteurl; ?>assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="<?php echo $siteurl; ?>assets/vendor/php-email-form/validate.js"></script>
@@ -145,37 +146,51 @@
   <script src="<?php echo $siteurl; ?>assets/vendor/glightbox/js/glightbox.min.js"></script>
   <script src="<?php echo $siteurl; ?>assets/vendor/drift-zoom/Drift.min.js"></script>
   <script src="<?php echo $siteurl; ?>assets/vendor/purecounter/purecounter_vanilla.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
   <!-- Main JS File -->
   <script src="<?php echo $siteurl; ?>assets/js/main.js"></script>
-  <script type="text/javascript">const paymentForm = document.getElementById('paymentForm');
-paymentForm.addEventListener("submit", payWithPaystack, false);
-function payWithPaystack(e) {
-  e.preventDefault();
-  let handler = PaystackPop.setup({
-    key: '<?php echo $apikey; ?>', // Replace with your public key
-    email:  document.getElementById("email-address").value,
-    amount: document.getElementById("amount").value * 100,
-    ref: document.getElementById("ref").Value, // generates a pseudo-unique reference. Please replace with a reference you generated. Or remove the line entirely so our API will generate one for you
-    // label: "Optional string that replaces customer email"
-    metadata: {
-               custom_fields: [
-                  {
-                      display_name: "Mobile Number",
-                      variable_name: "mobile_number",
-                      value: document.getElementById("mobile-number").value,
-                  }
-               ]
-            },
-    onClose: function(){
-      alert('Window closed.');
-    },
-    callback: function(response){ 
-	window.location.href = document.getElementById("refer").value;
-	}
+<script type="text/javascript">
+  document.querySelector(".paystack-button").addEventListener("click", function (e) {
+    e.preventDefault();
+
+    const email = document.getElementById("email-address").value;
+    const amountNaira = document.getElementById("amount").value;
+    const mobile = document.getElementById("mobile-number").value;
+    const ref = document.getElementById("ref").value;
+
+    // Convert Naira to Kobo
+    const amountKobo = parseFloat(amountNaira) * 100;
+
+    const options = {
+      amount: amountKobo,
+      currency: 'NGN',
+      domain: 'sandbox', // use 'live' in production
+      key: '916b35ac-6705-4769-ad2b-c4dc00d0d92f', // replace with your VPay public key
+      email: email,
+      transactionref: ref,
+      customer_logo: 'https://www.vpay.africa/static/media/vpayLogo.91e11322.svg',
+      customer_service_channel: '+2348030007000, support@org.com',
+      txn_charge: 6,
+      txn_charge_type: 'flat',
+      onSuccess: function(response) {
+        console.log('Payment Success:', response.message);
+        window.location.href = document.getElementById("refer").value;
+      },
+      onExit: function(response) {
+        console.log('Payment Cancelled:', response.message);
+        alert("Payment was not completed.");
+      }
+    };
+
+    if (window.VPayDropin) {
+      const { open, exit } = VPayDropin.create(options);
+      open();
+    } else {
+      alert("VPay is not loaded. Try again later.");
+    }
   });
-  handler.openIframe();
-}</script>
+</script>
 
 </body>
 

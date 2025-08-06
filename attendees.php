@@ -57,7 +57,7 @@ $result = $stmt->get_result();
 echo "<div class='container'>";
 echo "<div class='row'>";
 echo "<div class='col-lg-8 mx-auto'>";
-echo "<h4>Training Attendees</h4>";
+echo "<h4 class='mt-3'>Training Attendees</h4>";
 echo "<div class='card mb-4'><div class='card-body'>";
 echo "<ul class='list-group mb-4'>";
 while ($row = $result->fetch_assoc()) {

@@ -14,7 +14,7 @@ $user = mysqli_fetch_assoc($user_query);
 
 // Example assignments (adjust field names as needed)
 $freelancer_representative = $user['company_name'] ?? '';
-$freelancer_address = $user['n_office_address'] ?? '';
+$freelancer_address = $user['address'] ?? '';
 $freelancer_name = $user['display_name'] ?? '';
 $freelancer_phone = $user['phone_number'] ?? '';
 $freelancer_email = $user['email_address'] ?? '';

@@ -52,11 +52,11 @@
             </div>
             <div class="mb-3">
               <label class="form-label">Description</label>
-              <textarea class="form-control" name="description" required></textarea>
+              <textarea class="form-control editor" name="description" required></textarea>
             </div>
             <div class="mb-3">
               <label class="form-label">Who Should Attend</label>
-              <input type="text" class="form-control" name="who_should_attend" placeholder="E.g. Beginners, Entrepreneurs, etc.">
+              <input type="hidden" class="form-control" name="who_should_attend" placeholder="E.g. Beginners, Entrepreneurs, etc.">
             </div>
             <div class="mb-3">
               <label class="form-label">Event Dates & Times</label>
@@ -106,8 +106,7 @@
                 <option value="physical">Physical (In-person)</option>
                 <option value="online">Online (Webinar/Virtual)</option>
                 <option value="hybrid">Hybrid (Physical & Online)</option>
-                <option value="video">Video</option>
-                <option value="text">Text</option>
+                
               </select>
             </div> 
             <!-- Physical Address Fields -->
@@ -120,9 +119,15 @@
               </select>
               <div id="nigeriaPhysicalFields" style="display:none;">
                 <label class="form-label mt-2">Nigerian Address</label>
-                <input type="text" class="form-control mb-2" name="nigeria_address">
-                <input type="text" class="form-control mb-2" name="state" placeholder="State">
-                <input type="text" class="form-control mb-2" name="lga" placeholder="LGA">
+                <select id="state" name="state" class="form-control" required>
+              <option value="">-Select State-</option>
+            </select>
+                <select class="form-control" id="lga" required name="lga">
+            <option value="">-Select LGA-</option>
+          </select>
+                <input type="text" class="form-control mb-2" name="nigeria_address" placeholder="Address">
+               
+  
                 <input type="text" class="form-control mb-2" name="country" value="Nigeria" readonly>
               </div>
               <div id="foreignPhysicalFields" style="display:none;">
@@ -148,8 +153,12 @@
                 <option value="foreign">Foreign</option>
               </select>
               <div id="nigeriaHybridFields" style="display:none;">
-                <input type="text" class="form-control mb-2" name="hybrid_state" placeholder="State">
-                <input type="text" class="form-control mb-2" name="hybrid_lga" placeholder="LGA">
+                    <select id="hybrid_state"  name="hybrid_state" class="form-control" required>
+              <option value="">-Select State-</option>
+            </select>
+                <select class="form-control" id="hybrid_lga" required name="hybrid_lga">
+            <option value="">-Select LGA-</option>
+          </select>
                 <input type="text" class="form-control mb-2" name="hybrid_country" value="Nigeria" readonly>
               </div>
               <div id="foreignHybridFields" style="display:none;">
@@ -160,11 +169,11 @@
             <h6>Course Content Details</h6>
             <div class="mb-3">
               <label class="form-label">Course Description</label>
-              <textarea class="form-control" name="course_description" rows="4"></textarea>
+              <textarea class="form-control editor" name="course_description" rows="4"></textarea>
             </div>
             <div class="mb-3">
               <label class="form-label">Learning Objectives / Outcomes</label>
-              <textarea class="form-control" name="learning_objectives" rows="3" placeholder="List what the learner will be able to do after completing the course."></textarea>
+              <textarea class="form-control editor" name="learning_objectives" rows="3" placeholder="List what the learner will be able to do after completing the course."></textarea>
             </div>
             <div class="mb-3">
               <label class="form-label">Target Audience</label>
@@ -172,7 +181,7 @@
             </div>
             <div class="mb-3">
               <label class="form-label">Course Requirements / Prerequisites</label>
-              <textarea class="form-control" name="prerequisites" rows="2" placeholder="Any knowledge, tools, or skills needed before starting."></textarea>
+              <textarea class="form-control editor" name="prerequisites" rows="2" placeholder="Any knowledge, tools, or skills needed before starting."></textarea>
             </div>
 
             <h6>Course Content Uploads</h6>
@@ -200,7 +209,7 @@
         <!-- Option 1: Text Entry -->
         <div id="quizText" style="display:none;">
           <label>Text Entry:</label>
-          <textarea name="quiz_text[]" placeholder="e.g., Write a short essay on the impact of AI on job markets..." class="form-control"></textarea>
+          <textarea name="quiz_text[]" placeholder="e.g., Write a short essay on the impact of AI on job markets..." class="form-control editor"></textarea>
         </div>
 
         <!-- Option 2: File Upload -->
@@ -222,7 +231,7 @@
     <div id="quizBuilderModal">
       <div class="mb-3">
         <label>Instructions:</label>
-        <textarea name="quiz_instructions" placeholder="Quiz Instructions" class="form-control mb-2"></textarea>
+        <textarea name="quiz_instructions" placeholder="Quiz Instructions" class="form-control mb-2 editor"></textarea>
       </div>
       <div class="question-block">
         <div class="mb-3">
@@ -307,18 +316,25 @@
 <!-- Paid Ticket Fields -->
 <div class="mb-3" id="paidFields" style="display:none;">
   <label class="form-label">Ticket Name</label>
-  <input type="text" class="form-control mb-2" name="ticket_name" placeholder="e.g. General Admission">
+  <input type="text" class="form-control mb-2" name="ticket_name[]" placeholder="e.g. General Admission">
   <label class="form-label">Benefits</label>
-  <input type="text" class="form-control mb-2" name="ticket_benefits" placeholder="e.g. Certificate, Lunch, Materials">
+  <input type="text" class="form-control mb-2" name="ticket_benefits[]" placeholder="e.g. Certificate, Lunch, Materials">
   <label class="form-label">Price</label>
-  <input type="number" class="form-control mb-2" name="ticket_price" min="0" step="0.01" placeholder="e.g. 5000">
+  <input type="number" class="form-control mb-2" name="ticket_price[]" min="0" step="0.01" placeholder="e.g. 5000">
   <label class="form-label">Number of Seats Available</label>
-  <input type="number" class="form-control" name="ticket_seats" min="1" placeholder="e.g. 100">
+  <input type="number" class="form-control" name="ticket_seats[]" min="1" placeholder="e.g. 100">
+
+  <div class="mb-3" id="ticketWrapper">
+
+              </div>
+  <!-- Add Another Ticket Button -->
+<button type="button" id="addTicketBtn" class="btn btn-secondary">Add Another Ticket</button>
 </div>
 
                          <div class="mb-3">
-                        <select class="form-select" name="category" aria-label="Default select example" required>
-                          <option selected>- Select Category -</option>
+                          <label>Category </label>
+                        <select class="form-select select-multiple w-100" name="category[]" id="category-select" multiple required>
+                          <option  disabled>- Select Category -</option>
                           <?php
                     $sql = "SELECT * FROM " . $siteprefix . "categories WHERE parent_id IS NULL ";
                      $sql2 = mysqli_query($con, $sql);
@@ -328,8 +344,9 @@
                         </div>
 
                         <div class="mb-3" id="subcategory-container" style="display:none;">
-                          <select class="form-select" name="subcategory" id="subcategory-select" required>
-                            <option selected>- Select Subcategory -</option>
+                            <label>SubCategory </label>
+                          <select  class="form-select select-multiple" name="subcategory[]" id="subcategory-select" multiple required>
+                            <option  disabled>- Select Subcategory -</option>
                           </select>
                         </div>
 
@@ -370,12 +387,13 @@
 <div class="mb-3" id="addInstructorFields" style="display:none;">
   <label class="form-label">Instructor Name</label>
   <input type="text" class="form-control mb-2" name="new_instructor_name" placeholder="Enter instructor name">
-   <label class="form-label">Instructor Email</label>
-  <input type="email" class="form-control mb-2" name="new_instructor_email" placeholder="Enter instructor email">
+ <!---  <label class="form-label">Instructor Email</label> --->
+  <input type="hidden" class="form-control mb-2" name="new_instructor_email" placeholder="Enter instructor email">
   <label class="form-label">Instructor Bio</label>
-  <textarea class="form-control mb-2" name="new_instructor_bio" placeholder="Enter instructor bio"></textarea>
+  <textarea class="form-control mb-2 editor" name="new_instructor_bio" placeholder="Enter instructor bio"></textarea>
   <label class="form-label">Instructor Photo</label>
   <input type="file" class="form-control" name="new_instructor_photo" accept="image/*">
+      <input type="hidden" name="user_id" value="<?php echo $user_id; ?>">
 </div>
 
 <div class="mb-3">
@@ -385,7 +403,7 @@
 
 <div class="mb-3">
   <label class="form-label">Additional Instructions or Notes</label>
-  <textarea class="form-control" name="additional_notes" rows="3"></textarea>
+  <textarea class="form-control editor" name="additional_notes" rows="3"></textarea>
 </div>
 
 
@@ -426,31 +444,60 @@
 
 
           
-                        <script>
-                        document.querySelector('select[name="category"]').addEventListener('change', function() {
-                          let parentId = this.value;
-                          let subSelect = document.getElementById('subcategory-container');
-                          let subcategorySelect = document.getElementById('subcategory-select');
-                          
-                          fetch(`get_subcategories.php?parent_id=${parentId}`)
-                            .then(response => response.json())
-                            .then(data => {
-                              console.log('Received data:', data);
-                              if (data.length > 0) {
-                                subcategorySelect.innerHTML = '<option selected>- Select Subcategory -</option>';
-                                data.forEach(cat => {
-                                  console.log('Processing category:', cat);
-                                  subcategorySelect.innerHTML += `<option value="${cat.s}">${cat.title}</option>`;
-                                });
-                                subSelect.style.display = 'block';
-                              } else {
-                                console.log('No subcategories found');
-                                subSelect.style.display = 'none';
-                              }
-                            })
-                            .catch(error => {
-                              console.error('Error fetching subcategories:', error);
-                            });
-                        });
-                        </script>
+                <script>
+  var $j = jQuery.noConflict();
+
+  $j(document).ready(function () {
+    $j('.select-multiple').select2();
+
+    $j('#category-select').on('change', function () {
+      const selectedCategories = Array.from(this.selectedOptions).map(opt => opt.value);
+      const $subSelect = $j('#subcategory-select');
+      const $subContainer = $j('#subcategory-container');
+
+      // Clear subcategory options
+      $subSelect.html('');
+
+      if (selectedCategories.length === 0) {
+        $subContainer.hide();
+        return;
+      }
+
+      // Fetch subcategories for each selected category
+      Promise.all(
+        selectedCategories.map(categoryId =>
+          fetch(`get_subcategories.php?parent_id=${categoryId}`)
+            .then(response => response.json())
+            .catch(error => {
+              console.error('Error fetching subcategories for category', categoryId, error);
+              return [];
+            })
+        )
+      ).then(allResults => {
+        let found = false;
+
+        // Flatten all subcategories into one array
+        allResults.flat().forEach(cat => {
+          if ($subSelect.find(`option[value="${cat.s}"]`).length === 0) {
+            $subSelect.append(new Option(cat.title, cat.s));
+            found = true;
+          }
+        });
+
+        if (found) {
+          $subContainer.show();
+
+          // Re-initialize select2 after modifying the options
+          if ($subSelect.hasClass('select2-hidden-accessible')) {
+            $subSelect.select2('destroy');
+          }
+          $subSelect.select2();
+        } else {
+          $subContainer.hide();
+        }
+      });
+    });
+  });
+</script>
+
             <?php include "footer.php"; ?>

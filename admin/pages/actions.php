@@ -84,13 +84,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_event'])) {
     $status = $_POST['status'];
     $trainingId = mysqli_real_escape_string($con, $_POST['id']);
     $title = mysqli_real_escape_string($con, $_POST['title']);
-     $description = mysqli_real_escape_string($con, $_POST['description']);
-    $category = mysqli_real_escape_string($con, $_POST['category']);
+    $description = mysqli_real_escape_string($con, $_POST['description']);
+    $category = implode(',', $_POST['category']);
+    $subcategory = implode(',', $_POST['subcategory']);
     $event_type = mysqli_real_escape_string($con, $_POST['event_type']);
     $attendee = mysqli_real_escape_string($con, $_POST['who_should_attend']);
     $loyalty = isset($_POST['loyalty']) ? 1 : 0;
     $user = mysqli_real_escape_string($con, $_POST['user']);
-    $subcategory = isset($_POST['subcategory']) ? mysqli_real_escape_string($con, $_POST['subcategory']) : null;
     $training_id = mysqli_real_escape_string($con, $_POST['id']);
     $language = mysqli_real_escape_string($con, $_POST['language']);
     $certification = mysqli_real_escape_string($con, $_POST['certification']);
@@ -119,7 +119,7 @@ $stmt->bind_param("sss", $training_id, $empty, $trailer_video_path);
     }
 
     // Replace spaces with hyphens and convert to lowercase
-$baseSlug = strtolower(str_replace(' ', '-', $title));
+$baseSlug = strtolower(trim(preg_replace('/[^a-z0-9]+/i', '-', $title), '-'));
 
 // Start with the cleaned slug
 $alt_title = $baseSlug;
@@ -143,19 +143,70 @@ while (true) {
     $counter++;
 }
 
+if ($status === 'approved') {
+    // Query to get users following the category
+$categories = explode(',', $category); // Convert comma-separated string back to array
+
+foreach ($categories as $catId) {
+    $catId = trim($catId);
+
+    // Query to get users following this category
+    $categoryFollowersQuery = "SELECT user_id FROM " . $siteprefix . "followers WHERE category_id = '$catId'";
+    $categoryFollowersResult = mysqli_query($con, $categoryFollowersQuery);
+
+    if ($categoryFollowersResult && mysqli_num_rows($categoryFollowersResult) > 0) {
+        // Fetch category name for the email
+        $categoryQuery = "SELECT * FROM " . $siteprefix . "categories WHERE id = '$catId'";
+        $categoryResult = mysqli_query($con, $categoryQuery);
+        $categoryRow = mysqli_fetch_assoc($categoryResult);
+        $categoryName = $categoryRow['category_name'];
+        $slugs = $categoryRow['slug'];
+
+        // Notify all users following this category
+        while ($follower = mysqli_fetch_assoc($categoryFollowersResult)) {
+            $followerId = $follower['user_id'];
+
+            // Fetch follower details
+            $followerDetailsQuery = "SELECT email_address, display_name FROM " . $siteprefix . "users WHERE s = '$followerId'";
+            $followerDetailsResult = mysqli_query($con, $followerDetailsQuery);
+            $followerDetails = mysqli_fetch_assoc($followerDetailsResult);
+
+            $followerEmail = $followerDetails['email_address'];
+            $followerName = $followerDetails['display_name'];
+
+            // Prepare the email
+            $emailSubject = "New event in $categoryName";
+        $emailMessage = "
+    <p>We are excited to inform you that a new eventl titled <strong>{$title}</strong> has been added to the <strong>{$categoryName}</strong> category.</p>
+    <p>You can check it out here: <a href=\"{$siteurl}category/{$slugs}\" target=\"_blank\">{$categoryName}</a></p>
+    <p>Thank you for following the <strong>{$categoryName}</strong> category!</p>
+";
+
+
+            // Send the email
+            sendEmail($followerEmail, $followerName, $siteName, $siteMail, $emailMessage, $emailSubject);
+
+            // Notify user
+            insertAlert($con, $followerId, "New resource titled $title under category $categoryName has been posted", $currentdatetime, 0);
+        }
+    }
+}
+
+}
+
     $promo_video = $_FILES['promo_video']['name'];
     if (!empty($promo_video)) { 
         $fileKey = 'promo_video';
         $fileName = uniqid() . '_' . basename($promo_video);
         $logopromo_video = handleFileUpload($fileKey, $uploadDir, $fileName);
-        $insertQuery=mysqli_query($con, "INSERT INTO {$siteprefix}training_videos (training_id, video_type, video_path, updated_at) VALUES ('$training_id', 'promo', '$logopromo_video', NOW())");
+        $insertQuery=mysqli_query($con, "INSERT INTO {$siteprefix}training_videos (training_id, video_type, video_path, updated_at) VALUES ('$training_id', 'promo', '$fileName', NOW())");
     } 
     $trailer_video = $_FILES['trailer_video']['name'];
     if (!empty($trailer_video)) {
         $fileKey = 'trailer_video';
         $fileName = uniqid() . '_' . basename($trailer_video);
         $logotrailer_video = handleFileUpload($fileKey, $fileuploadDir, $fileName);
-        $insertQuery=mysqli_query($con, "INSERT INTO {$siteprefix}training_videos (training_id, video_type, video_path, updated_at) VALUES ('$training_id', 'trailer', '$logotrailer_video', NOW())");
+        $insertQuery=mysqli_query($con, "INSERT INTO {$siteprefix}training_videos (training_id, video_type, video_path, updated_at) VALUES ('$training_id', 'trailer', '$fileName', NOW())");
     } 
 
     if (!empty($_FILES['video_lessons']['name'])) {
@@ -242,11 +293,23 @@ $stmt->close();
 }
 
         if ($_POST['pricing'] === 'paid') {
-        $ticket_name = mysqli_real_escape_string($con, $_POST['ticket_name']);
-        $ticket_benefits = mysqli_real_escape_string($con, $_POST['ticket_benefits']);
-        $ticket_price = floatval($_POST['ticket_price']);
-        $ticket_seats = intval($_POST['ticket_seats']);
-        mysqli_query($con, "INSERT INTO " . $siteprefix . "training_tickets (training_id, ticket_name, benefits, price, seats) VALUES ('$training_id', '$ticket_name', '$ticket_benefits', '$ticket_price', '$ticket_seats')");
+       $ticket_names = $_POST['ticket_name'];
+$ticket_benefits = $_POST['ticket_benefits'];
+$ticket_prices = $_POST['ticket_price'];
+$ticket_seats = $_POST['ticket_seats'];
+
+foreach ($ticket_names as $index => $name) {
+    $name = mysqli_real_escape_string($con, $name);
+    $benefits = mysqli_real_escape_string($con, $ticket_benefits[$index]);
+    $price = floatval($ticket_prices[$index]);
+    $seats = intval($ticket_seats[$index]);
+
+    // Insert into database
+    mysqli_query($con, "INSERT INTO " . $siteprefix . "training_tickets 
+        (training_id, ticket_name, benefits, price, seats, seatremain)
+        VALUES ('$training_id', '$name', '$benefits', '$price', '$seats', '$seats')");
+}
+
     }
 
         //  Handle Instructor
@@ -257,7 +320,7 @@ if ($instructor_id === 'add_new') {
     $new_name = mysqli_real_escape_string($con, $_POST['new_instructor_name']);
     $new_bio = mysqli_real_escape_string($con, $_POST['new_instructor_bio']);
     $new_email = mysqli_real_escape_string($con, $_POST['new_instructor_email']);
-
+    $adduser = mysqli_real_escape_string($con, $_POST['user_id']);
     $instructor_photo = ''; // initialize photo filename
     $photo_path = '';       // full path for saving file
 
@@ -271,8 +334,8 @@ if ($instructor_id === 'add_new') {
         }
     }
 
-    mysqli_query($con, "INSERT INTO {$siteprefix}instructors (name, email_address, bio, photo) 
-                        VALUES ('$new_name', '$new_email', '$new_bio', '$instructor_photo')");
+    mysqli_query($con, "INSERT INTO {$siteprefix}instructors (name, email_address, bio, photo, user) 
+                        VALUES ('$new_name', '$new_email', '$new_bio', '$instructor_photo','$adduser')");
 
     $instructor_id = mysqli_insert_id($con);
 }

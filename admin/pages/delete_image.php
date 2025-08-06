@@ -36,6 +36,48 @@ if($action == 'deleteimage'){
 } 
 
 
+// Check if the correct action is provided
+if (isset($_GET['action']) && $_GET['action'] === 'deletevideo' && isset($_GET['video_id'])) {
+    $video_id = intval($_GET['video_id']);
+    $query = "DELETE FROM {$siteprefix}training_Video_Lessons WHERE s = ?";
+    $stmt = $con->prepare($query);
+
+    if ($stmt) {
+        $stmt->bind_param("i", $video_id);
+        if ($stmt->execute()) {
+            echo "success";
+        } else {
+            echo "error: could not execute query";
+        }
+        $stmt->close();
+    } else {
+        echo "error: invalid SQL statement";
+    }
+} else {
+    echo "error: invalid request";
+}
+
+
+if (isset($_GET['action']) && $_GET['action'] === 'deletetext') {
+    $textId = intval($_GET['text_id'] ?? 0);
+
+    if ($textId <= 0) {
+        echo 'Invalid ID';
+        exit;
+    }
+
+    $sql = "DELETE FROM {$siteprefix}training_text_modules WHERE id = $textId";
+    if (mysqli_query($con, $sql)) {
+        echo 'success';
+    } else {
+        echo 'Delete failed: ' . mysqli_error($conn);
+    }
+
+    exit;
+}
+
+
+
 if($action == 'deletefile'){
     // Fetch the image file name
     $image_id = $_GET['image_id'];
@@ -126,19 +168,7 @@ if ($_GET['action'] === 'deletequizfile') {
     exit;
 }
 
-if ($_GET['action'] === 'deletetextmodule' && isset($_GET['id'])) {
-    $id = intval($_GET['id']);
 
-    $query = mysqli_query($con, "SELECT file_path FROM {$siteprefix}training_text_modules WHERE s = '$id' LIMIT 1");
-    if ($row = mysqli_fetch_assoc($query)) {
-        $file_path = '../../documents/' . $row['file_path'];
-        if (file_exists($file_path)) unlink($file_path);
-
-        mysqli_query($con, "DELETE FROM {$siteprefix}training_text_modules WHERE s = '$id'");
-        echo json_encode(['success' => true]);
-        exit;
-    }
-}
 
 echo json_encode(['success' => false]);
 
@@ -173,36 +203,36 @@ if($action == 'deletepromovideo'){
     }
 }
 
-if($action == 'deleteguidancevideo'){
-   $image_id = $_GET['image_id'];
-    // Fetch the video file name
-    $query = "SELECT 	video_path FROM ".$siteprefix."training_videos WHERE s = ?";
-    $stmt = $con->prepare($query);
-    $stmt->bind_param("i", $image_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $video = $result->fetch_assoc();
-    $stmt->close();
-
-    if ($video) {
-        // Delete the video file from the server
-        $file_path = '../../documents/' . $video['video_path'];
-        if (file_exists($file_path)) {
-            unlink($file_path);
-        }
-
-        // Delete the video record from the database
-        $delete_query = "DELETE FROM ".$siteprefix."training_videos WHERE s = ?";
-        $delete_stmt = $con->prepare($delete_query);
-        $delete_stmt->bind_param("i", $image_id);
-        $delete_stmt->execute();
-        $delete_stmt->close();
-
-        echo json_encode(['success' => true]);
+if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])) {
+    $video_id = intval($_GET['id']);
+    
+    $stmt = $con->prepare("DELETE FROM {$siteprefix}training_videos WHERE id = ?");
+    $stmt->bind_param("i", $video_id);
+    
+    if ($stmt->execute()) {
+        echo "success";
     } else {
-        echo json_encode(['success' => false, 'message' => ' video not found.']);
+        echo "error";
     }
+    
+    $stmt->close();
+} else {
+    echo "error";
 }
+
+if (isset($_GET['action']) && $_GET['action'] == 'deletevideotrain' && isset($_GET['video_id'])) {
+    $video_id = intval($_GET['video_id']);
+
+    $sql = "DELETE FROM " . $siteprefix . "training_videos WHERE id = $video_id";
+    if (mysqli_query($con, $sql)) {
+        echo 'success';
+    } else {
+        echo 'error: ' . mysqli_error($con);
+    }
+} else {
+    echo 'invalid request';
+}
+
 
 if($action == 'deletedocfile'){
    $image_id = $_GET['image_id'];

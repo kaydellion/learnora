@@ -4,11 +4,11 @@ include "header.php"; // Include the header file
 
 // Fetch all product reports
 $query = "SELECT pr.product_id, pr.user_id, pr.reason, pr.report_date, 
-                 u.display_name AS user_name, u.email AS user_email, 
+                 u.display_name AS user_name, u.email_address AS user_email, 
                  r.title AS product_title 
           FROM " . $siteprefix . "product_reports pr
           LEFT JOIN " . $siteprefix . "users u ON pr.user_id = u.s
-          LEFT JOIN " . $siteprefix . "reports r ON pr.product_id = r.id
+          LEFT JOIN " . $siteprefix . "training r ON pr.product_id = r.training_id
           ORDER BY pr.report_date DESC";
 $result = mysqli_query($con, $query);
 
@@ -18,7 +18,7 @@ if (!$result) {
 ?>
 
 <div class="container-xxl flex-grow-1 container-p-y">
-    <h4 class="fw-bold py-3 mb-4">Product Reports</h4>
+    <h4 class="fw-bold py-3 mb-4">Event Reports</h4>
     <div class="card">
         <div class="table-responsive text-nowrap">
             <table class="table table-bordered">
@@ -71,7 +71,7 @@ if (!$result) {
                         <?php endwhile; ?>
                     <?php else: ?>
                         <tr>
-                            <td colspan="5" class="text-center">No product reports found.</td>
+                            <td colspan="5" class="text-center">No event reports found.</td>
                         </tr>
                     <?php endif; ?>
                 </tbody>

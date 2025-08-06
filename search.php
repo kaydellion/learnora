@@ -132,6 +132,28 @@ $total_pages = ceil($total_reports / $limit);
         $image_path = $imagePath.$row['picture'];
         $slug = $alt_title;
         $event_type = $row['event_type'] ?? '';
+
+
+        
+           // Fetch price variations for this report
+    $priceSql = "SELECT price FROM {$siteprefix}training_tickets WHERE training_id = '$training_id'";
+    $priceRes = mysqli_query($con, $priceSql);
+    $prices = [];
+    while ($priceRow = mysqli_fetch_assoc($priceRes)) {
+        $prices[] = floatval($priceRow['price']);
+    }
+
+    // Determine price display
+   if (count($prices) === 1) {
+        $priceDisplay = $sitecurrency . number_format($prices[0], 2);
+        $price = $prices[0];
+    } if (count($prices) > 1) {
+        $minPrice = min($prices);
+        $maxPrice = max($prices);
+        $priceDisplay = $sitecurrency . number_format($minPrice, 2) . ' - ' . $sitecurrency . number_format($maxPrice, 2);
+        $price = $minPrice; // Use min price for sorting or other logic
+    }
+
     
 
             $sql_resource_type = "SELECT name FROM {$siteprefix}event_types WHERE s = $event_type";
