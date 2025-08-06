@@ -58,7 +58,15 @@
                       <label class="form-label">Commission Fee</label>
                       <input type="number" name="com_fee" class="form-control" value="<?php echo $escrowfee; ?>">
                     </div>
+                 <div class="mb-3">
+                      <label class="form-label">Payment Api key</label>
+                      <input type="text" name="apikey" class="form-control" value="<?php echo $apikey; ?>">
+                    </div>
 
+                       <div class="mb-3">
+                      <label class="form-label">Payment url text/live</label>
+                      <input type="url" name="paymenturl" class="form-control" value="<?php echo $paymenturl; ?>">
+                    </div>
                     <div class="mb-3">
                       <label class="form-label">Site Account Name</label>
                       <input type="text" name="account_name" class="form-control" value="<?php echo $siteaccname; ?>">
