@@ -47,15 +47,14 @@
   </div>
 
   <div class="row mt-3">
-    <div class="col-md-4 form-group">
+    <div class="col-md-6 form-group">
       <label for="photo">Photo</label>
       <input type="file" name="photo" class="form-control" id="photo" required>
     </div>
-    <div class="col-md-4 form-group">
-      <label for="age">Age</label>
+
       <input type="hidden" name="age" class="form-control" id="age" placeholder="Must be 18 years and above" hidden>
-    </div>
-    <div class="col-md-4 form-group">
+ 
+    <div class="col-md-6 form-group">
       <label for="gender">Gender</label>
       <select class="form-control" id="gender" name="gender" required>
         <option value="">-Select Gender-</option>
