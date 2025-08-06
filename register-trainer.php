@@ -147,7 +147,7 @@
   <!-- Foreign Office -->
   <div class="form-group mt-3">
 
-    <textarea hidden name="foreign-office" class="form-control editor" placeholder="Full address of foreign office (if any)"></textarea>
+    <textarea hidden name="foreign-office" class="form-control" placeholder="Full address of foreign office (if any)"></textarea>
   </div>
 <div class="row mt-3">
   <div class="col-md-6 form-group">
