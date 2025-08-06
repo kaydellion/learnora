@@ -43,7 +43,7 @@
 
   <div class="form-group mt-3">
     <label for="profile">Tell Us About Yourself</label>
-    <textarea class="form-control editor" name="profile" id="profile" placeholder="Your Profile" required></textarea>
+    <textarea class="form-control editor" name="profile" id="profile" placeholder="Your Profile"></textarea>
   </div>
 
   <div class="row mt-3">
