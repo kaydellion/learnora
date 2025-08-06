@@ -215,7 +215,7 @@ foreach ($categories as $catId) {
 
     foreach ($videoFiles as $file) {
         $stmt = $con->prepare(
-            "INSERT INTO {$siteprefix}training_Video_Lessons (training_id, file_path, video_url, updated_at) VALUES (?, ?, '', NOW())"
+            "INSERT INTO {$siteprefix}training_video_lessons (training_id, file_path, video_url, updated_at) VALUES (?, ?, '', NOW())"
         );
         $stmt->bind_param("ss", $training_id, $file);
         if (!$stmt->execute()) {
