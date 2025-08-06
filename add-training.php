@@ -55,7 +55,7 @@
             </div>
             <div class="mb-3">
               <label class="form-label">Description</label>
-              <textarea class="form-control editor" name="description" required></textarea>
+              <textarea class="form-control editor" name="description" ></textarea>
             </div>
             <div class="mb-3">
               <label class="form-label">Who Should Attend</label>
