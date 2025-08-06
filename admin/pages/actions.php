@@ -108,7 +108,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_event'])) {
     if(isset($_POST['video_embed_url']) && !empty($_POST['video_embed_url'])) {
     $trailer_video_path = mysqli_real_escape_string($con, $_POST['video_embed_url']);
     $stmt = $con->prepare(
-    "INSERT INTO {$siteprefix}training_Video_Lessons (training_id, file_path, video_url, updated_at) VALUES (?, ?, ?, NOW())"
+    "INSERT INTO {$siteprefix}training_video_lessons (training_id, file_path, video_url, updated_at) VALUES (?, ?, ?, NOW())"
 );
 $empty = '';
 $stmt->bind_param("sss", $training_id, $empty, $trailer_video_path);
