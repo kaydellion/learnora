@@ -221,35 +221,37 @@
     <span class="close" onclick="closeQuizModal()">&times;</span>
     <h3>🧠 Add Quiz Questions</h3>
     
-    <div id="quizBuilderModal">
-      <div class="mb-3">
-        <label>Instructions:</label>
-        <textarea name="quiz_instructions" placeholder="Quiz Instructions" class="form-control mb-2 editor"></textarea>
-      </div>
-      <div class="question-block">
-        <div class="mb-3">
-          <label>Question:</label>
-        <textarea id="question_editor_1" name="questions[]" placeholder="Question" class="form-control mb-2"></textarea>
+<div id="quizBuilderModal">
+  <div class="mb-3">
+    <label>Instructions:</label>
+    <textarea name="quiz_instructions" placeholder="Quiz Instructions" class="form-control mb-2 editor"></textarea>
+  </div>
 
-        </div>
-        <div class="mb-3">
-        <input type="text" name="option_a[]" placeholder="Option A">
-        <input type="text" name="option_b[]" placeholder="Option B">
-        <input type="text" name="option_c[]" placeholder="Option C">
-        <input type="text" name="option_d[]" placeholder="Option D">
-          </div>
-        <div class="mb-3">
-        <label>Correct Answer:</label>
-        <select name="correct_answer[]" class="form-select mb-3">
-          <option value="a">A</option>
-          <option value="b">B</option>
-          <option value="c">C</option>
-          <option value="d">D</option>
-        </select>
-         </div>
-        <hr>
-      </div>
+  <!-- Template to clone -->
+  <div class="question-block">
+    <div class="mb-3">
+      <label>Question:</label>
+      <textarea name="questions[]" class="form-control mb-2 editor" placeholder="Question"></textarea>
     </div>
+    <div class="mb-3">
+      <input type="text" name="option_a[]" placeholder="Option A">
+      <input type="text" name="option_b[]" placeholder="Option B">
+      <input type="text" name="option_c[]" placeholder="Option C">
+      <input type="text" name="option_d[]" placeholder="Option D">
+    </div>
+    <div class="mb-3">
+      <label>Correct Answer:</label>
+      <select name="correct_answer[]" class="form-select mb-3">
+        <option value="a">A</option>
+        <option value="b">B</option>
+        <option value="c">C</option>
+        <option value="d">D</option>
+      </select>
+    </div>
+    
+    <hr>
+  </div>
+</div>
 
     <button type="button" onclick="addQuizQuestionModal()" class="btn btn-secondary"><i class="bx bx-plus me-1"></i>Add Another Question</button>
     <br><br>
