@@ -59,7 +59,7 @@
 
        
 ?>
-
+ 
              <!-- Cart Item 1 -->
    <div class="cart-item" data-aos="fade-up" data-aos-delay="100" id="cart-item-<?php echo htmlspecialchars($item['s']); ?>">
         <div class="row align-items-center gy-4">
