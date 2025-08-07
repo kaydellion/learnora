@@ -212,7 +212,7 @@ $subcategory = isset($_POST['subcategory']) && is_array($_POST['subcategory']) ?
        $password=hashPassword($password);
             $query = "INSERT INTO ".$siteprefix."users (
         title, display_name, first_name, middle_name, last_name, company_name, company_profile, company_logo, biography, profile_photo, age, gender, email_address, phone_number, skills_hobbies, language, proficiency, n_office_address, f_office_address, category, subcategory, facebook, instagram, twitter, linkedin, state, lga, country,address, type,status, trainer,password, last_login, created_date, reset_token, reset_token_expiry,affliate,loyalty,downloads,wallet,bank_name,bank_accname,bank_number
-    ) VALUES ('$title','$display_name','$firstName','$middleName','$lastName','$companyName','$companyProfile','$company_logo','$biography','$profile_photo','$age','$gender','$email','$phone','$skills','$language','$proficiency','$nigeriaOffice','$foreignOffice','$category','$subcategory','$facebook','$instagram','$twitter','$linkedin','$state','$lga','$country','$address','$type', '$status', '$trainer','$password','$last_login','$created_date','$reset_token','$reset_token_expiry','','','','','','',''
+    ) VALUES ('$title','$display_name','$firstName','$middleName','$lastName','$companyName','$companyProfile','$company_profile_picture','$biography','$profile_picture','$age','$gender','$email','$phone','$skills','$language','$proficiency','$nigeriaOffice','$foreignOffice','$category','$subcategory','$facebook','$instagram','$twitter','$linkedin','$state','$lga','$country','$address','$type', '$status', '$trainer','$password','$last_login','$created_date','$reset_token','$reset_token_expiry','','','','','','',''
     )";
 
         if (mysqli_query($con, $query)) {
@@ -325,7 +325,7 @@ if(isset($_POST['register-newuser'])){
        $password=hashPassword($password);
                      $query = "INSERT INTO ".$siteprefix."users (
         title, display_name, first_name, middle_name, last_name, company_name, company_profile, company_logo, biography, profile_photo, age, gender, email_address, phone_number, skills_hobbies, language, proficiency, n_office_address, f_office_address, category, subcategory, facebook, instagram, twitter, linkedin, state, lga, country, address, type,status, trainer,password, last_login, created_date, reset_token, reset_token_expiry,affliate,loyalty,downloads,wallet,bank_name,bank_accname,bank_number
-    ) VALUES ('$title','$display_name','$firstName','$middleName','$lastName','','','','$profile','$profile_photo','','$gender','$email','$phone','','','','','','','','$facebook','$instagram','$twitter','$linkedin','$state','$lga','$country','$address', '$type', '', '','$password','$last_login','$created_date','$reset_token','$reset_token_expiry','','','','','','',''
+    ) VALUES ('$title','$display_name','$firstName','$middleName','$lastName','','','','$profile','$profile_picture','','$gender','$email','$phone','','','','','','','','$facebook','$instagram','$twitter','$linkedin','$state','$lga','$country','$address', '$type', '', '','$password','$last_login','$created_date','$reset_token','$reset_token_expiry','','','','','','',''
     )";
 
         if (mysqli_query($con, $query)) {
@@ -859,18 +859,18 @@ if ($instructor_id === 'add_new') {
         $randomImage = $defaultImages[array_rand($defaultImages)];
         $reportImages = [$randomImage];
     }else{
-
+        $reportImage =$_FILES[$fileKey]['name'];
     // Insert images into the database
-    $fileName = uniqid() . '_' . basename($trailer_video);
+    $fileName = uniqid() . '_' . basename($reportImage);
     $reportImages = handleFileUpload($fileKey, $uploadDir,$fileName);
     }
 
  
   
         $stmt = $con->prepare("INSERT INTO " . $siteprefix . "training_images (training_id, picture, updated_at) VALUES (?, ?, current_timestamp())");
-        $stmt->bind_param("ss", $training_id, $fileName);
+        $stmt->bind_param("ss", $training_id, $reportImages);
         if ($stmt->execute()) {
-            $uploadedFiles[] = $fileName;
+            $uploadedFiles[] = $reportImages;
         } else {
             $message .= "Error inserting image: " . $stmt->error . "<br>";
         }

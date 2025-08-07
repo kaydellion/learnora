@@ -31,7 +31,7 @@
               <ul class="footer-links">
                 <li><a href="<?php echo $siteurl; ?>about.php">About Us</a></li>
                 <li><a href="<?php echo $siteurl; ?>contact.php">Contact Us</a></li>
-                <li><a href="<?php echo $siteurl; ?>privacy.php">Privacy Policy</a></li>
+                <li><a href="<?php echo $siteurl; ?>privacy-policy.php">Privacy Policy</a></li>
                 <li><a href="<?php echo $siteurl; ?>cookie-policy">Cookie Policy</a></li>
                 <li><a href="<?php echo $siteurl; ?>terms">Terms of Use</a></li>
                 <li><a href="<?php echo $siteurl; ?>why-us">Why Us?</a></li>

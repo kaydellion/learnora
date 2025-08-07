@@ -21,13 +21,38 @@ if (!empty($event_dates)) {
 
 
 $is_in_cart = false;
+
 if (isset($order_id)) {
-   
-    $sql = "SELECT COUNT(*) as count FROM {$siteprefix}order_items WHERE training_id = '$training_id' AND order_id = '$order_id'";
-    $result = mysqli_query($con, $sql);
-    $row = mysqli_fetch_assoc($result);
-    if ($row['count'] > 0) {
-        $is_in_cart = true;
+    if ($pricing === 'free') {
+        // Check if "free" training is already in cart
+        $sql = "SELECT COUNT(*) as count FROM {$siteprefix}order_items 
+                WHERE training_id = '$training_id' AND order_id = '$order_id' AND item_id = 'free'";
+        $result = mysqli_query($con, $sql);
+        $row = mysqli_fetch_assoc($result);
+        if ($row['count'] > 0) {
+            $is_in_cart = true;
+        }
+    } else {
+        // For paid items, ensure all variations are in cart
+        $sql = "SELECT s FROM {$siteprefix}training_tickets WHERE training_id = '$training_id'";
+        $ticket_result = mysqli_query($con, $sql);
+        $ticket_ids = [];
+
+        while ($ticket_row = mysqli_fetch_assoc($ticket_result)) {
+            $ticket_ids[] = $ticket_row['s'];
+        }
+
+        // Now check how many of those tickets are in the cart
+        $ticket_ids_string = "'" . implode("','", $ticket_ids) . "'";
+        $sql = "SELECT COUNT(DISTINCT item_id) as count FROM {$siteprefix}order_items 
+                WHERE training_id = '$training_id' AND order_id = '$order_id' 
+                AND item_id IN ($ticket_ids_string)";
+        $result = mysqli_query($con, $sql);
+        $row = mysqli_fetch_assoc($result);
+
+        if ($row['count'] == count($ticket_ids)) {
+            $is_in_cart = true;
+        }
     }
 }
 
@@ -124,17 +149,22 @@ $user_review = $existing_review_result->fetch_assoc();
                 </div>
               </div>
 
-                  <div class="col-6">
-        <!-- Instructor Section -->
-        <h6>Instructor:</h6>
-        <div class="user_info mb-1 d-flex">
-            <img src="<?php echo $siteurl . $instructor_picture; ?>" alt="<?php echo $instructor_name; ?>" class="user-image rounded-circle me-2" width="32" height="32">
-            <span class="mt-3"><?php echo $instructor_name; ?></span>
-        </div>
+                <div class="col-6">
+    <!-- Instructor Section -->
+    <h6>Instructor:</h6>
+    <div class="user_info mb-1 d-flex align-items-center instructor-click" 
+         data-user-id="<?php echo $instructor_user; ?>" style="cursor:pointer;">
+        <img src="<?php echo $siteurl . $instructor_picture; ?>" 
+             alt="<?php echo $instructor_name; ?>" 
+             class="user-image rounded-circle me-2" width="32" height="32">
+        <span><?php echo $instructor_name; ?></span>
     </div>
+</div>
             </div>
 			  </div>
             </div>
+          
+
             <div class="product-gallery mb-3">
             
               <!-- Main Image -->
@@ -900,14 +930,29 @@ $rating_data = calculateRating($training_id, $con, $siteprefix);
       </div>
 
     </section><!-- /Related Products Section -->
-
+  <!-- Instructor Popup Modal -->
+<div class="modal" id="instructorModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Instructor Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body text-center">
+        <img id="instructorPhoto" src="" class="rounded-circle mb-3" width="80" height="80" />
+        <h6 id="instructorName"></h6>
+        <p id="instructorBio"></p>
+      </div>
+    </div>
+  </div>
+</div>
 
  <!-- Recent Reports Swiper Section -->
     <section id="best-sellers" class="best-sellers section">
   <div class="container" data-aos="fade-up" data-aos-delay="100">
     <div class="section-title text-center mb-4">
-      <h2>Last Purchased Events</h2>
-      <p>Stay up to date with the latest workshops, trainings, and learning sessions.</p>
+      <h2>Recently Enrolled Trainings</h2>
+      <p>Explore the latest training programs our learners are signing up for. Stay ahead with trending and in-demand courses!</p>
     </div>
     <div class="recent-reports-slider swiper init-swiper">
       <script type="application/json" class="swiper-config">
@@ -1097,6 +1142,33 @@ document.getElementById('webShareBtn').addEventListener('click', function() {
 
   
 
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".instructor-click").forEach(function (el) {
+        el.addEventListener("click", function () {
+            const userId = this.dataset.userId;
+
+            fetch("get_instructor.php?user_id=" + userId)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById("instructorPhoto").src = data.photo;
+                        document.getElementById("instructorName").textContent = data.name;
+                        document.getElementById("instructorBio").textContent = data.bio;
+                        let instructorModal = new bootstrap.Modal(document.getElementById("instructorModal"));
+                        instructorModal.show();
+                    } else {
+                        alert("Instructor not found.");
+                    }
+                })
+                .catch(error => {
+                    console.error(error);
+                    alert("Failed to load instructor data.");
+                });
+        });
+    });
+});
+</script>
 
 
 <?php include "footer.php"; ?>

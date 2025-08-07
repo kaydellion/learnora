@@ -18,7 +18,7 @@ if (isset($_GET['slug'])) {
             GROUP_CONCAT(DISTINCT sc.category_name SEPARATOR ', ') AS subcategory_name,
             u.name AS display_name, 
             u.photo AS profile_picture, us.display_name AS user_name, us.s AS user_id, us.profile_photo AS user_photo, 
-            tv.video_path, 
+            tv.video_path, u.s AS instructors,
             et.name AS event_types, 
             ti.picture AS event_image,
             tem.event_date, tem.start_time, tem.end_time,
@@ -71,6 +71,7 @@ if (isset($_GET['slug'])) {
                 $tags = $row['tags'];
                 $level = $row['level'];
                 $language = $row['Language'];
+                $instructor_user = $row['instructors'];
                 $instructor_name = $row['display_name'];
                 $instructor_picture =  $imagePath .$row['profile_picture'];
                 $target_audience = $row['target_audience'];

@@ -98,9 +98,9 @@
                                     </div>
                                   </div>
                                 </div>
-  <div class="form-group">
-   
-    <textarea class="form-control" name="skills" id="skills" placeholder="List your skills and hobbies" hidden></textarea>
+  <div class="form-group mt-3">
+  <label for="skills">Skills and Hobbies</label>
+    <textarea class="form-control editor" name="skills" id="skills" placeholder="List your skills and hobbies"></textarea>
   </div>
 
 

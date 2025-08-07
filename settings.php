@@ -159,7 +159,7 @@ checkActiveLog($active_log);
                                 </div>
   <div class="form-group mt-3">
     <label for="skills">Skills and Hobbies</label>
-    <textarea class="form-control" name="skills" id="skills" placeholder="List your skills and hobbies" hidden><?php echo $skills_hobbies; ?></textarea>
+    <textarea class="form-control editor" name="skills" id="skills" placeholder="List your skills and hobbies"><?php echo $skills_hobbies; ?></textarea>
   </div>
 
   <!-- LANGUAGE SECTION -->

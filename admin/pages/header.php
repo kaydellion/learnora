@@ -216,7 +216,7 @@ redirectToDashboardIfSubAdmin();
                   </a>
                 </li>
                 <li class="menu-item">
-                  <a href="reports.php" class="menu-link">
+                  <a href="training.php" class="menu-link">
                     <div data-i18n="Without navbar">Manage Events</div>
                   </a>
                 </li>

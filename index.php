@@ -96,7 +96,33 @@
         </div>
       </div>
     </section><!-- /Hero Section -->
-  
+
+       <!-- Promo Cards Section -->
+    <section id="promo-cards" class="promo-cards section">
+
+      <div class="container" data-aos="fade-up" data-aos-delay="100">
+
+        <div class="row g-4">
+               <?php
+                $query = "SELECT * FROM ".$siteprefix."event_types";
+                $result = mysqli_query($con, $query);
+                if ($result) {
+                    while ($row = mysqli_fetch_assoc($result)) {
+                        $category_id = $row['s'];
+                        $category_name = $row['name'];
+                        $alt_names = $row['slug'];
+                        $slugs = $alt_names;
+
+                        include "type-card.php"; // Include the promo card template
+
+                    }
+                  }
+
+                  ?>
+         
+              </div>
+              </div>
+          </section>
 
     <!-- Best Sellers Section -->
     <section id="best-sellers" class="best-sellers section">
@@ -252,7 +278,7 @@ while ($row = mysqli_fetch_assoc($result)) {
     <div class="row align-items-center affiliate-prompt-container">
         <!-- Image Column -->
        <div class="col-md-5 mb-4 mb-md-0">
-        <img src="<?php echo $siteurl;?>assets/img/lenora-affliate-2.png" alt="Join Marketplace" class="img-fluid affiliate-prompt-img">
+        <img src="<?php echo $siteurl;?>assets/img/lenora-affliate-3.png" alt="Join Marketplace" class="img-fluid affiliate-prompt-img">
       </div>
       <!-- Content Column -->
       <div class="col-md-7">

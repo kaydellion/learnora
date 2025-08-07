@@ -76,9 +76,7 @@ $report_loyalty = $row['loyalty'];
 
 
 
-$sql_count = "SELECT COUNT(*) as count FROM {$siteprefix}order_items WHERE  training_id = '$training_id' AND order_id = '$order_id' AND item_id = '$file_id'";
-$result_count = mysqli_query($con, $sql_count);
-$row_count = mysqli_fetch_assoc($result_count);
+
 if ($pricing === 'free') {
     // Use default file_id for free items
     $file_id = 'free';
@@ -110,6 +108,10 @@ if ($pricing === 'free') {
 else{
 foreach ($variation_ids as $file_id_raw) {
     $file_id = mysqli_real_escape_string($con, trim($file_id_raw));
+
+         $sql_count = "SELECT COUNT(*) as count FROM {$siteprefix}order_items WHERE  training_id = '$training_id' AND order_id = '$order_id' AND item_id = '$file_id'";
+$result_count = mysqli_query($con, $sql_count);
+$row_count = mysqli_fetch_assoc($result_count);
     if ($file_id === '') continue;
 
     $sql = "SELECT price FROM ln_training_tickets WHERE s = '$file_id' LIMIT 1";
@@ -123,6 +125,8 @@ foreach ($variation_ids as $file_id_raw) {
 
     $row = mysqli_fetch_assoc($res);
     $original_price = $price = floatval($row['price']);
+
+   
 // Apply loyalty discount if applicable
 if ($loyalty > 0 && $report_loyalty > 0) {
 //select loyalty discount
@@ -149,6 +153,8 @@ if ($discount == "") {
         'discount' => $discount,
         'new_price' => $price
     ];
+
+
 
     // Check if the user has reached the maximum number of downloads for their loyalty plan
     $query = "SELECT downloads AS count FROM {$siteprefix}users WHERE s = '$user_id'";

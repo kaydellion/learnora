@@ -199,14 +199,14 @@ foreach ($categories as $catId) {
         $fileKey = 'promo_video';
         $fileName = uniqid() . '_' . basename($promo_video);
         $logopromo_video = handleFileUpload($fileKey, $uploadDir, $fileName);
-        $insertQuery=mysqli_query($con, "INSERT INTO {$siteprefix}training_videos (training_id, video_type, video_path, updated_at) VALUES ('$training_id', 'promo', '$fileName', NOW())");
+        $insertQuery=mysqli_query($con, "INSERT INTO {$siteprefix}training_videos (training_id, video_type, video_path, updated_at) VALUES ('$training_id', 'promo', '$logopromo_video', NOW())");
     } 
     $trailer_video = $_FILES['trailer_video']['name'];
     if (!empty($trailer_video)) {
         $fileKey = 'trailer_video';
         $fileName = uniqid() . '_' . basename($trailer_video);
         $logotrailer_video = handleFileUpload($fileKey, $fileuploadDir, $fileName);
-        $insertQuery=mysqli_query($con, "INSERT INTO {$siteprefix}training_videos (training_id, video_type, video_path, updated_at) VALUES ('$training_id', 'trailer', '$fileName', NOW())");
+        $insertQuery=mysqli_query($con, "INSERT INTO {$siteprefix}training_videos (training_id, video_type, video_path, updated_at) VALUES ('$training_id', 'trailer', '$logotrailer_video', NOW())");
     } 
 
     if (!empty($_FILES['video_lessons']['name'])) {
@@ -389,18 +389,18 @@ if ($instructor_id === 'add_new') {
         $randomImage = $defaultImages[array_rand($defaultImages)];
         $reportImages = [$randomImage];
     }else{
-$reportImages= $_FILES['cover_images']['name'];
+$reportImage= $_FILES['cover_images']['name'];
     // Insert images into the database
-    $fileName = uniqid() . '_' . basename($reportImages);
+    $fileName = uniqid() . '_' . basename($reportImage);
     $reportImages = handleFileUpload($fileKey, $uploadDir,$fileName);
     }
 
  
   
         $stmt = $con->prepare("INSERT INTO " . $siteprefix . "training_images (training_id, picture, updated_at) VALUES (?, ?, current_timestamp())");
-        $stmt->bind_param("ss", $training_id, $fileName);
+        $stmt->bind_param("ss", $training_id, $reportImages);
         if ($stmt->execute()) {
-            $uploadedFiles[] = $fileName;
+            $uploadedFiles[] = $reportImages;
         } else {
             $message .= "Error inserting image: " . $stmt->error . "<br>";
         }
@@ -756,7 +756,7 @@ if(isset($_POST['settings'])){
     }
 
 
-    $update = mysqli_query($con,"UPDATE " . $siteprefix . "site_settings SET site_name='$name',site_bank='$site_bank', account_name='$account_name', affliate_percentage='$affiliate_percentage', commision_fee='$com_fee', account_number='$account_number', google_map='$google',  site_logo='$fileName',  site_keywords='$keywords', site_url='$url', site_description='$description', site_mail='$email', site_number='$number', payment_url='$paymenturl', paystack_key='$apikey' WHERE s=1");
+    $update = mysqli_query($con,"UPDATE " . $siteprefix . "site_settings SET site_name='$name',site_bank='$site_bank', account_name='$account_name', affliate_percentage='$affiliate_percentage', commision_fee='$com_fee', account_number='$account_number', google_map='$google',  site_logo='$logo',  site_keywords='$keywords', site_url='$url', site_description='$description', site_mail='$email', site_number='$number', payment_url='$paymenturl', paystack_key='$apikey' WHERE s=1");
 
 
     if($update){
