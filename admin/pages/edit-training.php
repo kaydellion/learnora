@@ -44,9 +44,12 @@ while ($row = mysqli_fetch_assoc($result)) {
         $alt_title = $row['alt_title'];
         $description = $row['description'];
         $learning_objectives = $row['learning_objectives'];
-        $category = $row['category'];
+        $category_id = $row['category'];
+    $subcategory_id = $row['subcategory'];
+    $selected_categories = explode(',', $category_id); // result: [1, 3]
+    $selected_subcategories = explode(',', $subcategory_id); // result: [5, 6]
         $image_id = $row['image_id'];
-        $subcategory = $row['subcategory'];
+       
         $loyalty = $row['loyalty'];
         $pricing = $row['pricing'];
         $attendee = $row['attendee'];
@@ -67,7 +70,7 @@ while ($row = mysqli_fetch_assoc($result)) {
         $quiz_method = $row['quiz_method'];
         $slug = $alt_title;
         $training_video = $imagePath . $row['video_path'];
-        $selected_event_type = $row['event_types'] ?? '';
+        $selected_event_type = $row['event_type'];
         $format = $row['delivery_format'];
         $selected_resource_type = explode(',', $row['use_case'] ?? '');
         $physical_country = $row['physical_country'];
@@ -117,7 +120,7 @@ if (!$training_data_set) {
             <h6>Event Details</h6>
             <div class="mb-3">
               <label class="form-label">Title</label>
-              <input type="text" class="form-control" name="title" value="<?php echo $title; ?>" required>
+              <input type="text" class="form-control" name="title" value="<?php echo $title; ?>" >
             </div>
             
                             <input type="hidden" id="training-id" name="training-id" class="form-control" value="<?php echo $training_id; ?>" readonly required>
@@ -127,17 +130,36 @@ if (!$training_data_set) {
                             </div>
             <div class="mb-3">
               <label class="form-label">Cover Image</label>
-              <input type="file" class="form-control" name="cover_images" accept="image/*"  required>
+              <input type="file" class="form-control" name="cover_images" accept="image/*">
             </div>
 
                <div class="mb-3">
                         <label class="form-label" for="course-id">Training ID</label>
                         <input type="text" id="course-id" name="id" class="form-control" value="<?php echo $training_id; ?>" readonly required>
                     </div>
+                       <h6>Course Content Details</h6>
+            <div class="mb-3">
+              <label class="form-label">Course Description</label>
+              <textarea class="form-control editor" name="course_description" rows="4"><?php echo $course_description; ?></textarea>
+            </div>
             <div class="mb-3">
               <label class="form-label">Description</label>
-              <textarea class="form-control" name="description" required><?php echo $description; ?></textarea>
+              <textarea class="form-control editor"  name="description" required><?php echo $description; ?></textarea>
             </div>
+
+            <div class="mb-3">
+              <label class="form-label">Learning Objectives / Outcomes</label>
+              <textarea class="form-control editor" name="learning_objectives" rows="3" placeholder="List what the learner will be able to do after completing the course."><?php echo $learning_objectives; ?></textarea>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Target Audience</label>
+              <input type="hidden" class="form-control" name="target_audience" placeholder='E.g. "Beginners in Python", "Entrepreneurs", etc.' value="<?php echo $target_audience; ?>">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Course Requirements / Prerequisites</label>
+              <textarea class="form-control editor" name="prerequisites" rows="2" placeholder="Any knowledge, tools, or skills needed before starting.">$course_requirrement</textarea>
+            </div>
+
             <div class="mb-3">
               <label class="form-label">Who Should Attend</label>
               <input type="text" class="form-control" name="who_should_attend" placeholder="E.g. Beginners, Entrepreneurs, etc." value="<?php echo $attendee; ?>">
@@ -168,6 +190,27 @@ if (!$training_data_set) {
   <i class="bx bx-plus me-1"></i> Add
 </button>
 
+</div>
+
+
+     <h6>Area of Specialization</h6>
+<div class="mb-3">
+   <select class="form-select select-multiple w-100" name="category[]" id="category-select" multiple required>
+  <?php
+  $sql = "SELECT * FROM " . $siteprefix . "categories WHERE parent_id IS NULL";
+  $sql2 = mysqli_query($con, $sql);
+  while ($row = mysqli_fetch_array($sql2)) {
+    $selected = in_array($row['id'], $selected_categories) ? 'selected' : '';
+    echo '<option value="' . $row['id'] . '" ' . $selected . '>' . $row['category_name'] . '</option>';
+  }
+  ?>
+</select>
+</div>
+
+<div class="mb-3" id="subcategory-container" style="display:block;">
+  <select class="form-select select-multiple w-100" name="subcategory[]" id="subcategory-select" multiple required>
+    <!-- Subcategories will be filled via JS -->
+  </select>
 </div>
 
 <div class="mb-3">
@@ -269,7 +312,7 @@ if (!$training_data_set) {
 </div>
 
       <?php
-$lessonQuery = mysqli_query($con, "SELECT * FROM {$siteprefix}training_Video_Lessons WHERE training_id = '$training_id'");
+$lessonQuery = mysqli_query($con, "SELECT * FROM {$siteprefix}training_video_lessons WHERE training_id = '$training_id'");
 $embedValue = ''; // to store the embed url for pre-filling
 ?>
 
@@ -332,117 +375,186 @@ if ($textQuery && mysqli_num_rows($textQuery) > 0): ?>
               <label class="form-label">Text Modules / PDFs / Readings (Upload)</label>
               <input type="file" class="form-control" name="text_modules[]" multiple accept=".pdf,.txt,.doc,.docx">
             </div>
-
-              <?php
-$quiz = mysqli_query($con, "SELECT * FROM {$siteprefix}training_quizzes WHERE training_id = '$training_id' ORDER BY s DESC LIMIT 1");
-$quizData = mysqli_fetch_assoc($quiz);
-$quiz_type = $quizData['type'];
-
-$quizQuestions = [];
-if ($quiz_type === 'form') {
-    $quiz_id = $quizData['s'];
-    $questionQuery = mysqli_query($con, "SELECT * FROM {$siteprefix}training_quiz_questions WHERE quiz_id = '$quiz_id'");
-    while ($q = mysqli_fetch_assoc($questionQuery)) {
-        $quizQuestions[] = $q;
-    }
-}
-            ?>
-            <div class="mb-3">
-              <div>
-              <label class="form-label">Quizzes & Assignments</label>
-          </div>
-         <label>Choose how to provide quiz/assignment content:</label>
-         <select onchange="toggleQuizOption(this.value)" name="quiz_method" class="form-control mb-3">
-  <option value="">-- Select Option --</option>
-  <option value="text" <?= ($quiz_type === 'text') ? 'selected' : '' ?>>Text Entry</option>
-  <option value="upload" <?= ($quiz_type === 'upload') ? 'selected' : '' ?>>Upload Files</option>
-  <option value="form" <?= ($quiz_type === 'form') ? 'selected' : '' ?>>Use Form Builder</option>
+           <select class="form-control" name="pricing" id="pricingSelect" onchange="togglePricingFields()" required>
+  <option value="">Select Pricing</option>
+  <option value="donation" <?php echo ($pricing === 'donation') ? 'selected' : ''; ?>>Donation</option>
+  <option value="free" <?php echo ($pricing === 'free') ? 'selected' : ''; ?>>Free</option>
+  <option value="paid" <?php echo ($pricing === 'paid') ? 'selected' : ''; ?>>Paid</option>
 </select>
 
-        <!-- Option 1: Text Entry -->
-       <div id="quizText" style="display:none;">
-  <label>Text Entry:</label>
-  <textarea name="quiz_text[]" class="form-control"><?= $quizData['text_path']  ?></textarea>
+
+<!-- Donation Info -->
+<div class="mb-3" id="donationFields" style="display:none;">
+  <p>This event allows attendees to pay any amount they choose as a donation.</p>
+</div>
+
+<!-- Free Info -->
+<div class="mb-3" id="freeFields" style="display:none;">
+  <p>This event is free for all attendees.</p>
 </div>
 
 
-        <!-- Option 2: File Upload -->
-    <div id="quizUpload" style="display:none;">
-  <label>Upload Quiz or Assignment Files:</label>
-  <input type="file" name="quiz_files[]" multiple class="form-control">
-  <small>You can upload multiple files (PDF, Word, Text).</small>
-
-  <?php if ($quiz_type === 'upload' && !empty($quizData['file_path'])): ?>
-    <div class="mt-2">
-      <strong>Previously Uploaded:</strong>
-     <ul>
+<!-- Paid Ticket Fields -->
+<div class="mb-3" id="paidFields" style="display:none;">
   <?php
-  $uploadedFiles = explode(',', $quizData['file_path']);
-  foreach ($uploadedFiles as $file):
-    $file = trim($file);
-    $fileId = md5($file); // Unique ID for each file (optional but useful for DOM)
+  $tickets = [];
+  if ($pricing === 'paid') {
+      $ticketQuery = mysqli_query($con, "SELECT s, ticket_name, benefits, price, seats FROM {$siteprefix}training_tickets WHERE training_id = '$training_id'");
+      while ($row = mysqli_fetch_assoc($ticketQuery)) {
+          $tickets[] = $row;
+      }
+  }
   ?>
-    <li id="file_<?= $fileId ?>">
-      <a href="<?= $fileuploadURL . $file ?>" target="_blank"><?= basename($file) ?></a>
-      <button type="button" class="btn btn-sm btn-danger ms-2 delete-quiz-file" data-file="<?= $file ?>" data-id="<?= $training_id ?>">
+
+  <?php if (!empty($tickets)): ?>
+    <?php foreach ($tickets as $ticket): ?>
+      <label class="form-label">Ticket Name</label>
+      <input type="hidden" name="ticket_ids[]" value="<?php echo htmlspecialchars($ticket['s']); ?>">
+      <input type="text" class="form-control mb-2" name="ticket_name[]" value="<?php echo htmlspecialchars($ticket['ticket_name']); ?>" placeholder="e.g. General Admission">
+
+      <label class="form-label">Benefits</label>
+      <input type="text" class="form-control mb-2" name="ticket_benefits[]" value="<?php echo htmlspecialchars($ticket['benefits']); ?>" placeholder="e.g. Certificate, Lunch, Materials">
+
+      <label class="form-label">Price</label>
+      <input type="number" class="form-control mb-2" name="ticket_price[]" min="0" step="0.01" value="<?php echo htmlspecialchars($ticket['price']); ?>" placeholder="e.g. 5000">
+
+      <label class="form-label">Number of Seats Available</label>
+      <input type="number" class="form-control mb-3" name="ticket_seats[]" min="1" value="<?php echo htmlspecialchars($ticket['seats']); ?>" placeholder="e.g. 100">
+    <?php endforeach; ?>
+  <?php else: ?>
+    <!-- Default empty fields if no tickets exist -->
+    <label class="form-label">Ticket Name</label>
+    <input type="text" class="form-control mb-2" name="ticket_name[]" placeholder="e.g. General Admission">
+
+    <label class="form-label">Benefits</label>
+    <input type="text" class="form-control mb-2" name="ticket_benefits[]" placeholder="e.g. Certificate, Lunch, Materials">
+
+    <label class="form-label">Price</label>
+    <input type="number" class="form-control mb-2" name="ticket_price[]" min="0" step="0.01" placeholder="e.g. 5000">
+
+    <label class="form-label">Number of Seats Available</label>
+    <input type="number" class="form-control mb-3" name="ticket_seats[]" min="1" placeholder="e.g. 100">
+  <?php endif; ?>
+
+  <!-- Container for JS-added tickets -->
+  <div class="mb-3" id="ticketWrapper"></div>
+
+  <!-- Add Another Ticket Button -->
+  <button type="button" id="addTicketBtn" class="btn btn-secondary">Add Another Ticket</button>
+</div>
+
+<ul class="list-group mb-4">
+  <h5>Promo Videos</h5>
+  <?php
+  $sql5 = "SELECT * FROM " . $siteprefix . "training_videos WHERE training_id = '$training_id' AND video_type = 'promo'";
+  $sql6 = mysqli_query($con, $sql5);
+  if (!$sql6) {
+    die("Query failed: " . mysqli_error($con));
+  }
+  while ($row = mysqli_fetch_array($sql6)) {
+    $videoId = $row['s'];
+    $filePath = $row['video_path'];
+
+  ?>
+    <li class="list-group-item d-flex justify-content-between align-items-center" id="lesson_<?php echo $videoId; ?>">
+      <div>
+        <?php if (!empty($filePath)): ?>
+          📁 <a href="<?php echo $siteurl . 'documents/' . $filePath; ?>" target="_blank">View Uploaded Video</a>
+       
+        <?php endif; ?>
+      </div>
+      <button type="button" class="btn btn-sm btn-danger delete-video-promo" data-video-id="<?php echo $videoId; ?>">
         Delete
       </button>
     </li>
-  <?php endforeach; ?>
+  <?php } ?>
 </ul>
-    </div>
-  <?php endif; ?>
-</div>
-<div id="quizModal" class="modal" style="display:none;">
-  <div class="modal-content">
-    <span class="close" onclick="closeQuizModal()">&times;</span>
-    <h3>🧠 Add Quiz Questions</h3>
 
-    <div id="quizBuilderModal">
-      <div class="mb-3">
-        <label>Instructions:</label>
-        <textarea name="quiz_instructions" class="form-control mb-2"><?= $quizData['instructions'] ?></textarea>
+
+<div class="mb-3">
+  <label class="form-label">Promo Video (Optional)</label>
+  <input type="file" class="form-control" name="promo_video" accept="video/*">
+</div>
+
+<ul class="list-group mb-4">
+  <h5>Trailer Videos</h5>
+  <?php
+  $sql3 = "SELECT * FROM " . $siteprefix . "training_videos WHERE training_id = '$training_id' AND video_type = 'trailer'";
+  $sql4 = mysqli_query($con, $sql3);
+  if (!$sql4) {
+    die("Query failed: " . mysqli_error($con));
+  }
+  while ($row = mysqli_fetch_array($sql4)) {
+    $videoId = $row['s'];
+    $filePath = $row['video_path'];
+  
+  ?>
+    <li class="list-group-item d-flex justify-content-between align-items-center" id="lesson_<?php echo $videoId; ?>">
+      <div>
+        <?php if (!empty($filePath)): ?>
+          📁 <a href="<?php echo $siteurl . 'documents/' . $filePath; ?>" target="_blank">View Uploaded Video</a>
+       
+        <?php endif; ?>
       </div>
+      <button type="button" class="btn btn-sm btn-danger delete-video-trailer" data-video-id="<?php echo $videoId; ?>">
+        Delete
+      </button>
+    </li>
+  <?php } ?>
+</ul>
 
-      <?php if (!empty($quizQuestions)): ?>
-        <?php foreach ($quizQuestions as $q): ?>
-          <div class="question-block">
-            <div class="mb-3">
-              <label>Question:</label>
-              <input type="text" name="questions[]" value="<?= $q['question'] ?>" class="form-control mb-2">
+ <div class="mb-3">
+              <label class="form-label">Course Trailer/Intro Video (Optional)</label>
+              <input type="file" class="form-control" name="trailer_video" accept="video/*">
             </div>
-            <div class="mb-3">
-              <input type="text" name="option_a[]" placeholder="Option A" value="<?= $q['option_a'] ?>">
-              <input type="text" name="option_b[]" placeholder="Option B" value="<?= $q['option_b'] ?>">
-              <input type="text" name="option_c[]" placeholder="Option C" value="<?= $q['option_c'] ?>">
-              <input type="text" name="option_d[]" placeholder="Option D" value="<?= $q['option_d'] ?>">
-            </div>
-            <div class="mb-3">
-              <label>Correct Answer:</label>
-              <select name="correct_answer[]" class="form-select mb-3">
-                <option value="a" <?= ($q['correct_answer'] === 'a') ? 'selected' : '' ?>>A</option>
-                <option value="b" <?= ($q['correct_answer'] === 'b') ? 'selected' : '' ?>>B</option>
-                <option value="c" <?= ($q['correct_answer'] === 'c') ? 'selected' : '' ?>>C</option>
-                <option value="d" <?= ($q['correct_answer'] === 'd') ? 'selected' : '' ?>>D</option>
-              </select>
-            </div>
-            <hr>
-          </div>
-        <?php endforeach; ?>
-      <?php else: ?>
-        <!-- Default empty one block -->
-        <div class="question-block">
-          <!-- same block structure as above -->
-        </div>
-      <?php endif; ?>
-    </div>
+        <?php
+// Fetch event types from the database
+$eventTypes = [];
+$eventTypeQuery = mysqli_query($con, "SELECT s, name FROM {$siteprefix}event_types");
+while ($row = mysqli_fetch_assoc($eventTypeQuery)) {
+    $eventTypes[] = $row;
+}
+?>
 
-    <button type="button" onclick="addQuizQuestionModal()" class="btn btn-secondary"><i class="bx bx-plus me-1"></i>Add Another Question</button>
-    <br><br>
-    <button type="button" onclick="closeQuizModal()" class="btn btn-primary">✅ Done</button>
+<div class="mb-3">
+  <label class="form-label">Type of Training & Events</label>
+  <select class="form-control" name="event_type" required>
+    <option value="">Select Type</option>
+    <?php foreach ($eventTypes as $type): ?>
+      <option value="<?php echo htmlspecialchars($type['s']); ?>"
+        <?php echo ($type['s'] == $selected_event_type) ? 'selected' : ''; ?>>
+        <?php echo htmlspecialchars($type['name']); ?>
+      </option>
+    <?php endforeach; ?>
+  </select>
+</div>
+
+ <?php
+    // Fetch instructors from the database
+    $instructors = [];
+    $instructorQuery = mysqli_query($con, "SELECT s, name, photo FROM {$siteprefix}instructors");
+    while ($row = mysqli_fetch_assoc($instructorQuery)) {
+        $instructors[] = $row;
+    }
+    ?>
+            <h6>Instructor Information</h6>
+    <div class="mb-3">
+      <label class="form-label">Select Instructor</label>
+
+           <select class="form-control" name="instructor"id="instructorSelect" onchange="displayInstructorInfo()" required>
+  <option value="">-- Select Instructor --</option>
+  <?php foreach ($instructors as $inst): ?>
+    <option value="<?php echo htmlspecialchars($inst['s']); ?>"
+      data-name="<?php echo htmlspecialchars($inst['name']); ?>"
+      data-photo="<?php echo $adminimagePath.$inst['photo']; ?>"
+      <?php echo ($selected_instructor_id === $inst['s']) ? 'selected' : ''; ?>>
+      <?php echo htmlspecialchars($inst['name']); ?>
+    </option>
+  <?php endforeach; ?>
+  <option value="add_new">+ Add New Instructor</option>
+</select>
   </div>
-</div>
-</div>
+         
 <!-- Display selected instructor info -->
 <div class="mb-3" id="instructorInfo" style="display:none;">
   <img id="instructorPhoto" src="" alt="Instructor Photo" style="width:50px;height:50px;border-radius:50%;object-fit:cover;">
@@ -455,102 +567,15 @@ if ($quiz_type === 'form') {
  <!---  <label class="form-label">Instructor Email</label> --->
   <input type="hidden" class="form-control mb-2" name="new_instructor_email" placeholder="Enter instructor email">
   <label class="form-label">Instructor Bio</label>
-  <textarea class="form-control mb-2" name="new_instructor_bio" placeholder="Enter instructor bio"></textarea>
+  <textarea class="form-control mb-2 editor" name="new_instructor_bio" placeholder="Enter instructor bio"></textarea>
   <label class="form-label">Instructor Photo</label>
   <input type="file" class="form-control" name="new_instructor_photo" accept="image/*">
       <input type="hidden" name="user_id" value="<?php echo $user_id; ?>">
 </div>
-<div class="preview-container">
-  <?php
-  $sql3 = "SELECT * FROM " . $siteprefix . "training_videos WHERE training_id = '$training_id' AND video_type = 'trailer'";
-  $sql4 = mysqli_query($con, $sql3);
-  if (!$sql4) {
-    die("Query failed: " . mysqli_error($con));
-  }
-  while ($image_row = mysqli_fetch_array($sql4)) {
-    $trailer_video = $image_row['video_path'];
-    $video_id = $image_row['s']; // Make sure this is your actual video ID column
-  ?>
-    <?php if (!empty($trailer_video)): ?>
-      <span class="file-preview">
-        <input type="radio" class="btn-check" value="<?php echo $video_id; ?>" name="guidance_radio" id="guidanceRadio<?php echo $video_id; ?>" autocomplete="off">
-        
-        <!-- ✅ Changed to button -->
-        <button type="button" class="btn btn-outline-danger delete-guidance-video" data-image-id="<?php echo $video_id; ?>">
-          Delete Video
-        </button>
-
-        <a href="<?php echo $siteurl; ?>documents/<?php echo $trailer_video; ?>" target="_blank" class="btn btn-outline-secondary">View</a>
-      </span>
-    <?php endif; ?>
-  <?php } ?>
-</div>
-          <?php
-          // Fetch event types from the database
-          $eventTypes = [];
-          $eventTypeQuery = mysqli_query($con, "SELECT s, name FROM {$siteprefix}event_types");
-          while ($row = mysqli_fetch_assoc($eventTypeQuery)) {
-              $eventTypes[] = $row;
-          }
-          ?>
-          <!-- ...existing code... -->
-
-         <div class="mb-3">
-  <label class="form-label">Type of Training & Events</label>
-  <select class="form-control" name="event_type" required>
-    <option value="">Select Type</option>
-    <?php foreach ($eventTypes as $type): ?>
-      <option value="<?php echo $type['s']; ?>" <?= ($type['s'] == $selected_event_type) ? 'selected' : '' ?>>
-        <?php echo htmlspecialchars($type['name']); ?>
-      </option>
-    <?php endforeach; ?>
-  </select>
-</div>
-
-        <div class="mb-3">
-  <label class="form-label">Pricing</label>
-  <select class="form-control" name="pricing" id="pricingSelect" onchange="togglePricingFields()" required>
-    <option value="">Select Pricing</option>
-    <option value="donation" <?= ($pricing === 'donation') ? 'selected' : '' ?>>Donation</option>
-    <option value="free" <?= ($pricing === 'free') ? 'selected' : '' ?>>Free</option>
-    <option value="paid" <?= ($pricing === 'paid') ? 'selected' : '' ?>>Paid</option>
-  </select>
-</div>
-
-<!-- Donation Info -->
-<div class="mb-3" id="donationFields" style="display:none;">
-  <p>This event allows attendees to pay any amount they choose as a donation.</p>
-</div>
-
-<!-- Free Info -->
-<div class="mb-3" id="freeFields" style="display:none;">
-  <p>This event is free for all attendees.</p>
-</div>
-
-<!-- Paid Ticket Fields -->
-<div class="mb-3" id="paidFields" style="display:none;">
-  <label class="form-label">Ticket Name</label>
-  <input type="text" class="form-control mb-2" name="ticket_name" placeholder="e.g. General Admission" value="<?= $row['ticket_name'] ?>">
-
-  <label class="form-label">Benefits</label>
-  <input type="text" class="form-control mb-2" name="ticket_benefits" placeholder="e.g. Certificate, Lunch, Materials" value="<?= $row['ticket_benefits'] ?>">
-
-  <label class="form-label">Price</label>
-  <input type="number" class="form-control mb-2" name="ticket_price" min="0" step="0.01" placeholder="e.g. 5000" value="<?= row['price'] ?>">
-
-  <label class="form-label">Number of Seats Available</label>
-  <input type="number" class="form-control" name="ticket_seats" min="1" placeholder="e.g. 100" value="<?= $row['seats'] ?>">
-<div class="mb-3" id="ticketWrapper">
-
-              </div>
-  <!-- Add Another Ticket Button -->
-<button type="button" id="addTicketBtn" class="btn btn-secondary">Add Another Ticket</button>
-
-</div>
 
 <div class="mb-3">
   <label class="form-label">Additional Instructions or Notes</label>
-  <textarea class="form-control" name="additional_notes" rows="3"><?php echo $additional_notes; ?></textarea>
+  <textarea class="form-control editor" name="additional_notes" rows="3"><?php echo $additional_notes; ?></textarea>
 </div>
 
 
@@ -622,6 +647,15 @@ if ($quiz_type === 'form') {
                         });
                         </script>
 
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var select = document.getElementById('instructorSelect');
+  if (select && select.value !== '') {
+    displayInstructorInfo(); // Trigger display logic for pre-selected instructor
+  }
+});
+</script>
+
 
 
                         <script>
@@ -631,51 +665,68 @@ if ($quiz_type === 'form') {
     toggleHybridLocationFields();
   });
 </script>
+
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-  document.querySelectorAll('.delete-guidance-video').forEach(button => {
-    button.addEventListener('click', function () {
-      const videoId = this.getAttribute('data-image-id');
-
-      if (!confirm('Are you sure you want to delete this video from the database?')) return;
-
-      fetch(`delete_image.php?action=deletevideotrain&video_id=${videoId}`, {
-        method: 'GET'
-      })
-      .then(response => response.text())
-      .then(result => {
-        const trimmed = result.trim();
-
-        if (trimmed === 'success') {
-          this.closest('.file-preview').remove();
-          alert('✅ Video deleted successfully.');
-        } else if (trimmed === 'not_found') {
-          alert('⚠️ Video not found in database.');
-        } else if (trimmed === 'db_error') {
-          alert('❌ Database error occurred.');
-        } else {
-          alert('❓ Unknown server response: ' + result);
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        alert('❌ An error occurred while deleting.');
-      });
-    });
-  });
+  togglePricingFields();
 });
 </script>
 
-  <script>
-  // Call on page load to preserve selected values only for this page
-  document.addEventListener('DOMContentLoaded', function () {
-    toggleDeliveryFields();
-    togglePhysicalLocationFields();
-    toggleHybridLocationFields();
+
+<script>
+var $j = jQuery.noConflict();
+
+const selectedSubcategoryIds = <?= json_encode($selected_subcategories ?? []) ?>;
+const selectedCategoryIds = <?= json_encode($selected_categories ?? []) ?>;
+
+function fetchSubcategoriesForEdit(categoryIds) {
+  const $subSelect = $j('#subcategory-select');
+  const $subContainer = $j('#subcategory-container');
+  $subSelect.html('');
+
+  if (!categoryIds.length) {
+    $subContainer.hide();
+    return;
+  }
+
+  Promise.all(categoryIds.map(id =>
+    fetch(`get_subcategories.php?parent_id=${id}`)
+      .then(res => res.json())
+      .catch(() => [])
+  )).then(allResults => {
+    let found = false;
+
+    allResults.flat().forEach(cat => {
+      if ($subSelect.find(`option[value="${cat.s}"]`).length === 0) {
+        const isSelected = selectedSubcategoryIds.includes(cat.s.toString()) ? 'selected' : '';
+        $subSelect.append(`<option value="${cat.s}" ${isSelected}>${cat.title}</option>`);
+        found = true;
+      }
+    });
+
+    if (found) {
+      $subContainer.show();
+      if ($subSelect.hasClass('select2-hidden-accessible')) {
+        $subSelect.select2('destroy');
+      }
+      $subSelect.select2();
+    } else {
+      $subContainer.hide();
+    }
   });
+}
+
+$j(document).ready(function () {
+  $j('.select-multiple').select2();
+
+  fetchSubcategoriesForEdit(selectedCategoryIds);
+
+  $j('#category-select').on('change', function () {
+    const selected = $j(this).val() || [];
+    fetchSubcategoriesForEdit(selected);
+  });
+});
 </script>
-
-
 
 
             <?php include "footer.php"; ?>

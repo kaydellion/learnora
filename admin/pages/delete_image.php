@@ -58,6 +58,53 @@ if (isset($_GET['action']) && $_GET['action'] === 'deletevideo' && isset($_GET['
 }
 
 
+
+
+
+// Check if the correct action is provided
+if (isset($_GET['action']) && $_GET['action'] === 'deletevideotrailer' && isset($_GET['video_id'])) {
+    $video_id = intval($_GET['video_id']);
+    $query = "DELETE FROM {$siteprefix}training_videos WHERE s = ?";
+    $stmt = $con->prepare($query);
+
+    if ($stmt) {
+        $stmt->bind_param("i", $video_id);
+        if ($stmt->execute()) {
+            echo "success";
+        } else {
+            echo "error: could not execute query";
+        }
+        $stmt->close();
+    } else {
+        echo "error: invalid SQL statement";
+    }
+} else {
+    echo "error: invalid request";
+}
+
+
+
+// Check if the correct action is provided
+if (isset($_GET['action']) && $_GET['action'] === 'deletevideopromo' && isset($_GET['video_id'])) {
+    $video_id = intval($_GET['video_id']);
+    $query = "DELETE FROM {$siteprefix}training_videos WHERE s = ?";
+    $stmt = $con->prepare($query);
+
+    if ($stmt) {
+        $stmt->bind_param("i", $video_id);
+        if ($stmt->execute()) {
+            echo "success";
+        } else {
+            echo "error: could not execute query";
+        }
+        $stmt->close();
+    } else {
+        echo "error: invalid SQL statement";
+    }
+} else {
+    echo "error: invalid request";
+}
+
 if (isset($_GET['action']) && $_GET['action'] === 'deletetext') {
     $textId = intval($_GET['text_id'] ?? 0);
 
@@ -233,6 +280,29 @@ if (isset($_GET['action']) && $_GET['action'] == 'deletevideotrain' && isset($_G
     echo 'invalid request';
 }
 
+
+
+if ($_GET['action'] === 'deletequizfile' && isset($_GET['quiz_id'])) {
+  $quiz_id = intval($_GET['quiz_id']);
+
+  $query = mysqli_query($con, "SELECT file_path FROM {$siteprefix}training_quizzes WHERE id = '$quiz_id' AND type = 'upload' LIMIT 1");
+
+  if ($row = mysqli_fetch_assoc($query)) {
+    $file = $row['file_path'];
+
+    if (file_exists($file)) {
+      unlink($file); // delete file from server
+    }
+
+    mysqli_query($con, "DELETE FROM {$siteprefix}training_quizzes WHERE s = '$quiz_id'");
+
+    echo 'success';
+    exit;
+  }
+
+  echo 'file_not_found';
+  exit;
+}
 
 if($action == 'deletedocfile'){
    $image_id = $_GET['image_id'];

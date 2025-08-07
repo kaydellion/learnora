@@ -266,8 +266,6 @@
     <button type="button" onclick="closeQuizModal()" class="btn btn-primary">✅ Done</button>
   </div>
 </div>
-
-
             </div>
             <div class="mb-3">
               <label class="form-label">Course Trailer/Intro Video (Optional)</label>

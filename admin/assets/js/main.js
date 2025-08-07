@@ -156,7 +156,81 @@ document.querySelectorAll('a.read').forEach(link => {
   });
 });
 
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('.delete-video-trailer').forEach(function (button) {
+    button.addEventListener('click', function () {
+      const videoId = this.getAttribute('data-video-id');
 
+      if (!videoId) {
+        alert('Video ID not found.');
+        return;
+      }
+
+      if (!confirm('Are you sure you want to delete this video?')) {
+        return;
+      }
+
+      fetch(`delete_image.php?action=deletevideotrailer&video_id=${videoId}`, {
+        method: 'GET',
+      })
+      .then(response => response.text())
+      .then(data => {
+        const cleaned = data.trim().toLowerCase();
+        console.log('Server response:', JSON.stringify(cleaned)); // Debug log
+
+        if (cleaned.includes('success')) {
+          this.closest('li')?.remove();
+          alert('Video deleted successfully.');
+        } else {
+          alert('Failed to delete video: ' + cleaned);
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred.');
+      });
+    });
+  });
+});
+
+
+
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('.delete-video-promo').forEach(function (button) {
+    button.addEventListener('click', function () {
+      const videoId = this.getAttribute('data-video-id');
+
+      if (!videoId) {
+        alert('Video ID not found.');
+        return;
+      }
+
+      if (!confirm('Are you sure you want to delete this video?')) {
+        return;
+      }
+
+      fetch(`delete_image.php?action=deletevideopromo&video_id=${videoId}`, {
+        method: 'GET',
+      })
+      .then(response => response.text())
+      .then(data => {
+        const cleaned = data.trim().toLowerCase();
+        console.log('Server response:', JSON.stringify(cleaned)); // Debug log
+
+        if (cleaned.includes('success')) {
+          this.closest('li')?.remove();
+          alert('Video deleted successfully.');
+        } else {
+          alert('Failed to delete video: ' + cleaned);
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred.');
+      });
+    });
+  });
+});
 
 document.querySelectorAll('.delete-image').forEach(button => {
   button.addEventListener('click', function() {
@@ -218,7 +292,42 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 });
 
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('.delete-quiz-file').forEach(function (button) {
+    button.addEventListener('click', function () {
+      const quizId = this.getAttribute('data-quiz-id');
 
+      if (!quizId) {
+        alert('Quiz file ID not found.');
+        return;
+      }
+
+      if (!confirm('Are you sure you want to delete this file?')) {
+        return;
+      }
+
+      fetch(`delete_image.php?action=deletequizfile&quiz_id=${quizId}`, {
+        method: 'GET',
+      })
+      .then(response => response.text())
+      .then(data => {
+        const cleaned = data.trim().toLowerCase();
+        console.log('Server response:', JSON.stringify(cleaned));
+
+        if (cleaned.includes('success')) {
+          this.closest('li')?.remove();
+          alert('File deleted successfully.');
+        } else {
+          alert('Failed to delete file: ' + cleaned);
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while deleting the file.');
+      });
+    });
+  });
+});
 
 
 document.querySelectorAll('.delete-promo-video').forEach(button => {
