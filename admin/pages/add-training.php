@@ -209,7 +209,7 @@
         <!-- Option 1: Text Entry -->
         <div id="quizText" style="display:none;">
           <label>Text Entry:</label>
-          <textarea name="quiz_text[]" placeholder="e.g., Write a short essay on the impact of AI on job markets..." class="form-control editor"></textarea>
+          <textarea name="quiz_text" placeholder="e.g., Write a short essay on the impact of AI on job markets..." class="form-control editor"></textarea>
         </div>
 
         <!-- Option 2: File Upload -->

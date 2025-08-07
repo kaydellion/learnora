@@ -452,6 +452,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_event'])) {
     $delivery_format = mysqli_real_escape_string($con, $_POST['delivery_format']);
     $video_embed_url = mysqli_real_escape_string($con, $_POST['video_embed_url']);
     $pricing = mysqli_real_escape_string($con, $_POST['pricing']);
+       // 4. Handle Quiz/Assignment
+     $quiz_method = $_POST['quiz_method'];
 
     if(isset($_POST['video_embed_url']) && !empty($_POST['video_embed_url'])) {
     $trailer_video_path = mysqli_real_escape_string($con, $_POST['video_embed_url']);
@@ -589,16 +591,15 @@ foreach ($categories as $catId) {
     }
 }
 
-     // 4. Handle Quiz/Assignment
-$quiz_type = $_POST['quiz_method'];
+  
 
-if ($quiz_type === 'text' && !empty($_POST['quiz_text'][0])) {
-    $text_content = mysqli_real_escape_string($con, $_POST['quiz_text'][0]);
+if ($quiz_method === 'text') {
+    $text_content = mysqli_real_escape_string($con, $_POST['quiz_text']);
    mysqli_query(
     $con,
     "INSERT INTO {$siteprefix}training_quizzes (training_id, type, file_path, text_path, instructions, updated_at) VALUES ('$training_id', 'text', '', '$text_content', '', NOW())"
 );
-} elseif ($quiz_type === 'upload' && !empty($_FILES['quiz_files']['name'][0])) {
+} elseif ($quiz_method === 'upload' && !empty($_FILES['quiz_files']['name'][0])) {
     $fileKey = 'quiz_files';
     $quizfiles = handleMultipleFileUpload($fileKey, $fileuploadDir);
 
@@ -613,25 +614,30 @@ if ($quiz_type === 'text' && !empty($_POST['quiz_text'][0])) {
         $stmt->close();
     }
 }
-elseif ($quiz_type === 'form' && !empty($_POST['questions'])) {
-    $quiz_instructions = isset($_POST['quiz_instructions']) ? mysqli_real_escape_string($con, $_POST['quiz_instructions']) : '';
+
+elseif ($quiz_method === 'form' && !empty($_POST['questions'])) {
+    $quiz_instructions = isset($_POST['quiz_instructions']) 
+        ? mysqli_real_escape_string($con, $_POST['quiz_instructions']) 
+        : '';
+
     // Insert the quiz meta row
- $stmt = $con->prepare(
+    $stmt = $con->prepare(
         "INSERT INTO {$siteprefix}training_quizzes (training_id, type, file_path, text_path, instructions, updated_at) VALUES (?, 'form', '', '', ?, NOW())"
     );
-$stmt->bind_param("ss", $training_id, $quiz_instructions);
-$stmt->execute();
-$quiz_id = $stmt->insert_id;
-$stmt->close();
+    $stmt->bind_param("ss", $training_id, $quiz_instructions);
+    $stmt->execute();
+    $quiz_id = $stmt->insert_id;
+    $stmt->close();
 
     // Insert each question/answer into training_quiz_questions
     foreach ($_POST['questions'] as $i => $question) {
-        $q = mysqli_real_escape_string($con, $question);
-        $a = mysqli_real_escape_string($con, $_POST['option_a'][$i]);
-        $b = mysqli_real_escape_string($con, $_POST['option_b'][$i]);
-        $c = mysqli_real_escape_string($con, $_POST['option_c'][$i]);
-        $d = mysqli_real_escape_string($con, $_POST['option_d'][$i]);
-        $correct = mysqli_real_escape_string($con, $_POST['correct_answer'][$i]);
+        $q = mysqli_real_escape_string($con, $question ?? '');
+        $a = mysqli_real_escape_string($con, $_POST['option_a'][$i] ?? '');
+        $b = mysqli_real_escape_string($con, $_POST['option_b'][$i] ?? '');
+        $c = mysqli_real_escape_string($con, $_POST['option_c'][$i] ?? '');
+        $d = mysqli_real_escape_string($con, $_POST['option_d'][$i] ?? '');
+        $correct = mysqli_real_escape_string($con, $_POST['correct_answer'][$i] ?? '');
+
         mysqli_query(
             $con,
             "INSERT INTO {$siteprefix}training_quiz_questions (quiz_id, question, option_a, option_b, option_c, option_d, correct_answer)
@@ -639,6 +645,7 @@ $stmt->close();
         );
     }
 }
+
 
         if ($_POST['pricing'] === 'paid') {
        $ticket_names = $_POST['ticket_name'];
@@ -766,7 +773,7 @@ $reportImage= $_FILES['cover_images']['name'];
         '$physical_address', '$physical_state', '$physical_lga', '$physical_country', '$foreign_address', '$web_address',
         '$hybrid_physical_address', '$hybrid_web_address', '$hybrid_state', '$hybrid_lga', '$hybrid_country', '$hybrid_foreign_address',
         '$course_description', '$learning_objectives', '$target_audience', '$prerequisites','$event_type',
-        '$pricing', '$category', '$subcategory', '$instructor_id', '$additional_notes', '$tags', '$quiz_type', NOW(), '$alt_title', '$status', '$loyalty', '$user'
+        '$pricing', '$category', '$subcategory', '$instructor_id', '$additional_notes', '$tags', '$quiz_method', NOW(), '$alt_title', '$status', '$loyalty', '$user'
     )");
 
 if ($insertTraining) {
