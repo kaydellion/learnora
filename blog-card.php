@@ -13,7 +13,7 @@
       <a href="<?php echo $siteurl; ?>view-blog/<?php echo $alt_title; ?>"><?php echo $title; ?></a>
     </h2>
     <div class="d-flex align-items-center">
-      <img src="<?php echo $siteurl;?>/img/<?php echo $siteimg; ?>" alt="site image" class="img-fluid post-author-img flex-shrink-0">
+      <img src="<?php echo $siteurl;?>/uploads/<?php echo $siteimg; ?>" alt="site image" class="img-fluid post-author-img flex-shrink-0">
       <div class="post-meta">
         <p class="post-author"><?php echo $sitename; ?></p>
         <p class="post-date">

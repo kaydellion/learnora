@@ -365,7 +365,7 @@ redirectToDashboardIfSubAdmin();
             <li class="menu-header small text-uppercase"><span class="menu-header-text">ADMIN</span></li>
             <li class="menu-item"> <a href="notifications.php" class="menu-link"><i class="menu-icon tf-icons bx bx-bell"></i> <div data-i18n="Spinners">Notifications</div></a></li>
             <li class="menu-item <?= getDisplayClass() ?>"> <a href="settings.php" class="menu-link"><i class="menu-icon tf-icons bx bx-cog"></i> <div data-i18n="Spinners">Settings</div></a></li>
-            <li class="menu-item"> <a href="logout.php" class="menu-link"><i class="menu-icon tf-icons bx bx-log-out"></i> <div data-i18n="Spinners">Log Out</div></a></li>
+            <li class="menu-item"> <a href="logout.php" class="menu-link"><i class="menu-icon tf-icons bx bx-user"></i> <div data-i18n="Spinners">Log Out</div></a></li>
    
           </aside>
         <!-- / Menu -->
