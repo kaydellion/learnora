@@ -144,7 +144,7 @@ if (!$training_data_set) {
             </div>
             <div class="mb-3">
               <label class="form-label">Description</label>
-              <textarea class="form-control editor"  name="description" required><?php echo $description; ?></textarea>
+              <textarea class="form-control editor"  name="description" ><?php echo $description; ?></textarea>
             </div>
 
             <div class="mb-3">
