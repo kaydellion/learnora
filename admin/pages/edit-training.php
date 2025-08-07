@@ -622,6 +622,8 @@ if ($quiz_type === 'form') {
                         });
                         </script>
 
+
+
                         <script>
   document.addEventListener("DOMContentLoaded", function () {
     toggleDeliveryFields();
@@ -629,7 +631,40 @@ if ($quiz_type === 'form') {
     toggleHybridLocationFields();
   });
 </script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('.delete-guidance-video').forEach(button => {
+    button.addEventListener('click', function () {
+      const videoId = this.getAttribute('data-image-id');
 
+      if (!confirm('Are you sure you want to delete this video from the database?')) return;
+
+      fetch(`delete_image.php?action=deletevideotrain&video_id=${videoId}`, {
+        method: 'GET'
+      })
+      .then(response => response.text())
+      .then(result => {
+        const trimmed = result.trim();
+
+        if (trimmed === 'success') {
+          this.closest('.file-preview').remove();
+          alert('✅ Video deleted successfully.');
+        } else if (trimmed === 'not_found') {
+          alert('⚠️ Video not found in database.');
+        } else if (trimmed === 'db_error') {
+          alert('❌ Database error occurred.');
+        } else {
+          alert('❓ Unknown server response: ' + result);
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('❌ An error occurred while deleting.');
+      });
+    });
+  });
+});
+</script>
 
   <script>
   // Call on page load to preserve selected values only for this page

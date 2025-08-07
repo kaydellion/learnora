@@ -2147,34 +2147,6 @@ function displayInstructorInfo() {
     }
   }
 
-  document.addEventListener('DOMContentLoaded', function () {
-  document.querySelectorAll('.delete-guidance-video').forEach(button => {
-    button.addEventListener('click', function () {
-      const videoId = this.getAttribute('data-image-id');
-
-      if (!confirm('Are you sure you want to delete this video from the database?')) return;
-
-      fetch(`delete_image.php?action=deletevideotrain&video_id=${videoId}`, {
-        method: 'GET'
-      })
-      .then(response => response.text())
-      .then(result => {
-        alert('Server response: ' + result); // Show server response
-        if (result.trim() === 'success') {
-          this.closest('.file-preview').remove();
-          alert('Video deleted from database.');
-        } else {
-          alert('Failed to delete video from database.');
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        alert('An error occurred while deleting.');
-      });
-    });
-  });
-});
-
   function togglePhysicalLocationFields() {
     const type = document.getElementById('physicalLocationType').value;
     const nigeriaFields = document.getElementById('nigeriaPhysicalFields');
@@ -2296,10 +2268,42 @@ function closeQuizModal() {
   document.getElementById('quizModal').style.display = 'none';
 }
 
+let questionCounter = 1; // start from 1 since first one exists
+
 function addQuizQuestionModal() {
-  const block = document.querySelector('.question-block');
-  const clone = block.cloneNode(true);
+  const originalBlock = document.querySelector('.question-block');
+  const clone = originalBlock.cloneNode(true);
+
+  // Generate a unique ID for the new textarea
+  questionCounter++;
+  const newId = 'question_editor_' + questionCounter;
+
+  // Find the textarea inside the clone and assign a new ID
+  const textarea = clone.querySelector('textarea[name="questions[]"]');
+  textarea.id = newId;
+
+  // Clear the contents of the cloned fields
+  textarea.value = '';
+  const inputs = clone.querySelectorAll('input[type="text"]');
+  inputs.forEach(input => input.value = '');
+  const select = clone.querySelector('select[name="correct_answer[]"]');
+  select.selectedIndex = 0;
+
+  // Append to the modal
   document.getElementById('quizBuilderModal').appendChild(clone);
+
+  // Initialize TinyMCE for the new textarea only
+  tinymce.init({
+    selector: '#' + newId,
+     toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
+    tinycomments_mode: 'embedded',
+    tinycomments_author: 'Author name',
+    mergetags_list: [
+      { value: 'First.Name', title: 'First Name' },
+      { value: 'Email', title: 'Email' },
+    ],
+    ai_request: (request, respondWith) => respondWith.string(() => Promise.reject('See docs to implement AI Assistant')),
+  });
 }
 
 

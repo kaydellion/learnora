@@ -156,10 +156,4 @@ if (mysqli_num_rows($quiz_check_result) > 0) {
         </section>
 
 
-
-
-
-
-
-
 <?php include "footer.php"; ?>

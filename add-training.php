@@ -229,7 +229,8 @@
       <div class="question-block">
         <div class="mb-3">
           <label>Question:</label>
-        <input type="text" name="questions[]" placeholder="Question" class="form-control mb-2">
+        <textarea id="question_editor_1" name="questions[]" placeholder="Question" class="form-control mb-2"></textarea>
+
         </div>
         <div class="mb-3">
         <input type="text" name="option_a[]" placeholder="Option A">
