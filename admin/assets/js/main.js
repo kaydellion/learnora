@@ -306,33 +306,7 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 });
 
-document.addEventListener('DOMContentLoaded', function () {
-  document.querySelectorAll('.delete-guidance-video').forEach(button => {
-    button.addEventListener('click', function () {
-      const videoId = this.getAttribute('data-image-id');
 
-      if (!confirm('Are you sure you want to delete this video from the database?')) return;
-
-      fetch(`delete_image.php?action=deletevideotrain&video_id=${videoId}`, {
-        method: 'GET'
-      })
-      .then(response => response.text())
-      .then(result => {
-        alert('Server response: ' + result); // Show server response
-        if (result.trim() === 'success') {
-          this.closest('.file-preview').remove();
-          alert('Video deleted from database.');
-        } else {
-          alert('Failed to delete video from database.');
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        alert('An error occurred while deleting.');
-      });
-    });
-  });
-});
 
 document.addEventListener('DOMContentLoaded', function () {
       const stateAndLGAs = {
@@ -2172,6 +2146,34 @@ function displayInstructorInfo() {
       foreignFields.style.display = 'block';
     }
   }
+
+  document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('.delete-guidance-video').forEach(button => {
+    button.addEventListener('click', function () {
+      const videoId = this.getAttribute('data-image-id');
+
+      if (!confirm('Are you sure you want to delete this video from the database?')) return;
+
+      fetch(`delete_image.php?action=deletevideotrain&video_id=${videoId}`, {
+        method: 'GET'
+      })
+      .then(response => response.text())
+      .then(result => {
+        alert('Server response: ' + result); // Show server response
+        if (result.trim() === 'success') {
+          this.closest('.file-preview').remove();
+          alert('Video deleted from database.');
+        } else {
+          alert('Failed to delete video from database.');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while deleting.');
+      });
+    });
+  });
+});
 
   function togglePhysicalLocationFields() {
     const type = document.getElementById('physicalLocationType').value;

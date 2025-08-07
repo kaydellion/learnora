@@ -1144,11 +1144,14 @@ document.getElementById('webShareBtn').addEventListener('click', function() {
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
+    // Get the base site URL from the hidden input field
+    const siteurl = document.getElementById("siteurl").value;
+
     document.querySelectorAll(".instructor-click").forEach(function (el) {
         el.addEventListener("click", function () {
             const userId = this.dataset.userId;
 
-            fetch("get_instructor.php?user_id=" + userId)
+            fetch(siteurl + "get_instructor.php?user_id=" + userId)
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
@@ -1169,6 +1172,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 </script>
+
 
 
 <?php include "footer.php"; ?>
