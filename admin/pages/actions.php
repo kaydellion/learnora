@@ -83,7 +83,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['edit_event'])) {
     $web_address = '';
     $hybrid_physical_address = $hybrid_web_address = $hybrid_state = $hybrid_lga = $hybrid_country = $hybrid_foreign_address = '';
     $status = $_POST['status'];
-    $trainingId = mysqli_real_escape_string($con, $_POST['id']);
     $title = mysqli_real_escape_string($con, $_POST['title']);
     $description = mysqli_real_escape_string($con, $_POST['description']);
     $category = implode(',', $_POST['category']);
@@ -266,8 +265,8 @@ if ($_POST['pricing'] === 'paid') {
         } else {
             // Insert new ticket
             mysqli_query($con, "INSERT INTO {$siteprefix}training_tickets 
-                (training_id, ticket_name, benefits, price, seats, seatremain, created_at) 
-                VALUES ('$training_id', '$name', '$benefits', '$price', '$seats', '$seats', NOW())");
+                (training_id, ticket_name, benefits, price, seats, seatremain) 
+                VALUES ('$training_id', '$name', '$benefits', '$price', '$seats', '$seats')");
         }
     }
 }
