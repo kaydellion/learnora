@@ -157,7 +157,7 @@ if (!$training_data_set) {
             </div>
             <div class="mb-3">
               <label class="form-label">Course Requirements / Prerequisites</label>
-              <textarea class="form-control editor" name="prerequisites" rows="2" placeholder="Any knowledge, tools, or skills needed before starting.">$course_requirrement</textarea>
+              <textarea class="form-control editor" name="prerequisites" rows="2" placeholder="Any knowledge, tools, or skills needed before starting."><?php echo $course_requirrement; ?></textarea>
             </div>
 
             <div class="mb-3">
