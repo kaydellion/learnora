@@ -2208,46 +2208,53 @@ let questionCounter = 1;
 
 function addQuizQuestionModal() {
   const originalBlock = document.querySelector('.question-block');
-  const clone = originalBlock.cloneNode(true);
 
+  // Clone original block
+  const clone = originalBlock.cloneNode(true);
   questionCounter++;
+
+  // Remove any existing TinyMCE editor DOM wrappers from the clone
+  const oldEditorWrapper = clone.querySelector('.tox-tinymce');
+  if (oldEditorWrapper) {
+    // Replace the entire TinyMCE wrapper with a new textarea
+    const newTextarea = document.createElement('textarea');
+    newTextarea.name = 'questions[]';
+    newTextarea.placeholder = 'Question';
+    newTextarea.className = 'form-control mb-2 editor';
+    newTextarea.id = `question_editor_${questionCounter}`;
+
+    oldEditorWrapper.parentNode.replaceChild(newTextarea, oldEditorWrapper);
+  } else {
+    // Fallback: if somehow there's no wrapper, still update the ID
+    const textarea = clone.querySelector('textarea[name="questions[]"]');
+    if (textarea) {
+      textarea.id = `question_editor_${questionCounter}`;
+      textarea.value = '';
+    }
+  }
 
   // Reset inputs
   clone.querySelectorAll('input[type="text"]').forEach(input => input.value = '');
   clone.querySelector('select[name="correct_answer[]"]').selectedIndex = 0;
 
-  // Update textarea
-  const textarea = clone.querySelector('textarea[name="questions[]"]');
-  const newId = `question_editor_${questionCounter}`;
-  textarea.id = newId;
-  textarea.value = '';
-  textarea.classList.add('editor');
-
-  // Remove any existing remove button (just in case)
+  // Remove existing remove button
   const oldRemoveBtn = clone.querySelector('.remove-question');
   if (oldRemoveBtn) oldRemoveBtn.remove();
 
-  // 🗑️ Add Remove Button
+  // Add new remove button
   const removeBtn = document.createElement('button');
   removeBtn.type = 'button';
   removeBtn.className = 'btn btn-danger remove-question';
   removeBtn.innerHTML = '🗑️ Remove';
-
-  // Append remove button before the <hr>
   const hr = clone.querySelector('hr');
   clone.insertBefore(removeBtn, hr);
 
-  // Remove existing editor instance if cloned (just precaution)
-  if (tinymce.get(newId)) {
-    tinymce.get(newId).remove();
-  }
-
-  // Append to DOM
+  // Append clone to DOM
   document.getElementById('quizBuilderModal').appendChild(clone);
 
-  // Init TinyMCE for new textarea
+  // Init TinyMCE on new textarea
   tinymce.init({
-    selector: `#${newId}`,
+    selector: `#question_editor_${questionCounter}`,
     toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
     tinycomments_mode: 'embedded',
     tinycomments_author: 'Author name',
@@ -2259,7 +2266,7 @@ function addQuizQuestionModal() {
   });
 }
 
-// 🗑️ Remove block when remove button is clicked
+// 🗑️ Remove cloned question blocks
 document.addEventListener('click', function(e) {
   if (e.target.classList.contains('remove-question')) {
     const block = e.target.closest('.question-block');
@@ -2270,6 +2277,7 @@ document.addEventListener('click', function(e) {
     block.remove();
   }
 });
+
 
 
 
