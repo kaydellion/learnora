@@ -240,33 +240,7 @@ $user_review = $existing_review_result->fetch_assoc();
                 </div>
 				 </div>
                 <?php } ?>
-                <?php
-                if (!empty($course_requirrement)) {
-
-                    ?>
-                  <!-- Specifications Accordion -->
-              <div class="accordion-item">
-                <h2 class="accordion-header">
-                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#specifications" aria-expanded="false" aria-controls="specifications">
-                    Course Requirements 
-                  </button>
-                </h2>
-                <div id="specifications" class="accordion-collapse collapse">
-                  <div class="accordion-body">
-                    <div class="product-specifications">
-                      <div class="row">
-                        <div class="col-md-12">
-                          <div class="specs-group">
-                            <p><?php echo $course_requirrement; ?></p>
-                              </div>
-                        </div>
-                            </div>
-                </div>
-                </div>
-              </div>
-            </div>
-			<?php } ?>
-			
+               
 			      
                    <?php if (!empty($learning_objectives)) { ?>
         <!-- Description Accordion -->
