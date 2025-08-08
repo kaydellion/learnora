@@ -112,8 +112,7 @@
         <div class="row g-4">
           <!-- Product 1 -->
           <?php
-$query = "
-SELECT 
+$query = "SELECT 
     t.*, 
     u.name AS display_name, 
     tt.price, 
@@ -138,9 +137,7 @@ WHERE t.status = 'approved'
   AND CONCAT(ted.event_date, ' ', ted.start_time) >= NOW() 
 GROUP BY t.training_id
 ORDER BY t.training_id DESC
-LIMIT 20
-";
-
+LIMIT 20";
 $result = mysqli_query($con, $query);
 if ($result) {
 while ($row = mysqli_fetch_assoc($result)) {
