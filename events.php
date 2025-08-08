@@ -240,7 +240,48 @@ $user_review = $existing_review_result->fetch_assoc();
                 </div>
 				 </div>
                 <?php } ?>
-               
+                <?php
+                if (!empty($course_requirrement)) {
+
+                    ?>
+                  <!-- Specifications Accordion -->
+              <div class="accordion-item">
+                <h2 class="accordion-header">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#specifications" aria-expanded="false" aria-controls="specifications">
+                    Course Requirements 
+                  </button>
+                </h2>
+                <div id="specifications" class="accordion-collapse collapse">
+                  <div class="accordion-body">
+                    <div class="product-specifications">
+                      <div class="row">
+                        <div class="col-md-12">
+                          <div class="specs-group">
+						   <?php 
+        // Strip tags from short version to avoid breaking HTML
+        $descss_words = explode(' ', strip_tags($course_requirrement));
+        $descss_short = implode(' ', array_slice($descss_words, 0, 10));
+        $descss_is_long = str_word_count(strip_tags($course_requirrement)) > 10;
+        ?>
+        
+        <span class="desc-short"><?php echo $descss_short; ?><?php if ($descss_is_long) echo '...'; ?></span>
+        
+        <?php if ($descss_is_long): ?>
+            <span class="desc-full" style="display: none;"><?php echo $course_requirrement;  ?></span>
+            <br>
+            <button type="button" class="btn btn-link btn-sm p-0 read-more-desc" style="text-decoration: none;">Read More</button>
+            <button type="button" class="btn btn-link btn-sm p-0 read-less-desc" style="text-decoration: none; display:none;">Read Less</button>
+        <?php endif; ?>
+                            
+                              </div>
+                        </div>
+                            </div>
+                </div>
+                </div>
+              </div>
+            </div>
+			<?php } ?>
+			
 			      
                    <?php if (!empty($learning_objectives)) { ?>
         <!-- Description Accordion -->
