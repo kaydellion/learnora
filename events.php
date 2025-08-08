@@ -280,21 +280,7 @@ $user_review = $existing_review_result->fetch_assoc();
                 <div id="specifications" class="accordion-collapse collapse">
                   <div class="accordion-body">
     <div class="product-short-description mb-1">
-    <?php 
-    // Strip HTML tags for the short version to avoid broken HTML
-    $wordss = explode(' ', strip_tags($course_requirrement));
-    $shortDescs = implode(' ', array_slice($wordss, 0, 10));
-    $isLongs = str_word_count(strip_tags($course_requirrement)) > 10;
-    ?>
-
-    <span class="short-description"><?php echo $shortDescs; ?><?php if ($isLongs) echo '...'; ?></span>
-
-    <?php if ($isLongs): ?>
-        <span class="full-description" style="display: none;"><?php echo $course_requirrement; ?></span>
-        <br>
-        <button type="button" class="btn btn-link btn-sm p-0 read-more-btn" style="text-decoration: none;">Read More</button>
-        <button type="button" class="btn btn-link btn-sm p-0 read-less-btn" style="text-decoration: none; display:none;">Read Less</button>
-    <?php endif; ?>
+        <?php echo $course_requirrement; ?>
 </div>
                         
                 </div>
