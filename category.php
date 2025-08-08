@@ -40,12 +40,17 @@ if ($sort === 'price_high') {
     $order_by = "tt.price ASC";
 }
 
-// Handle subcategory filtering
+// Subcategory filtering
 $subcategory_filter = isset($_GET['subcategory']) ? $_GET['subcategory'] : '';
 $subcategory_condition = '';
 
 if (!empty($subcategory_filter) && $subcategory_filter !== 'all') {
-    $subcategory_condition = "AND sc.slug = '".mysqli_real_escape_string($con, $subcategory_filter)."'";
+    $subcategory_slug = mysqli_real_escape_string($con, $subcategory_filter);
+    $subcat_result = mysqli_query($con, "SELECT id FROM {$siteprefix}categories WHERE slug = '$subcategory_slug'");
+    if ($subcat_row = mysqli_fetch_assoc($subcat_result)) {
+        $subcat_id = $subcat_row['id'];
+        $subcategory_condition = "AND FIND_IN_SET('$subcat_id', t.subcategory)";
+    }
 }
 
 $query = "SELECT t.*, u.name as display_name, tt.price, u.photo as profile_picture, l.category_name AS category, sc.category_name AS subcategory, ti.picture 
@@ -55,7 +60,7 @@ $query = "SELECT t.*, u.name as display_name, tt.price, u.photo as profile_pictu
     LEFT JOIN ".$siteprefix."categories sc ON t.subcategory = sc.id 
     LEFT JOIN ".$siteprefix."training_tickets tt ON t.training_id= tt.training_id
     LEFT JOIN ".$siteprefix."training_images ti ON t.training_id = ti.training_id
-          WHERE t.status = 'approved' AND t.category='$id' $subcategory_condition 
+          WHERE t.status = 'approved'  AND FIND_IN_SET('$id', t.category) $subcategory_condition
           GROUP BY t.training_id
           ORDER BY $order_by 
           LIMIT $limit OFFSET $offset";
@@ -67,7 +72,7 @@ $report_count = mysqli_num_rows($result);
 $total_query = "SELECT COUNT(*) as total 
                 FROM ".$siteprefix."training t 
                 LEFT JOIN ".$siteprefix."categories sc ON t.subcategory = sc.id 
-                WHERE t.status = 'approved' AND t.category='$id' $subcategory_condition";
+                WHERE t.status = 'approved'  AND FIND_IN_SET('$id', t.category) $subcategory_condition";
 $total_result = mysqli_query($con, $total_query);
 $total_row = mysqli_fetch_assoc($total_result);
 $total_reports = $total_row['total'];
@@ -134,21 +139,21 @@ $total_pages = ceil($total_reports / $limit);
                   <div class="col-6 col-md-5 col-lg-5">
 				    <div class="filter-item">
                       <label for="priceRange" class="form-label">filter By Subcategory</label>
-                   <select id="subcategory-select" class="form-select" onchange="filterBySubcategory(this.value)">
-                <option value="">Filter by Subcategory</option>
-                <option value="all" <?php if (!isset($_GET['subcategory']) || $_GET['subcategory'] === 'all') echo 'selected'; ?>>Show All</option>
-                <?php
-                $subcat_query = "SELECT DISTINCT slug, category_name AS subcategory 
-                                 FROM ".$siteprefix."categories 
-                                 WHERE parent_id = $id";
-                $subcat_result = mysqli_query($con, $subcat_query);
-                while ($subcat_row = mysqli_fetch_assoc($subcat_result)) {
-                     $subcategorySlug = $subcat_row['slug'];
-    $selected = (isset($_GET['subcategory']) && $_GET['subcategory'] === $subcategorySlug) ? 'selected' : '';
-    echo '<option value="'.htmlspecialchars($subcategorySlug).'" '.$selected.'>'.htmlspecialchars($subcat_row['subcategory']).'</option>';
-                }
-                ?>
-            </select>
+         <select id="subcategory-select" class="form-select" onchange="filterBySubcategory(this.value)">
+        <option value="">-- Select Subcategory --</option>
+        <option value="all" <?= (!isset($_GET['subcategory']) || $_GET['subcategory'] === 'all') ? 'selected' : '' ?>>Show All</option>
+        <?php
+        $subcat_query = "SELECT DISTINCT slug, category_name AS subcategory 
+                         FROM {$siteprefix}categories 
+                         WHERE parent_id = $id";
+        $subcat_result = mysqli_query($con, $subcat_query);
+        while ($subcat_row = mysqli_fetch_assoc($subcat_result)) {
+            $subcategorySlug = $subcat_row['slug'];
+            $selected = (isset($_GET['subcategory']) && $_GET['subcategory'] === $subcategorySlug) ? 'selected' : '';
+            echo '<option value="' . htmlspecialchars($subcategorySlug) . '" ' . $selected . '>' . htmlspecialchars($subcat_row['subcategory']) . '</option>';
+        }
+        ?>
+      </select>
                   </div>
 				    </div>
 
@@ -388,22 +393,21 @@ $seller_linkedin = $seller['seller_linkedin'];
 
 
 <script>
-    function sortReports(sortValue) {
-        const urlParams = new URLSearchParams(window.location.search);
-        urlParams.set('sort', sortValue);
-        window.location.search = urlParams.toString();
-    }
-</script>
-<script>
-    function filterBySubcategory(subcategory) {
-        const urlParams = new URLSearchParams(window.location.search);
-        if (subcategory === "all") {
-            urlParams.delete('subcategory'); // Remove subcategory filter if "Show All" is selected
-        } else {
-            urlParams.set('subcategory', subcategory); // Set the selected subcategory
-        }
-        window.location.search = urlParams.toString(); // Reload the page with updated query parameters
-    }
+function sortReports(sortValue) {
+  const urlParams = new URLSearchParams(window.location.search);
+  urlParams.set('sort', sortValue);
+  window.location.search = urlParams.toString();
+}
+
+function filterBySubcategory(subcategory) {
+  const urlParams = new URLSearchParams(window.location.search);
+  if (subcategory === "all") {
+    urlParams.delete('subcategory');
+  } else {
+    urlParams.set('subcategory', subcategory);
+  }
+  window.location.search = urlParams.toString();
+}
 </script>
 
           <?php include "footer.php"; ?>
