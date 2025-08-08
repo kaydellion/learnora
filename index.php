@@ -122,7 +122,7 @@ $query = "SELECT
     ti.picture
 FROM {$siteprefix}training t
 LEFT JOIN {$siteprefix}categories l ON t.category = l.id
-LEFT JOIN {$siteprefix}instructors u ON t.instructors = u.s
+LEFT JOIN {$siteprefix}instructors u ON t.instructors = u.id
 LEFT JOIN {$siteprefix}categories sc ON t.subcategory = sc.id
 LEFT JOIN {$siteprefix}training_tickets tt ON t.training_id = tt.training_id
 LEFT JOIN {$siteprefix}training_images ti ON t.training_id = ti.training_id
@@ -130,11 +130,12 @@ WHERE t.status = 'approved'
 AND t.training_id IN (
     SELECT DISTINCT training_id 
     FROM {$siteprefix}training_event_dates
-    WHERE STR_TO_DATE(CONCAT(event_date, ' ', start_time), '%Y-%m-%d %H:%i') >= NOW()
+    WHERE STR_TO_DATE(CONCAT(event_date, ' ', end_time), '%Y-%m-%d %H:%i') >= NOW()
 )
 GROUP BY t.training_id
 ORDER BY t.training_id DESC
 LIMIT 20";
+
 
 
 
