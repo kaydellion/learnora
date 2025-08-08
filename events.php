@@ -265,29 +265,27 @@ $user_review = $existing_review_result->fetch_assoc();
         
 			<?php } ?>
 			
-                     <?php
-                if (!empty($course_requirrement)) {
 
-                    ?>
-                  <!-- Specifications Accordion -->
-               <div class="accordion-item">
+        <?php if (!empty($course_description)) { ?>
+        <!-- Description Accordion -->
+              <div class="accordion-item">
                 <h2 class="accordion-header">
-                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#specifications" aria-expanded="false" aria-controls="specifications">
-                    Course Requirements 
+                  <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#description" aria-expanded="true" aria-controls="description">
+                    Course Requirements
                   </button>
                 </h2>
-                <div id="specifications" class="accordion-collapse collapse">
+                <div id="description" class="accordion-collapse collapse show">
                   <div class="accordion-body">
-                     <div class="product-description mb-1">
+           <div class="product-description mb-1">
         <?php 
         // Strip tags from short version to avoid breaking HTML
-        $descs_words = explode(' ', strip_tags($$course_requirrement));
+        $descs_words = explode(' ', strip_tags($course_requirrement));
         $descs_short = implode(' ', array_slice($descs_words, 0, 10));
         $descs_is_long = str_word_count(strip_tags($course_requirrement)) > 10;
         ?>
         
         <span class="desc-short"><?php echo $descs_short; ?><?php if ($descs_is_long) echo '...'; ?></span>
-
+        
         <?php if ($descs_is_long): ?>
             <span class="desc-full" style="display: none;"><?php echo $course_requirrement; ?></span>
             <br>
@@ -295,33 +293,13 @@ $user_review = $existing_review_result->fetch_assoc();
             <button type="button" class="btn btn-link btn-sm p-0 read-less-desc" style="text-decoration: none; display:none;">Read Less</button>
         <?php endif; ?>
     </div>
-
-                </div>
-                        
-                </div>
-                </div>
-        
-			<?php } ?>
-
-			      
-                   <?php if (!empty($learning_objectives)) { ?>
-        <!-- Description Accordion -->
-              <div class="accordion-item">
-                <h2 class="accordion-header">
-                  <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#objective" aria-expanded="true" aria-controls="objective">
-                
-                  </button>
-                </h2>
-                <div id="objective" class="accordion-collapse collapse show">
-                  <div class="accordion-body">
-                    <div class="product-description">
-
-                      <p><?php echo $learning_objectives; ?></p>
-                    </div>
                   </div>
                 </div>
-				</div>
+				 </div>
                 <?php } ?>
+                  
+
+			      
 
                 <!--- training video -->
                 <?php if (!empty($training_video)): ?>
