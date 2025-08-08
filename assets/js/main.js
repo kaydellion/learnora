@@ -1018,6 +1018,7 @@ function showToast(message) {
 }
 
 //function for read more or see less
+//function for read more or see less
 document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('.product-short-description').forEach(function (container) {
         const readMoreBtn = container.querySelector('.read-more-btn');

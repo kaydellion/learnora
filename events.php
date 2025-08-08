@@ -195,27 +195,24 @@ $user_review = $existing_review_result->fetch_assoc();
             <div class="product-info-wrapper" id="product-info-sticky">
               <!-- Product Meta -->
               <div class="product-meta">
-<div class="product-short-description">
-    <p>
-        <?php 
-        // Strip HTML for word counting and short description
-        $plainDescription = strip_tags($description);
-        $words = explode(' ', $plainDescription);
-        $shortDesc = implode(' ', array_slice($words, 0, 10));
-        $isLong = str_word_count($plainDescription) > 10;
-        ?>
+<div class="product-short-description mb-1">
+    <?php 
+    // Strip HTML tags for the short version to avoid broken HTML
+    $words = explode(' ', strip_tags($description));
+    $shortDesc = implode(' ', array_slice($words, 0, 10));
+    $isLong = str_word_count(strip_tags($description)) > 10;
+    ?>
 
-        <span class="short-description"><?php echo htmlspecialchars($shortDesc); ?><?php if ($isLong) echo '...'; ?></span>
+    <span class="short-description"><?php echo $shortDesc; ?><?php if ($isLong) echo '...'; ?></span>
 
-        <?php if ($isLong): ?>
-            <!-- Show full description with original TinyMCE HTML -->
-            <span class="full-description" style="display: none;"><?php echo $description; ?></span>
-            <br>
-            <button type="button" class="btn btn-link btn-sm p-0 read-more-btn" style="text-decoration: none;">Read More</button>
-            <button type="button" class="btn btn-link btn-sm p-0 read-less-btn" style="text-decoration: none; display:none;">Read Less</button>
-        <?php endif; ?>
-    </p>
+    <?php if ($isLong): ?>
+        <span class="full-description" style="display: none;"><?php echo $description; ?></span>
+        <br>
+        <button type="button" class="btn btn-link btn-sm p-0 read-more-btn" style="text-decoration: none;">Read More</button>
+        <button type="button" class="btn btn-link btn-sm p-0 read-less-btn" style="text-decoration: none; display:none;">Read Less</button>
+    <?php endif; ?>
 </div>
+
 
               <!-- Product Price -->
               <div class="product-price-container">
