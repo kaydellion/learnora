@@ -266,28 +266,31 @@ $user_review = $existing_review_result->fetch_assoc();
 			<?php } ?>
 			
 
-        <?php if (!empty($course_requirrement)) { ?>
-        <!-- Requirements Accordion -->
+          <?php
+                if (!empty($course_requirrement)) {
+
+                    ?>
+                  <!-- Specifications Accordion -->
                <div class="accordion-item">
                 <h2 class="accordion-header">
-                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#courseRequirements" aria-expanded="false" aria-controls="courseRequirements">
-                  Course Requirements
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#specifications" aria-expanded="false" aria-controls="specifications">
+                    Course Requirements 
                   </button>
                 </h2>
-                <div id="courseRequirements" class="accordion-collapse collapse">
+                <div id="specifications" class="accordion-collapse collapse">
                   <div class="accordion-body">
                      <div class="product-description mb-1">
-       <?php 
+        <?php 
         // Strip tags from short version to avoid breaking HTML
-        $descs_words = explode(' ', strip_tags($course_requirrement));
+        $descs_words = explode(' ', strip_tags($course_description));
         $descs_short = implode(' ', array_slice($descs_words, 0, 10));
-        $descs_is_long = str_word_count(strip_tags($course_requirrement)) > 10;
+        $descs_is_long = str_word_count(strip_tags($course_description)) > 10;
         ?>
         
         <span class="desc-short"><?php echo $descs_short; ?><?php if ($descs_is_long) echo '...'; ?></span>
         
         <?php if ($descs_is_long): ?>
-            <span class="desc-full" style="display: none;"><?php echo $course_requirrement; ?></span>
+            <span class="desc-full" style="display: none;"><?php echo $course_description; ?></span>
             <br>
             <button type="button" class="btn btn-link btn-sm p-0 read-more-desc" style="text-decoration: none;">Read More</button>
             <button type="button" class="btn btn-link btn-sm p-0 read-less-desc" style="text-decoration: none; display:none;">Read Less</button>
@@ -297,8 +300,10 @@ $user_review = $existing_review_result->fetch_assoc();
                 </div>
                 </div>
               </div>
-                <?php } ?>
-                  
+        
+			<?php } ?>
+			
+			      
 
 			      
 
