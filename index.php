@@ -124,7 +124,7 @@ $query = "SELECT
           LEFT JOIN {$siteprefix}categories l 
             ON t.category = l.id 
           LEFT JOIN {$siteprefix}instructors u 
-            ON t.instructors = u.id
+            ON t.instructors = u.S
           LEFT JOIN {$siteprefix}categories sc 
             ON t.subcategory = sc.id 
           LEFT JOIN {$siteprefix}training_tickets tt 
