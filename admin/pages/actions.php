@@ -548,14 +548,14 @@ foreach ($categories as $catId) {
     if (!empty($promo_video)) { 
         $fileKey = 'promo_video';
         $fileName = uniqid() . '_' . basename($promo_video);
-        $logopromo_video = handleFileUpload($fileKey, $uploadDir, $fileName);
+        $logopromo_video = handleFileUpload($fileKey, $uploadDir, $promo_video);
         $insertQuery=mysqli_query($con, "INSERT INTO {$siteprefix}training_videos (training_id, video_type, video_path, updated_at) VALUES ('$training_id', 'promo', '$logopromo_video', NOW())");
     } 
     $trailer_video = $_FILES['trailer_video']['name'];
     if (!empty($trailer_video)) {
         $fileKey = 'trailer_video';
         $fileName = uniqid() . '_' . basename($trailer_video);
-        $logotrailer_video = handleFileUpload($fileKey, $fileuploadDir, $fileName);
+        $logotrailer_video = handleFileUpload($fileKey, $fileuploadDir, $trailer_video);
         $insertQuery=mysqli_query($con, "INSERT INTO {$siteprefix}training_videos (training_id, video_type, video_path, updated_at) VALUES ('$training_id', 'trailer', '$logotrailer_video', NOW())");
     } 
 

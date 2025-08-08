@@ -92,7 +92,9 @@ $user_review = $existing_review_result->fetch_assoc();
               <!-- Product Meta -->
               <div class="product-meta">
                      <div class="d-flex justify-content-between align-items-center mb-3">
+                     
                   <span class="product-category"><?php echo $event_type; ?></span>
+
                   <div class="product-share">
                     <button class="share-btn" id="webShareBtn" aria-label="Share product">
                       <i class="bi bi-share"></i>
@@ -116,6 +118,7 @@ $user_review = $existing_review_result->fetch_assoc();
   </a>
 
                     </div>
+                     <span>Event ID: <?php echo $training_id; ?></span>
                   </div>
                 </div>
 			      <h4 class="product-title"><?php echo $title; ?></h4>
