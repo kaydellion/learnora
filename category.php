@@ -374,7 +374,7 @@ $seller_linkedin = $seller['seller_linkedin'];
 
 <div class="col-6 col-md-4 col-lg-3 mb-4">
   <div class="card h-100 shadow-sm border-0">
-    <img src="<?php echo $seller_photo; ?>" class="card-img-top" alt="<?php echo $seller_name; ?>" style="object-fit: cover; height: 200px;">
+    <img src="<?php echo $siteurl.$seller_photo; ?>" class="card-img-top" alt="<?php echo $seller_name; ?>" style="object-fit: cover; height: 200px;">
 
     <div class="card-body d-flex flex-column">
       <h5 class="card-title d-flex justify-content-between align-items-center">

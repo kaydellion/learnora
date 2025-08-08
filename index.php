@@ -113,29 +113,32 @@
           <!-- Product 1 -->
           <?php
 $query = "SELECT 
-    t.*,
-    u.name AS display_name,
-    tt.price,
-    u.photo AS profile_picture,
-    l.category_name AS category,
-    sc.category_name AS subcategory,
-    ti.picture
+    t.*, 
+    u.name as display_name, 
+    tt.price, 
+    u.photo as profile_picture, 
+    l.category_name AS category, 
+    sc.category_name AS subcategory, 
+    ti.picture 
 FROM {$siteprefix}training t
-JOIN (
-    SELECT DISTINCT training_id
-    FROM {$siteprefix}training_event_dates
-    WHERE TIMESTAMP(event_date, end_time) >= NOW()
-) future ON future.training_id = t.training_id
-LEFT JOIN {$siteprefix}categories l  ON t.category    = l.id
-LEFT JOIN {$siteprefix}instructors u ON t.instructors = u.S
-LEFT JOIN {$siteprefix}categories sc ON t.subcategory = sc.id
+LEFT JOIN {$siteprefix}categories l ON t.category = l.id 
+LEFT JOIN {$siteprefix}instructors u ON t.instructors = u.s
+LEFT JOIN {$siteprefix}categories sc ON t.subcategory = sc.id 
 LEFT JOIN {$siteprefix}training_tickets tt ON t.training_id = tt.training_id
-LEFT JOIN {$siteprefix}training_images ti   ON t.training_id = ti.training_id
+LEFT JOIN {$siteprefix}training_images ti ON t.training_id = ti.training_id 
 WHERE t.status = 'approved'
-ORDER BY t.training_id DESC
-LIMIT 20
-";
-
+AND EXISTS (
+    SELECT 1 
+    FROM {$siteprefix}training_event_dates d
+    WHERE d.training_id = t.training_id
+    AND (
+        d.event_date > CURDATE() 
+        OR (d.event_date = CURDATE() AND d.end_time >= CURTIME())
+    )
+)
+GROUP BY t.s 
+ORDER BY t.s DESC 
+LIMIT 20";
 
 $result = mysqli_query($con, $query);
 if ($result) {
@@ -335,25 +338,37 @@ while ($row = mysqli_fetch_assoc($result)) {
       </script>
       <div class="swiper-wrapper">
           <?php
-    $query = "SELECT DISTINCT 
-                            t.*, 
-                            ti.picture, 
-                            u.display_name, tt.price, 
-                            u.profile_photo as profile_picture,
-                            l.category_name AS category,
-                            sc.category_name AS subcategory
-                        FROM ".$siteprefix."orders o
-                        JOIN ".$siteprefix."order_items oi ON o.order_id = oi.order_id
-                        JOIN ".$siteprefix."training t ON t.training_id= oi.training_id
-                        LEFT JOIN ".$siteprefix."training_images ti ON t.training_id = ti.training_id
-                        LEFT JOIN ".$siteprefix."users u ON t.user = u.s
-                        LEFT JOIN ".$siteprefix."categories l ON t.category = l.id
-                        LEFT JOIN ".$siteprefix."training_tickets tt ON t.training_id= tt.training_id
-                        LEFT JOIN ".$siteprefix."categories sc ON t.subcategory = sc.id
-                        WHERE o.status = 'paid' AND t.status = 'approved'
-                        GROUP BY t.training_id
-                        ORDER BY o.date DESC LIMIT 10
-                    ";
+   $query = "SELECT DISTINCT 
+            t.*, 
+            ti.picture, 
+            u.display_name, 
+            tt.price, 
+            u.profile_photo as profile_picture,
+            l.category_name AS category,
+            sc.category_name AS subcategory
+        FROM {$siteprefix}orders o
+        JOIN {$siteprefix}order_items oi ON o.order_id = oi.order_id
+        JOIN {$siteprefix}training t ON t.training_id = oi.training_id
+        LEFT JOIN {$siteprefix}training_images ti ON t.training_id = ti.training_id
+        LEFT JOIN {$siteprefix}users u ON t.user = u.s
+        LEFT JOIN {$siteprefix}categories l ON t.category = l.id
+        LEFT JOIN {$siteprefix}training_tickets tt ON t.training_id = tt.training_id
+        LEFT JOIN {$siteprefix}categories sc ON t.subcategory = sc.id
+        WHERE o.status = 'paid' 
+        AND t.status = 'approved'
+        AND EXISTS (
+            SELECT 1 
+            FROM {$siteprefix}training_event_dates d
+            WHERE d.training_id = t.training_id
+            AND (
+                d.event_date > CURDATE() 
+                OR (d.event_date = CURDATE() AND d.end_time >= CURTIME())
+            )
+        )
+        GROUP BY t.training_id
+        ORDER BY o.date DESC 
+        LIMIT 10";
+
 $result = mysqli_query($con, $query);
 if ($result) {
 while ($row = mysqli_fetch_assoc($result)) {

@@ -371,6 +371,86 @@ if ($active_log == 1){
                 </div>
 
 
+                
+     <section id="recent-posts" class="recent-posts section">
+
+      <!-- Section Title -->
+      <div class="container section-title" data-aos="fade-up">
+        <h2>Related Articles</h2>
+        <p></p>
+      </div><!-- End Section Title -->
+
+      <div class="container" data-aos="fade-up" data-aos-delay="100">
+        <div class="row gy-4">
+ <?php
+// Fetch forum posts
+// Category filter
+$current_categories = array_filter(array_map('intval', $current_categories));
+
+if (!empty($current_categories)) {
+    // Build WHERE clause to match any of these category IDs
+    $category_conditions = [];
+    foreach ($current_categories as $catId) {
+        // Match category ID in CSV column
+        $category_conditions[] = "FIND_IN_SET($catId, fp.categories)";
+    }
+    $category_where = implode(' OR ', $category_conditions);
+
+    // Fetch other posts from same categories
+    $sql = "SELECT fp.*, u.display_name 
+            FROM {$siteprefix}forum_posts fp
+            LEFT JOIN {$siteprefix}users u ON fp.user_id = u.s
+            WHERE ($category_where)
+            AND fp.s != '{$forum['s']}'  -- Exclude current article
+            ORDER BY fp.created_at DESC 
+            LIMIT 3";
+
+$result = mysqli_query($con, $sql);
+
+
+while ($row = mysqli_fetch_assoc($result)) {
+    $s = $row['s'];
+    $title = htmlspecialchars($row['title']);
+    $date = date('d M Y', strtotime($row['created_at']));
+    $uploader = htmlspecialchars($row['display_name']);
+    $alt_title = htmlspecialchars($row['slug']);
+     $image_path = $imagePath.$row['featured_image'];
+
+    // Fetch category names
+    $catNames = [];
+    $catIds = [];
+
+    if (!empty($row['categories'])) {
+        // Break string into array of IDs
+        $catIds = preg_split('/\s*,\s*/', trim($row['categories']));
+        $catIds = array_filter(array_map('intval', $catIds)); // convert to int & filter empty
+        if (!empty($catIds)) {
+            $catIdList = implode(',', $catIds);
+            $catSql = "SELECT id, category_name FROM {$siteprefix}categories WHERE id IN ($catIdList)";
+            $catRes = mysqli_query($con, $catSql);
+            while ($catRow = mysqli_fetch_assoc($catRes)) {
+                $catNames[] = $catRow['category_name'];
+            }
+        }
+    }
+    include 'blog-card.php'; // Include the blog post template
+}
+}else {
+    echo '<div class="alert alert-info" role="alert">
+        No related posts found.
+    </div>';
+}
+?>
+         
+        </div>
+      </div>
+
+    </section><!-- /Recent Posts Section -->
+
+
+
+
+
 </main>
 
 <?php include "footer.php"; ?>
