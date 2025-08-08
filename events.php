@@ -536,7 +536,12 @@ $cancel_words = explode(' ', strip_tags($cancel_text));
 </div>
 
 
-<!-- Course Info & Review Tabs Column -->
+
+
+	    </div>
+		<div class="row mb-2">
+		
+		<!-- Course Info & Review Tabs Column -->
 <div class="col-12 mb-3" data-aos="fade-left" data-aos-delay="300">
   <div class="card shadow-sm">
     <div class="card-body">
@@ -865,8 +870,8 @@ $all_reviews = $all_reviews_result->fetch_all(MYSQLI_ASSOC);
    </div>
      </div>
 	 </div>
-
-	    </div>
+		
+		</div>
       </div>
      
 
