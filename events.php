@@ -648,7 +648,7 @@ $cancel_words = explode(' ', strip_tags($cancel_text));
                     Target Audience
                 </button>
             </h2>
-            <div id="collapseAudience" class="accordion-collapse collapse" aria-labelledby="headingAudience" data-bs-parent="#audienceAccordion">
+            <div id="collapseAudience" class="accordion-collapse collapse show" aria-labelledby="headingAudience" data-bs-parent="#audienceAccordion">
                 <div class="accordion-body">
                     <?php echo $target_audience; ?>
                 </div>
