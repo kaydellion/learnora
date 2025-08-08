@@ -279,8 +279,29 @@ $user_review = $existing_review_result->fetch_assoc();
                 </h2>
                 <div id="specifications" class="accordion-collapse collapse">
                   <div class="accordion-body">
-    <div class="product-short-description mb-1">
-        <?php echo $course_requirrement; ?>
+<div class="product-short-description mb-1">
+    <?php 
+    // Clean up only for the short version — remove empty tags
+    function clean_html_for_preview($html) {
+        // Remove empty HTML tags (like <ul></ul>, <p></p>, etc.)
+        return preg_replace('/<(\w+)[^>]*>\s*<\/\1>/', '', $html);
+    }
+
+    // Clean and extract short preview
+    $cleaned_html = clean_html_for_preview($course_requirrement);
+    $short_words = explode(' ', strip_tags($cleaned_html));
+    $short_preview = implode(' ', array_slice($short_words, 0, 10));
+    $is_long = str_word_count(strip_tags($cleaned_html)) > 10;
+    ?>
+
+    <span class="short-description"><?php echo $short_preview; ?><?php if ($is_long) echo '...'; ?></span>
+
+    <?php if ($is_long): ?>
+        <span class="full-description" style="display: none;"><?php echo $course_requirrement; ?></span>
+        <br>
+        <button type="button" class="btn btn-link btn-sm p-0 read-more-btn" style="text-decoration: none;">Read More</button>
+        <button type="button" class="btn btn-link btn-sm p-0 read-less-btn" style="text-decoration: none; display:none;">Read Less</button>
+    <?php endif; ?>
 </div>
                         
                 </div>
