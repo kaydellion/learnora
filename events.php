@@ -321,14 +321,14 @@ $user_review = $existing_review_result->fetch_assoc();
     <div class="product-short-description mb-1">
     <?php 
     // Strip HTML tags for the short version to avoid broken HTML
-    $wordss = explode(' ', strip_tags($learning_objectives));
-    $shortDescs = implode(' ', array_slice($wordss, 0, 10));
-    $isLongs = str_word_count(strip_tags($learning_objectives)) > 10;
+    $wordt = explode(' ', strip_tags($learning_objectives));
+    $shortDesct = implode(' ', array_slice($wordt, 0, 10));
+    $isLongt = str_word_count(strip_tags($learning_objectives)) > 10;
     ?>
 
-    <span class="short-description"><?php echo $shortDescs; ?><?php if ($isLongs) echo '...'; ?></span>
+    <span class="short-description"><?php echo $shortDesct; ?><?php if ($isLongt) echo '...'; ?></span>
 
-    <?php if ($isLongs): ?>
+    <?php if ($isLongt): ?>
         <span class="full-description" style="display: none;"><?php echo $learning_objectives; ?></span>
         <br>
         <button type="button" class="btn btn-link btn-sm p-0 read-more-btn" style="text-decoration: none;">Read More</button>
