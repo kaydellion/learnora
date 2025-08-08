@@ -289,7 +289,7 @@ $user_review = $existing_review_result->fetch_assoc();
 
     <span class="short-description"><?php echo $shortDescs; ?><?php if ($isLongs) echo '...'; ?></span>
 
-    <?php if ($isLong): ?>
+    <?php if ($isLongs): ?>
         <span class="full-description" style="display: none;"><?php echo $course_requirrement; ?></span>
         <br>
         <button type="button" class="btn btn-link btn-sm p-0 read-more-btn" style="text-decoration: none;">Read More</button>
@@ -304,6 +304,43 @@ $user_review = $existing_review_result->fetch_assoc();
 			<?php } ?>
 			
 			
+      
+          <?php
+                if (!empty($learning_objectives)) {
+
+                    ?>
+                  <!-- Specifications Accordion -->
+               <div class="accordion-item">
+                <h2 class="accordion-header">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#learningobjectives" aria-expanded="false" aria-controls="learningobjectives">
+                    Learning Objectives
+                  </button>
+                </h2>
+                <div id="learningobjectives" class="accordion-collapse collapse">
+                  <div class="accordion-body">
+    <div class="product-short-description mb-1">
+    <?php 
+    // Strip HTML tags for the short version to avoid broken HTML
+    $wordss = explode(' ', strip_tags($learning_objectives));
+    $shortDescs = implode(' ', array_slice($wordss, 0, 10));
+    $isLongs = str_word_count(strip_tags($learning_objectives)) > 10;
+    ?>
+
+    <span class="short-description"><?php echo $shortDescs; ?><?php if ($isLongs) echo '...'; ?></span>
+
+    <?php if ($isLongs): ?>
+        <span class="full-description" style="display: none;"><?php echo $learning_objectives; ?></span>
+        <br>
+        <button type="button" class="btn btn-link btn-sm p-0 read-more-btn" style="text-decoration: none;">Read More</button>
+        <button type="button" class="btn btn-link btn-sm p-0 read-less-btn" style="text-decoration: none; display:none;">Read Less</button>
+    <?php endif; ?>
+</div>
+                        
+                </div>
+                </div>
+              </div>
+        
+			<?php } ?>
 
 			      
 
