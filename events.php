@@ -693,7 +693,7 @@ $cancel_words = explode(' ', strip_tags($cancel_text));
                 <div class="accordion-body">
                     <div class="product-video">
                         <video controls width="100%">
-                            <source src="<?php echo $training_video; ?>" type="video/mp4">
+                            <source src="<?php echo $siteurl . $training_video; ?>" type="video/mp4">
                             Your browser does not support the video tag.
                         </video>
                     </div>
