@@ -86,8 +86,8 @@ $user_review = $existing_review_result->fetch_assoc();
 		
           <!-- Product Images Column -->
           <div class="col-lg-6 mb-5 mb-lg-0" data-aos="fade-right" data-aos-delay="200">
-	<!---	<div class="row">
-		  <div class="col-12"> -->
+		  <div class="row">
+		  <div class="col-12">
 		  		  <div class="product-data">
               <!-- Product Meta -->
               <div class="product-meta">
@@ -179,12 +179,12 @@ $user_review = $existing_review_result->fetch_assoc();
                 </div>
               </div>
 			  </div>
-			 
+			   </div>
 			  
 			  
 			    
 <!-- Course Info & Review Tabs Column -->
-<div class="mb-3" data-aos="fade-left" data-aos-delay="300">
+<div class="col-12 mb-3" data-aos="fade-left" data-aos-delay="300">
   <div class="card shadow-sm">
     <div class="card-body">
       <!-- Nav tabs -->
@@ -473,7 +473,7 @@ $all_reviews = $all_reviews_result->fetch_all(MYSQLI_ASSOC);
    </div>
      </div>
 	 </div>
-          
+            </div>
           </div>
 
 
@@ -609,7 +609,31 @@ $all_reviews = $all_reviews_result->fetch_all(MYSQLI_ASSOC);
   </div>
 
   <!-- JavaScript -->
- 
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const checkboxes = document.querySelectorAll('.variation-checkbox');
+
+      checkboxes.forEach(function (checkbox) {
+        checkbox.addEventListener('change', function () {
+          const ticketId = this.value;
+          const infoDiv = document.getElementById('info-' + ticketId);
+          const seatRemain = document.getElementById('seat-' + ticketId).value;
+          const benefits = document.getElementById('benefits-' + ticketId).value;
+
+          if (this.checked) {
+            let html = `
+              <strong>Remaining Seat:</strong> ${seatRemain}<br>
+              <strong>Benefits:</strong> ${benefits}
+            `;
+            infoDiv.innerHTML = html;
+            infoDiv.style.display = 'block';
+          } else {
+            infoDiv.style.display = 'none';
+          }
+        });
+      });
+    });
+  </script>
 <?php endif; ?>
 </div>
             
@@ -1115,31 +1139,7 @@ document.getElementById('webShareBtn').addEventListener('click', function() {
 
 </script>
 
- <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      const checkboxes = document.querySelectorAll('.variation-checkbox');
 
-      checkboxes.forEach(function (checkbox) {
-        checkbox.addEventListener('change', function () {
-          const ticketId = this.value;
-          const infoDiv = document.getElementById('info-' + ticketId);
-          const seatRemain = document.getElementById('seat-' + ticketId).value;
-          const benefits = document.getElementById('benefits-' + ticketId).value;
-
-          if (this.checked) {
-            let html = `
-              <strong>Remaining Seat:</strong> ${seatRemain}<br>
-              <strong>Benefits:</strong> ${benefits}
-            `;
-            infoDiv.innerHTML = html;
-            infoDiv.style.display = 'block';
-          } else {
-            infoDiv.style.display = 'none';
-          }
-        });
-      });
-    });
-  </script>
   
 
 <script>
