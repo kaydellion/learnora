@@ -180,10 +180,68 @@ $user_review = $existing_review_result->fetch_assoc();
               </div>
 			  </div>
 			   </div>
-			  
-			  
-
             </div>
+			
+			
+			
+                
+<div class="col-12">
+  <div class="table-requirements">
+
+    <!-- Visa Requirement Section -->
+    <div class="collapsible-section mb-4">
+      <h6>Visa Requirement</h6>
+      <?php
+$visa_text = '
+
+<strong>For Trainings in Nigeria:</strong><br>
+If you reside outside Nigeria and plan to attend one of our trainings, a visitor visa may be required. We recommend applying early, as visa processing can take time. Citizens of Visa Waiver Program countries may not need an invitation letter. For full details and application guidance, visit: <a href="https://portal.immigration.gov.ng/pages/welcome" target="_blank">https://portal.immigration.gov.ng/pages/welcome</a>.<br><br>
+
+<strong>For Trainings Outside Nigeria:</strong><br>
+Participants attending training sessions abroad will need to obtain a visa independently. Learnora (Kyneli Business Support Services) does not process visas on behalf of trainees. Please contact the appropriate embassy for visa requirements specific to your destination country.';
+
+      $visa_words = explode(' ', strip_tags($visa_text));
+      $visa_short = implode(' ', array_slice($visa_words, 0, 30));
+      $visa_long = $visa_text;
+      $visa_is_long = count($visa_words) > 30;
+      ?>
+      <p>
+        <span class="short-desc"><?php echo $visa_short; ?><?php if ($visa_is_long) echo '...'; ?></span>
+        <?php if ($visa_is_long): ?>
+          <span class="full-desc" style="display:none;"><?php echo $visa_long; ?></span>
+          <br>
+          <button type="button" class="btn btn-link btn-sm p-0 read-more-btn" style="text-decoration: none;">Read More</button>
+          <button type="button" class="btn btn-link btn-sm p-0 read-less-btn" style="text-decoration: none; display:none;">Read Less</button>
+        <?php endif; ?>
+      </p>
+    </div>
+
+    <!-- Cancellation Policy Section -->
+    <div class="collapsible-section">
+      <h6>Cancellation Policy</h6>
+      <?php
+$cancel_text = "All cancellations must be submitted in writing to <a href=\"mailto:hello@learnora.ng\">hello@learnora.ng</a> at least three (3) days before the event. A twenty percent (20%) administrative fee applies to all cancellations. Substitutions are permitted at any time at no extra cost. For inquiries, you may also call <a href=\"tel:+2348033782777\">+234 (0) 803 3782 777</a> or <a href=\"tel:+23412952413\">+234 (01) 29 52 413</a>.";
+
+$cancel_words = explode(' ', strip_tags($cancel_text));
+      $cancel_short = implode(' ', array_slice($cancel_words, 0, 30));
+      $cancel_long = $cancel_text;
+      $cancel_is_long = count($cancel_words) > 30;
+      ?>
+      <p>
+        <span class="short-desc"><?php echo $cancel_short; ?><?php if ($cancel_is_long) echo '...'; ?></span>
+        <?php if ($cancel_is_long): ?>
+          <span class="full-desc" style="display:none;"><?php echo $cancel_long; ?></span>
+          <br>
+          <button type="button" class="btn btn-link btn-sm p-0 read-more-btn" style="text-decoration: none;">Read More</button>
+          <button type="button" class="btn btn-link btn-sm p-0 read-less-btn" style="text-decoration: none; display:none;">Read Less</button>
+        <?php endif; ?>
+      </p>
+    </div>
+
+  </div>
+</div>
+			
+
           </div>
 
 
@@ -194,7 +252,7 @@ $user_review = $existing_review_result->fetch_assoc();
             <div class="product-info-wrapper" id="product-info-sticky">
               <!-- Product Meta -->
               <div class="product-meta">
-        <div class="product-short-description mb-1">
+<div class="product-short-description mb-1">
     <?php 
     // Strip HTML tags for the short version to avoid broken HTML
     $words = explode(' ', strip_tags($description));
@@ -211,6 +269,7 @@ $user_review = $existing_review_result->fetch_assoc();
         <button type="button" class="btn btn-link btn-sm p-0 read-less-btn" style="text-decoration: none; display:none;">Read Less</button>
     <?php endif; ?>
 </div>
+
 
               <!-- Product Price -->
               <div class="product-price-container">
@@ -256,6 +315,7 @@ $user_review = $existing_review_result->fetch_assoc();
               <a href="<?php echo $siteurl; ?>loyalty-program.php" class="text-white text-decoration-none">
                 <span class="loyalty-plan-name"><?php echo $plan_name; ?></span> - ₦
                 <span class="loyalty-price">0.00</span>
+
               </a>
             </span>
     <?php } } ?>
@@ -423,9 +483,7 @@ $user_review = $existing_review_result->fetch_assoc();
 	    </div>
       </div>
 
-           
-	  
-	  <div class="col-12 mb-3" data-aos="fade-left" data-aos-delay="300">
+           			  <div class="col-12 mb-3" data-aos="fade-left" data-aos-delay="300">
        <!-- Language and Event Dates/Times Table (Borderless) -->
                <div class="table-actions">
  <table class="table table-borderless mt-3">
@@ -471,71 +529,13 @@ $user_review = $existing_review_result->fetch_assoc();
                 </div>
 
                     </div>
+	  
+	
 
-                
-<div class="col-12">
-  <div class="table-requirements">
-
-    <!-- Visa Requirement Section -->
-    <div class="collapsible-section mb-4">
-      <h6>Visa Requirement</h6>
-      <?php
-$visa_text = '
-
-<strong>For Trainings in Nigeria:</strong><br>
-If you reside outside Nigeria and plan to attend one of our trainings, a visitor visa may be required. We recommend applying early, as visa processing can take time. Citizens of Visa Waiver Program countries may not need an invitation letter. For full details and application guidance, visit: <a href="https://portal.immigration.gov.ng/pages/welcome" target="_blank">https://portal.immigration.gov.ng/pages/welcome</a>.<br><br>
-
-<strong>For Trainings Outside Nigeria:</strong><br>
-Participants attending training sessions abroad will need to obtain a visa independently. Learnora (Kyneli Business Support Services) does not process visas on behalf of trainees. Please contact the appropriate embassy for visa requirements specific to your destination country.';
-
-      $visa_words = explode(' ', strip_tags($visa_text));
-      $visa_short = implode(' ', array_slice($visa_words, 0, 30));
-      $visa_long = $visa_text;
-      $visa_is_long = count($visa_words) > 30;
-      ?>
-      <p>
-        <span class="short-desc"><?php echo $visa_short; ?><?php if ($visa_is_long) echo '...'; ?></span>
-        <?php if ($visa_is_long): ?>
-          <span class="full-desc" style="display:none;"><?php echo $visa_long; ?></span>
-          <br>
-          <button type="button" class="btn btn-link btn-sm p-0 read-more-btn" style="text-decoration: none;">Read More</button>
-          <button type="button" class="btn btn-link btn-sm p-0 read-less-btn" style="text-decoration: none; display:none;">Read Less</button>
-        <?php endif; ?>
-      </p>
-    </div>
-
-    <!-- Cancellation Policy Section -->
-    <div class="collapsible-section">
-      <h6>Cancellation Policy</h6>
-      <?php
-$cancel_text = "All cancellations must be submitted in writing to <a href=\"mailto:hello@learnora.ng\">hello@learnora.ng</a> at least three (3) days before the event. A twenty percent (20%) administrative fee applies to all cancellations. Substitutions are permitted at any time at no extra cost. For inquiries, you may also call <a href=\"tel:+2348033782777\">+234 (0) 803 3782 777</a> or <a href=\"tel:+23412952413\">+234 (01) 29 52 413</a>.";
-
-$cancel_words = explode(' ', strip_tags($cancel_text));
-      $cancel_short = implode(' ', array_slice($cancel_words, 0, 30));
-      $cancel_long = $cancel_text;
-      $cancel_is_long = count($cancel_words) > 30;
-      ?>
-      <p>
-        <span class="short-desc"><?php echo $cancel_short; ?><?php if ($cancel_is_long) echo '...'; ?></span>
-        <?php if ($cancel_is_long): ?>
-          <span class="full-desc" style="display:none;"><?php echo $cancel_long; ?></span>
-          <br>
-          <button type="button" class="btn btn-link btn-sm p-0 read-more-btn" style="text-decoration: none;">Read More</button>
-          <button type="button" class="btn btn-link btn-sm p-0 read-less-btn" style="text-decoration: none; display:none;">Read Less</button>
-        <?php endif; ?>
-      </p>
-    </div>
-
-  </div>
-</div>
         </div>               
 </div>
 
 
-
-
-
-			    
 <!-- Course Info & Review Tabs Column -->
 <div class="col-12 mb-3" data-aos="fade-left" data-aos-delay="300">
   <div class="card shadow-sm">
@@ -544,9 +544,19 @@ $cancel_words = explode(' ', strip_tags($cancel_text));
       <ul class="nav nav-tabs mb-3" id="courseTab" role="tablist">
         <li class="nav-item" role="presentation">
           <button class="nav-link active" id="info-tab" data-bs-toggle="tab" data-bs-target="#info" type="button" role="tab" aria-controls="info" aria-selected="true">
-            Course Info
+            Course Description
           </button>
         </li>
+		
+          <?php if (!empty($target_audience)) { ?>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="audience-tab" data-bs-toggle="tab" data-bs-target="#audience" type="button" role="tab" aria-controls="audience" aria-selected="false">
+           Who Should Attend / Target Audience
+          </button>
+        </li>
+
+        <?php } ?>
+		
           <?php if ($user_purchased) { ?>
         <li class="nav-item" role="presentation">
           <button class="nav-link" id="review-tab" data-bs-toggle="tab" data-bs-target="#review" type="button" role="tab" aria-controls="review" aria-selected="false">
@@ -559,169 +569,84 @@ $cancel_words = explode(' ', strip_tags($cancel_text));
       <!-- Tab panes -->
       <div class="tab-content" id="courseTabContent">
         <div class="tab-pane fade show active" id="info" role="tabpanel" aria-labelledby="info-tab">
-                 <div class="row" data-aos="fade-up">
-          <div class="col-12">
-            <div class="product-details-accordion">     
-                   <?php if (!empty($course_description)) { ?>
-        <!-- Description Accordion -->
-              <div class="accordion-item">
-                <h2 class="accordion-header">
-                  <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#description" aria-expanded="true" aria-controls="description">
-                    Course Description
-                  </button>
-                </h2>
-                <div id="description" class="accordion-collapse collapse show">
-                  <div class="accordion-body">
-           <div class="product-description mb-1">
-        <?php 
-        // Strip tags from short version to avoid breaking HTML
-        $descs_words = explode(' ', strip_tags($course_description));
-        $descs_short = implode(' ', array_slice($descs_words, 0, 10));
-        $descs_is_long = str_word_count(strip_tags($course_description)) > 10;
-        ?>
-        
-        <span class="desc-short"><?php echo $descs_short; ?><?php if ($descs_is_long) echo '...'; ?></span>
-        
-        <?php if ($descs_is_long): ?>
-            <span class="desc-full" style="display: none;"><?php echo $course_description; ?></span>
-            <br>
-            <button type="button" class="btn btn-link btn-sm p-0 read-more-desc" style="text-decoration: none;">Read More</button>
-            <button type="button" class="btn btn-link btn-sm p-0 read-less-desc" style="text-decoration: none; display:none;">Read Less</button>
-        <?php endif; ?>
-    </div>
-                  </div>
-                </div>
-				 </div>
-                <?php } ?>
-
-                
-           <?php
-                if (!empty($target_audience)) {
-
+      
+	  
+	      <div class="product-description mb-1">
+      <?php if (!empty(trim(strip_tags($course_description)))): ?>
+    <div class="accordion mb-3" id="benefitAccordion">
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingBenefit">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseBenefit" aria-expanded="false" aria-controls="collapseBenefit">
+                      Course Description
+                </button>
+            </h2>
+            <div id="collapseBenefit" class="accordion-collapse collapse show" aria-labelledby="headingBenefit" data-bs-parent="#benefitAccordion">
+                <div class="accordion-body">
+                    <?php 
+                    // Strip tags from short version to avoid breaking HTML
+                    $descs_words = explode(' ', strip_tags($course_description));
+                    $descs_short = implode(' ', array_slice($descs_words, 0, 10));
+                    $descs_is_long = str_word_count(strip_tags($course_description)) > 10;
                     ?>
-                  <!-- Specifications Accordion -->
-               <div class="accordion-item">
-                <h2 class="accordion-header">
-                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#targetAudience" aria-expanded="false" aria-controls="targetAudience">
-                  Target Audience
-                  </button>
-                </h2>
-                <div id="targetAudience" class="accordion-collapse collapse">
-                  <div class="accordion-body">
-                     <div class="product-description mb-1">
-        <?php echo $target_audience; ?>
-    </div>
-                        
+                    
+                    <span class="desc-short"><?php echo $descs_short; ?><?php if ($descs_is_long) echo '...'; ?></span>
+
+                    <?php if ($descs_is_long): ?>
+                        <span class="desc-full" style="display: none;"><?php echo $course_description; ?></span>
+                        <br>
+                        <button type="button" class="btn btn-link btn-sm p-0 read-more-desc" style="text-decoration: none;">Read More</button>
+                        <button type="button" class="btn btn-link btn-sm p-0 read-less-desc" style="text-decoration: none; display:none;">Read Less</button>
+                    <?php endif; ?>
                 </div>
-                </div>
-              </div>
-        
-			<?php } ?>
-			
-
-          <?php
-                if (!empty($course_requirrement)) {
-
-                    ?>
-                  <!-- Specifications Accordion -->
-               <div class="accordion-item">
-                <h2 class="accordion-header">
-                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#specifications" aria-expanded="false" aria-controls="specifications">
-                    Course Requirements 
-                  </button>
-                </h2>
-                <div id="specifications" class="accordion-collapse collapse">
-                  <div class="accordion-body">
-    <div class="product-short-description mb-1">
-    <?php 
-    // Strip HTML tags for the short version to avoid broken HTML
-    $wordss = explode(' ', strip_tags($course_requirrement));
-    $shortDescs = implode(' ', array_slice($wordss, 0, 10));
-    $isLongs = str_word_count(strip_tags($course_requirrement)) > 10;
-    ?>
-
-    <span class="short-description"><?php echo $shortDescs; ?><?php if ($isLongs) echo '...'; ?></span>
-
-    <?php if ($isLongs): ?>
-        <span class="full-description" style="display: none;"><?php echo $course_requirrement; ?></span>
-        <br>
-        <button type="button" class="btn btn-link btn-sm p-0 read-more-btn" style="text-decoration: none;">Read More</button>
-        <button type="button" class="btn btn-link btn-sm p-0 read-less-btn" style="text-decoration: none; display:none;">Read Less</button>
-    <?php endif; ?>
-</div>
-                        
-                </div>
-                </div>
-              </div>
-        
-			<?php } ?>
-			
-			  <?php
-                if (!empty($additional_notes)) {
-
-                    ?>
-                  <!-- Specifications Accordion -->
-               <div class="accordion-item">
-                <h2 class="accordion-header">
-                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#additionalNotes" aria-expanded="false" aria-controls="additionalNotes">
-                    Additional Notes
-                  </button>
-                </h2>
-                <div id="additionalNotes" class="accordion-collapse collapse">
-                  <div class="accordion-body">
-    <div class="product-short-description mb-1">
-    <?php 
-    // Strip HTML tags for the short version to avoid broken HTML
-    $wordss = explode(' ', strip_tags($additional_notes));
-    $shortDescs = implode(' ', array_slice($wordss, 0, 10));
-    $isLongs = str_word_count(strip_tags($additional_notes)) > 10;
-    ?>
-
-    <span class="short-description"><?php echo $shortDescs; ?><?php if ($isLongs) echo '...'; ?></span>
-
-    <?php if ($isLongs): ?>
-        <span class="full-description" style="display: none;"><?php echo $additional_notes; ?></span>
-        <br>
-        <button type="button" class="btn btn-link btn-sm p-0 read-more-btn" style="text-decoration: none;">Read More</button>
-        <button type="button" class="btn btn-link btn-sm p-0 read-less-btn" style="text-decoration: none; display:none;">Read Less</button>
-    <?php endif; ?>
-</div>
-                        
-                </div>
-                </div>
-              </div>
-        
-			<?php } ?>
-
-			      
-
-                <!--- training video -->
-                <?php if (!empty($training_video)): ?>
-<!-- Video Accordion -->
-<div class="accordion-item">
-  <h2 class="accordion-header">
-    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#trainingVideo" aria-expanded="false" aria-controls="trainingVideo">
-      Course Video
-    </button>
-  </h2>
-  <div id="trainingVideo" class="accordion-collapse collapse">
-    <div class="accordion-body">
-      <div class="product-video">
-        <video controls width="100%">
-          <source src="<?php echo $training_video; ?>" type="video/mp4">
-          Your browser does not support the video tag.
-        </video>
-      </div>
-    </div>
-  </div>
-</div>
-<?php endif; ?>
-              
-                </div>
-                </div>
-              </div>
+            </div>
         </div>
-	
+    </div>
+<?php endif; ?>
+                    </div>
+                    <div class="product-description mb-1">
+<?php if (!empty(trim(strip_tags($course_requirrement)))): ?>
+    <div class="accordion mb-3" id="requirementsAccordion">
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingRequirements">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseRequirements" aria-expanded="false" aria-controls="collapseRequirements">
+                    Course Requirements
+                </button>
+            </h2>
+            <div id="collapseRequirements" class="accordion-collapse collapse" aria-labelledby="headingRequirements" data-bs-parent="#requirementsAccordion">
+                <div class="accordion-body">
+                    <?php 
+                    // Strip tags for short version to avoid breaking HTML
+                    $req_words = explode(' ', strip_tags($course_requirrement));
+                    $req_short = implode(' ', array_slice($req_words, 0, 10));
+                    $req_is_long = str_word_count(strip_tags($course_requirrement)) > 10;
+                    ?>
+                    
+                    <span class="desc-short"><?php echo $req_short; ?><?php if ($req_is_long) echo '...'; ?></span>
+
+                    <?php if ($req_is_long): ?>
+                        <span class="desc-full" style="display: none;"><?php echo $course_requirrement; ?></span>
+                        <br>
+                        <button type="button" class="btn btn-link btn-sm p-0 read-more-desc" style="text-decoration: none;">Read More</button>
+                        <button type="button" class="btn btn-link btn-sm p-0 read-less-desc" style="text-decoration: none; display:none;">Read Less</button>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+    </div>
+<?php endif; ?>
+
+
+    </div>
+
+        </div>
+
+
+         <div class="tab-pane fade" id="audience" role="tabpanel" aria-labelledby="audience-tab">
+           <div class="product-description mb-1">
+             <span><?php echo $target_audience; ?></span>
+           </div>
+         </div>
+
 <?php if ($user_purchased) { ?>
         <div class="tab-pane fade" id="review" role="tabpanel" aria-labelledby="review-tab">
           <!-- Review Content -->
@@ -774,7 +699,6 @@ $all_reviews_query = "SELECT r.*, u.display_name AS user_name
                       JOIN {$siteprefix}users u ON r.user = u.s
                       WHERE r.training_id = ?
                       ORDER BY r.date DESC";
-
 $stmt = $con->prepare($all_reviews_query);
 $stmt->bind_param("i", $training_id);
 $stmt->execute();
@@ -882,6 +806,7 @@ $all_reviews = $all_reviews_result->fetch_all(MYSQLI_ASSOC);
    </div>
      </div>
 	 </div>
+
 	    </div>
       </div>
      
@@ -939,6 +864,7 @@ if ($result && mysqli_num_rows($result) > 0) {
         $pricing = $row['pricing'];
         $price = $row['price'];
         $tags = $row['tags'];
+
         $user = $row['display_name'];
         $user_picture = $imagePath.$row['profile_picture'];
         $created_date = $row['created_at'];
