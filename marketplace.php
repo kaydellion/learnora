@@ -30,18 +30,33 @@ switch ($filter) {
         $order_by = "t.title DESC";
         break;
 }
+$query = "SELECT t.*, 
+                u.name AS display_name, 
+                tt.price, 
+                u.photo AS profile_picture, 
+                l.category_name AS category, 
+                sc.category_name AS subcategory, 
+                ti.picture 
+          FROM {$siteprefix}training t
+          LEFT JOIN {$siteprefix}categories l ON t.category = l.id 
+          LEFT JOIN {$siteprefix}instructors u ON t.instructors = u.s
+          LEFT JOIN {$siteprefix}categories sc ON t.subcategory = sc.id 
+          LEFT JOIN {$siteprefix}training_tickets tt ON t.training_id = tt.training_id
+          LEFT JOIN {$siteprefix}training_images ti ON t.training_id = ti.training_id 
+          WHERE t.status = 'approved'
+            AND EXISTS (
+                SELECT 1 
+                FROM {$siteprefix}training_event_dates d
+                WHERE d.training_id = t.training_id
+                  AND (
+                      d.event_date > CURDATE() 
+                      OR (d.event_date = CURDATE() AND d.end_time >= CURTIME())
+                  )
+            )
+          GROUP BY t.training_id 
+          ORDER BY $order_by 
+          LIMIT $limit OFFSET $offset";
 
-$query = "SELECT t.*, u.name as display_name, tt.price, u.photo as profile_picture, l.category_name AS category, sc.category_name AS subcategory, ti.picture 
-    FROM ".$siteprefix."training t
-    LEFT JOIN ".$siteprefix."categories l ON t.category = l.id 
-    LEFT JOIN ".$siteprefix."instructors u ON t.instructors = u.s
-    LEFT JOIN ".$siteprefix."categories sc ON t.subcategory = sc.id 
-    LEFT JOIN ".$siteprefix."training_tickets tt ON t.training_id= tt.training_id
-    LEFT JOIN ".$siteprefix."training_images ti ON t.training_id = ti.training_id 
-WHERE t.status = 'approved' 
-GROUP BY t.training_id 
-ORDER BY $order_by 
-LIMIT $limit OFFSET $offset";
 $result = mysqli_query($con, $query);
 //if (!$result) {die('Error in SQL query: ' . mysqli_error($con));}
 $report_count = mysqli_num_rows($result);
@@ -49,8 +64,22 @@ $report_count = mysqli_num_rows($result);
 
 // Get total number of reports
 // Get total number of reports
-$total_query = "SELECT COUNT(*) as total FROM ".$siteprefix."training WHERE status = 'approved'";
+$total_query = "
+    SELECT COUNT(*) AS total 
+    FROM {$siteprefix}training t
+    WHERE t.status = 'approved'
+      AND EXISTS (
+          SELECT 1 
+          FROM {$siteprefix}training_event_dates d
+          WHERE d.training_id = t.training_id
+            AND (
+                d.event_date > CURDATE() 
+                OR (d.event_date = CURDATE() AND d.end_time >= CURTIME())
+            )
+      )
+";
 $total_result = mysqli_query($con, $total_query);
+
 if (!$total_result) {
     die('Error in total query: ' . mysqli_error($con));
 }
