@@ -81,6 +81,7 @@ if (isset($_GET['slug'])) {
                 $seller_photo = !empty($row['user_photo']) ? $imagePath . $row['user_photo'] : 'default-avatar.png';
                 $status = $row['status'];
                 $course_requirrement = $row['course_requirrement'];
+                $additional_notes = $row['additional_notes'];
                 $course_description = $row['course_description'];
                 $image_paths = $imagePath . $row['event_image'];
                 $slug = $alt_title;

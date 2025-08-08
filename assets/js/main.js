@@ -2055,8 +2055,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
-
-
 document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('.product-description').forEach(function (container) {
         var readMoreBtn = container.querySelector('.read-more-desc');

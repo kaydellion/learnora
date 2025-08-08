@@ -180,301 +180,68 @@ $user_review = $existing_review_result->fetch_assoc();
               </div>
 			  </div>
 			   </div>
-			  
-			  <!-- Course Info & Review Tabs Column -->
-<div class="col-12 mb-3" data-aos="fade-left" data-aos-delay="300">
-  <div class="card shadow-sm">
-    <div class="card-body">
-      <!-- Nav tabs -->
-      <ul class="nav nav-tabs mb-3" id="courseTab" role="tablist">
-        <li class="nav-item" role="presentation">
-          <button class="nav-link active" id="info-tab" data-bs-toggle="tab" data-bs-target="#info" type="button" role="tab" aria-controls="info" aria-selected="true">
-            Course Info
-          </button>
-        </li>
-          <?php if ($user_purchased) { ?>
-        <li class="nav-item" role="presentation">
-          <button class="nav-link" id="review-tab" data-bs-toggle="tab" data-bs-target="#review" type="button" role="tab" aria-controls="review" aria-selected="false">
-            Review
-          </button>
-        </li>
-
-        <?php } ?>
-      </ul>
-      <!-- Tab panes -->
-      <div class="tab-content" id="courseTabContent">
-        <div class="tab-pane fade show active" id="info" role="tabpanel" aria-labelledby="info-tab">
-                 <div class="row" data-aos="fade-up">
-          <div class="col-12">
-            <div class="product-details-accordion">     
-                   <?php if (!empty($course_description)) { ?>
-        <!-- Description Accordion -->
-              <div class="accordion-item">
-                <h2 class="accordion-header">
-                  <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#description" aria-expanded="true" aria-controls="description">
-                    Course Description
-                  </button>
-                </h2>
-                <div id="description" class="accordion-collapse collapse show">
-                  <div class="accordion-body">
-                    <div class="product-description">
-   <?php 
-        // Strip HTML for the short preview
-        $desc_words = explode(' ', strip_tags($course_description));
-        $desc_short = implode(' ', array_slice($desc_words, 0, 30));
-        $desc_is_long = str_word_count(strip_tags($course_description)) > 30;
-        ?>
-        
-        <span class="desc-short"><?php echo $desc_short; ?><?php if ($desc_is_long) echo '...'; ?></span>
-        
-        <?php if ($desc_is_long): ?>
-            <span class="desc-full" style="display: none;"><?php echo $course_description; ?></span>
-            <br>
-            <button type="button" class="btn btn-link btn-sm p-0 read-more-desc" style="text-decoration: none;">Read More</button>
-            <button type="button" class="btn btn-link btn-sm p-0 read-less-desc" style="text-decoration: none; display:none;">Read Less</button>
-        <?php endif; ?>
-                    </div>
-                  </div>
-                </div>
-				 </div>
-                <?php } ?>
-                <?php
-                if (!empty($course_requirrement)) {
-
-                    ?>
-                  <!-- Specifications Accordion -->
-              <div class="accordion-item">
-                <h2 class="accordion-header">
-                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#specifications" aria-expanded="false" aria-controls="specifications">
-                    Course Requirements 
-                  </button>
-                </h2>
-                <div id="specifications" class="accordion-collapse collapse">
-                  <div class="accordion-body">
-                    <div class="product-specifications">
-                      <div class="row">
-                        <div class="col-md-12">
-                          <div class="specs-group">
-                            <p><?php echo $course_requirrement; ?></p>
-                              </div>
-                        </div>
-                            </div>
-                </div>
-                </div>
-              </div>
             </div>
-			<?php } ?>
 			
-			      
-                   <?php if (!empty($learning_objectives)) { ?>
-        <!-- Description Accordion -->
-              <div class="accordion-item">
-                <h2 class="accordion-header">
-                  <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#objective" aria-expanded="true" aria-controls="objective">
-                    Course Description
-                  </button>
-                </h2>
-                <div id="objective" class="accordion-collapse collapse show">
-                  <div class="accordion-body">
-                    <div class="product-description">
+			
+			
+                
+<div class="col-12">
+  <div class="table-requirements">
 
-                      <p><?php echo $learning_objectives; ?></p>
-                    </div>
-                  </div>
-                </div>
-				</div>
-                <?php } ?>
+    <!-- Visa Requirement Section -->
+    <div class="collapsible-section mb-4">
+      <h6>Visa Requirement</h6>
+      <?php
+$visa_text = '
 
-                <!--- training video -->
-                <?php if (!empty($training_video)): ?>
-<!-- Video Accordion -->
-<div class="accordion-item">
-  <h2 class="accordion-header">
-    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#trainingVideo" aria-expanded="false" aria-controls="trainingVideo">
-      Course Video
-    </button>
-  </h2>
-  <div id="trainingVideo" class="accordion-collapse collapse">
-    <div class="accordion-body">
-      <div class="product-video">
-        <video controls width="100%">
-          <source src="<?php echo $training_video; ?>" type="video/mp4">
-          Your browser does not support the video tag.
-        </video>
-      </div>
+<strong>For Trainings in Nigeria:</strong><br>
+If you reside outside Nigeria and plan to attend one of our trainings, a visitor visa may be required. We recommend applying early, as visa processing can take time. Citizens of Visa Waiver Program countries may not need an invitation letter. For full details and application guidance, visit: <a href="https://portal.immigration.gov.ng/pages/welcome" target="_blank">https://portal.immigration.gov.ng/pages/welcome</a>.<br><br>
+
+<strong>For Trainings Outside Nigeria:</strong><br>
+Participants attending training sessions abroad will need to obtain a visa independently. Learnora (Kyneli Business Support Services) does not process visas on behalf of trainees. Please contact the appropriate embassy for visa requirements specific to your destination country.';
+
+      $visa_words = explode(' ', strip_tags($visa_text));
+      $visa_short = implode(' ', array_slice($visa_words, 0, 30));
+      $visa_long = $visa_text;
+      $visa_is_long = count($visa_words) > 30;
+      ?>
+      <p>
+        <span class="short-desc"><?php echo $visa_short; ?><?php if ($visa_is_long) echo '...'; ?></span>
+        <?php if ($visa_is_long): ?>
+          <span class="full-desc" style="display:none;"><?php echo $visa_long; ?></span>
+          <br>
+          <button type="button" class="btn btn-link btn-sm p-0 read-more-btn" style="text-decoration: none;">Read More</button>
+          <button type="button" class="btn btn-link btn-sm p-0 read-less-btn" style="text-decoration: none; display:none;">Read Less</button>
+        <?php endif; ?>
+      </p>
     </div>
+
+    <!-- Cancellation Policy Section -->
+    <div class="collapsible-section">
+      <h6>Cancellation Policy</h6>
+      <?php
+$cancel_text = "All cancellations must be submitted in writing to <a href=\"mailto:hello@learnora.ng\">hello@learnora.ng</a> at least three (3) days before the event. A twenty percent (20%) administrative fee applies to all cancellations. Substitutions are permitted at any time at no extra cost. For inquiries, you may also call <a href=\"tel:+2348033782777\">+234 (0) 803 3782 777</a> or <a href=\"tel:+23412952413\">+234 (01) 29 52 413</a>.";
+
+$cancel_words = explode(' ', strip_tags($cancel_text));
+      $cancel_short = implode(' ', array_slice($cancel_words, 0, 30));
+      $cancel_long = $cancel_text;
+      $cancel_is_long = count($cancel_words) > 30;
+      ?>
+      <p>
+        <span class="short-desc"><?php echo $cancel_short; ?><?php if ($cancel_is_long) echo '...'; ?></span>
+        <?php if ($cancel_is_long): ?>
+          <span class="full-desc" style="display:none;"><?php echo $cancel_long; ?></span>
+          <br>
+          <button type="button" class="btn btn-link btn-sm p-0 read-more-btn" style="text-decoration: none;">Read More</button>
+          <button type="button" class="btn btn-link btn-sm p-0 read-less-btn" style="text-decoration: none; display:none;">Read Less</button>
+        <?php endif; ?>
+      </p>
+    </div>
+
   </div>
 </div>
-<?php endif; ?>
-              
-                </div>
-                </div>
-              </div>
-        </div>
-	
-<?php if ($user_purchased) { ?>
-        <div class="tab-pane fade" id="review" role="tabpanel" aria-labelledby="review-tab">
-          <!-- Review Content -->
-           <div class="product-details-accordion"> 
-  <!-- Reviews Accordion -->
-              <div class="accordion-item" id="reviews">
-                <h2 class="accordion-header">
-                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#reviewsContent" aria-expanded="true" aria-controls="reviewsContent">
-                    Write a Review
-                  </button>
-                </h2>
-                <div id="reviewsContent" class="accordion-collapse collapse show">
-                  <div class="accordion-body">
-                    <div class="product-reviews">
-                     <div class="review-form-container mt-5">
-                        <h4>Write a Review</h4>
-                             <form class="review-form" method="POST">
-                         <input type="hidden" name="training_id" value="<?php echo $training_id; ?>">
-                        <input type="hidden" name="user_id" value="<?php echo $user_id; ?>">
-                        <div class="rating-select mb-4">
-                          <label class="form-label">Your Rating</label>
-                          <div class="star-rating">
-                            <input type="radio" id="star5" name="rating" value="5"><label for="star5" title="5 stars"><i class="bi bi-star-fill"></i></label>
-                              <input type="radio" id="star4" name="rating" value="4"><label for="star4" title="4 stars"><i class="bi bi-star-fill"></i></label>
-                              <input type="radio" id="star3" name="rating" value="3"><label for="star3" title="3 stars"><i class="bi bi-star-fill"></i></label>
-                              <input type="radio" id="star2" name="rating" value="2"><label for="star2" title="2 stars"><i class="bi bi-star-fill"></i></label>
-                              <input type="radio" id="star1" name="rating" value="1"><label for="star1" title="1 star"><i class="bi bi-star-fill"></i></label>
-                          </div>
-                        </div>
-                        <div class="mb-4">
-                          <label for="review-content" class="form-label">Your Review</label>
-                          <textarea class="form-control" id="review-content" rows="4" name="review" required=""></textarea>
+			
 
-                        </div>
-
-                        <div class="d-grid">
-                          <button type="submit" name="submit-review" class="btn btn-primary">Submit Review</button>
-                        </div>
-                      </form>
-                      </div>
-                      </div>
-                      </div>
-                      </div>
-                      </div>
-					  
-             <?php
-// Fetch all reviews for the product
-$all_reviews_query = "SELECT r.*, u.display_name AS user_name 
-                      FROM {$siteprefix}reviews r
-                      JOIN {$siteprefix}users u ON r.user = u.s
-                      WHERE r.training_id = ?
-                      ORDER BY r.date DESC";
-
-$stmt = $con->prepare($all_reviews_query);
-$stmt->bind_param("i", $training_id);
-$stmt->execute();
-$all_reviews_result = $stmt->get_result();
-$all_reviews = $all_reviews_result->fetch_all(MYSQLI_ASSOC);
-?>
-					     <?php if (!empty($all_reviews)): ?>
-                    <div class="accordion-item">
-                <h2 class="accordion-header">
-                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#reviewssummary" aria-expanded="false" aria-controls="reviewssummary">
-                 All Reviews
-                  </button>
-                </h2>
-                <div id="reviewssummary" class="accordion-collapse collapse">
-                  <div class="accordion-body">
-                     <div class="product-reviews">
-<div class="reviews-summary">
-  <div class="row">
-    <div class="col-lg-4">
-      <div class="overall-rating">
-        <div class="rating-number"><?php echo number_format($average_rating, 1); ?></div>
-        <div class="rating-stars">
-          <?php
-          for ($i = 1; $i <= 5; $i++) {
-            if ($average_rating >= $i) {
-              echo '<i class="bi bi-star-fill"></i>';
-            } elseif ($average_rating >= $i - 0.5) {
-              echo '<i class="bi bi-star-half"></i>';
-            } else {
-              echo '<i class="bi bi-star"></i>';
-            }
-          }
-          ?>
-        </div>
-        <div class="rating-count">
-          Based on <?php echo (int)$review_count; ?> review<?php echo ($review_count == 1 ? '' : 's'); ?>
-        </div>
-      </div>
-    </div>
-    <div class="col-lg-8">
-      <div class="rating-breakdown">
-        <?php
-          for ($i = 5; $i >= 1; $i--) {
-              echo getRatingBar($i, $ratings[$i], $review_count);
-          }
-        ?>
-      </div>
-    </div>
-  </div>
-</div>
-                      </div>
-
-<div class="reviews-list mt-5" id="reviews-list">
-  <h4>Customer Reviews</h4>
-
-  <?php foreach ($all_reviews as $i => $review): ?>
-    <div class="review-item mb-4" style="<?php echo $i > 2 ? 'display:none;' : ''; ?>">
-      <div class="review-header d-flex justify-content-between align-items-center">
-        <div class="reviewer-info d-flex align-items-center">
-          <div>
-            <h5 class="reviewer-name mb-0"><?php echo htmlspecialchars($review['user_name']); ?></h5>
-            <div class="review-date"><?php echo date('m/d/Y', strtotime($review['date'])); ?></div>
-          </div>
-        </div>
-        <div class="review-rating">
-          <?php
-            $rating = (int)$review['rating'];
-            for ($j = 1; $j <= 5; $j++) {
-              echo $j <= $rating ? '<i class="bi bi-star-fill"></i>' : '<i class="bi bi-star"></i>';
-            }
-          ?>
-        </div>
-      </div>
-      <div class="review-content mt-2">
-        <p><?php echo nl2br(htmlspecialchars($review['review'])); ?></p>
-      </div>
-    </div>
-  <?php endforeach; ?>
-
-  <?php if (count($all_reviews) > 3): ?>
-    <div class="text-center">
-      <button id="loadMoreReviews" class="btn btn-outline-primary btn-sm">Load More</button>
-    </div>
-  <?php endif; ?>
-
-
-</div>
-
-
-
-        </div>
-		
-      </div>
-    </div>
-	
-
-    <?php else: ?>
-  <p>No reviews yet.</p>
-    <?php endif; ?>
-	</div>
-  </div>
-  <?php }  ?>
-
-</div>
-   </div>
-     </div>
-	 </div>
-			    
-
-            </div>
           </div>
 
 
@@ -548,6 +315,7 @@ $all_reviews = $all_reviews_result->fetch_all(MYSQLI_ASSOC);
               <a href="<?php echo $siteurl; ?>loyalty-program.php" class="text-white text-decoration-none">
                 <span class="loyalty-plan-name"><?php echo $plan_name; ?></span> - ₦
                 <span class="loyalty-price">0.00</span>
+
               </a>
             </span>
     <?php } } ?>
@@ -715,9 +483,7 @@ $all_reviews = $all_reviews_result->fetch_all(MYSQLI_ASSOC);
 	    </div>
       </div>
 
-           
-	  
-	  <div class="col-12 mb-3" data-aos="fade-left" data-aos-delay="300">
+           			  <div class="col-12 mb-3" data-aos="fade-left" data-aos-delay="300">
        <!-- Language and Event Dates/Times Table (Borderless) -->
                <div class="table-actions">
  <table class="table table-borderless mt-3">
@@ -763,65 +529,222 @@ $all_reviews = $all_reviews_result->fetch_all(MYSQLI_ASSOC);
                 </div>
 
                     </div>
+	  
+	
 
-                
-<div class="col-12">
-  <div class="table-requirements">
-
-    <!-- Visa Requirement Section -->
-    <div class="collapsible-section mb-4">
-      <h6>Visa Requirement</h6>
-      <?php
-$visa_text = '
-
-<strong>For Trainings in Nigeria:</strong><br>
-If you reside outside Nigeria and plan to attend one of our trainings, a visitor visa may be required. We recommend applying early, as visa processing can take time. Citizens of Visa Waiver Program countries may not need an invitation letter. For full details and application guidance, visit: <a href="https://portal.immigration.gov.ng/pages/welcome" target="_blank">https://portal.immigration.gov.ng/pages/welcome</a>.<br><br>
-
-<strong>For Trainings Outside Nigeria:</strong><br>
-Participants attending training sessions abroad will need to obtain a visa independently. Learnora (Kyneli Business Support Services) does not process visas on behalf of trainees. Please contact the appropriate embassy for visa requirements specific to your destination country.';
-
-      $visa_words = explode(' ', strip_tags($visa_text));
-      $visa_short = implode(' ', array_slice($visa_words, 0, 30));
-      $visa_long = $visa_text;
-      $visa_is_long = count($visa_words) > 30;
-      ?>
-      <p>
-        <span class="short-desc"><?php echo $visa_short; ?><?php if ($visa_is_long) echo '...'; ?></span>
-        <?php if ($visa_is_long): ?>
-          <span class="full-desc" style="display:none;"><?php echo $visa_long; ?></span>
-          <br>
-          <button type="button" class="btn btn-link btn-sm p-0 read-more-btn" style="text-decoration: none;">Read More</button>
-          <button type="button" class="btn btn-link btn-sm p-0 read-less-btn" style="text-decoration: none; display:none;">Read Less</button>
-        <?php endif; ?>
-      </p>
-    </div>
-
-    <!-- Cancellation Policy Section -->
-    <div class="collapsible-section">
-      <h6>Cancellation Policy</h6>
-      <?php
-$cancel_text = "All cancellations must be submitted in writing to <a href=\"mailto:hello@learnora.ng\">hello@learnora.ng</a> at least three (3) days before the event. A twenty percent (20%) administrative fee applies to all cancellations. Substitutions are permitted at any time at no extra cost. For inquiries, you may also call <a href=\"tel:+2348033782777\">+234 (0) 803 3782 777</a> or <a href=\"tel:+23412952413\">+234 (01) 29 52 413</a>.";
-
-$cancel_words = explode(' ', strip_tags($cancel_text));
-      $cancel_short = implode(' ', array_slice($cancel_words, 0, 30));
-      $cancel_long = $cancel_text;
-      $cancel_is_long = count($cancel_words) > 30;
-      ?>
-      <p>
-        <span class="short-desc"><?php echo $cancel_short; ?><?php if ($cancel_is_long) echo '...'; ?></span>
-        <?php if ($cancel_is_long): ?>
-          <span class="full-desc" style="display:none;"><?php echo $cancel_long; ?></span>
-          <br>
-          <button type="button" class="btn btn-link btn-sm p-0 read-more-btn" style="text-decoration: none;">Read More</button>
-          <button type="button" class="btn btn-link btn-sm p-0 read-less-btn" style="text-decoration: none; display:none;">Read Less</button>
-        <?php endif; ?>
-      </p>
-    </div>
-
-  </div>
-</div>
         </div>               
 </div>
+
+
+<!-- Course Info & Review Tabs Column -->
+<div class="col-12 mb-3" data-aos="fade-left" data-aos-delay="300">
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <!-- Nav tabs -->
+      <ul class="nav nav-tabs mb-3" id="courseTab" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="info-tab" data-bs-toggle="tab" data-bs-target="#info" type="button" role="tab" aria-controls="info" aria-selected="true">
+            Course Description
+          </button>
+        </li>
+		
+		
+          <?php if ($user_purchased) { ?>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="review-tab" data-bs-toggle="tab" data-bs-target="#review" type="button" role="tab" aria-controls="review" aria-selected="false">
+            Review
+          </button>
+        </li>
+
+        <?php } ?>
+      </ul>
+      <!-- Tab panes -->
+      <div class="tab-content" id="courseTabContent">
+        <div class="tab-pane fade show active" id="info" role="tabpanel" aria-labelledby="info-tab">
+      
+	  
+	      <div class="product-description mb-1">
+        <?php 
+        // Strip tags from short version to avoid breaking HTML
+        $descs_words = explode(' ', strip_tags($course_description));
+        $descs_short = implode(' ', array_slice($descs_words, 0, 10));
+        $descs_is_long = str_word_count(strip_tags($course_description)) > 10;
+        ?>
+        
+        <span class="desc-short"><?php echo $descs_short; ?><?php if ($descs_is_long) echo '...'; ?></span>
+        
+        <?php if ($descs_is_long): ?>
+            <span class="desc-full" style="display: none;"><?php echo $course_description; ?></span>
+            <br>
+            <button type="button" class="btn btn-link btn-sm p-0 read-more-desc" style="text-decoration: none;">Read More</button>
+            <button type="button" class="btn btn-link btn-sm p-0 read-less-desc" style="text-decoration: none; display:none;">Read Less</button>
+        <?php endif; ?>
+    </div>
+
+        </div>
+		
+		
+	
+<?php if ($user_purchased) { ?>
+        <div class="tab-pane fade" id="review" role="tabpanel" aria-labelledby="review-tab">
+          <!-- Review Content -->
+           <div class="product-details-accordion"> 
+  <!-- Reviews Accordion -->
+              <div class="accordion-item" id="reviews">
+                <h2 class="accordion-header">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#reviewsContent" aria-expanded="true" aria-controls="reviewsContent">
+                    Write a Review
+                  </button>
+                </h2>
+                <div id="reviewsContent" class="accordion-collapse collapse show">
+                  <div class="accordion-body">
+                    <div class="product-reviews">
+                     <div class="review-form-container mt-5">
+                        <h4>Write a Review</h4>
+                             <form class="review-form" method="POST">
+                         <input type="hidden" name="training_id" value="<?php echo $training_id; ?>">
+                        <input type="hidden" name="user_id" value="<?php echo $user_id; ?>">
+                        <div class="rating-select mb-4">
+                          <label class="form-label">Your Rating</label>
+                          <div class="star-rating">
+                            <input type="radio" id="star5" name="rating" value="5"><label for="star5" title="5 stars"><i class="bi bi-star-fill"></i></label>
+                              <input type="radio" id="star4" name="rating" value="4"><label for="star4" title="4 stars"><i class="bi bi-star-fill"></i></label>
+                              <input type="radio" id="star3" name="rating" value="3"><label for="star3" title="3 stars"><i class="bi bi-star-fill"></i></label>
+                              <input type="radio" id="star2" name="rating" value="2"><label for="star2" title="2 stars"><i class="bi bi-star-fill"></i></label>
+                              <input type="radio" id="star1" name="rating" value="1"><label for="star1" title="1 star"><i class="bi bi-star-fill"></i></label>
+                          </div>
+                        </div>
+                        <div class="mb-4">
+                          <label for="review-content" class="form-label">Your Review</label>
+                          <textarea class="form-control" id="review-content" rows="4" name="review" required=""></textarea>
+
+                        </div>
+
+                        <div class="d-grid">
+                          <button type="submit" name="submit-review" class="btn btn-primary">Submit Review</button>
+                        </div>
+                      </form>
+                      </div>
+                      </div>
+                      </div>
+                      </div>
+                      </div>
+					  
+             <?php
+// Fetch all reviews for the product
+$all_reviews_query = "SELECT r.*, u.display_name AS user_name 
+                      FROM {$siteprefix}reviews r
+                      JOIN {$siteprefix}users u ON r.user = u.s
+                      WHERE r.training_id = ?
+                      ORDER BY r.date DESC";
+$stmt = $con->prepare($all_reviews_query);
+$stmt->bind_param("i", $training_id);
+$stmt->execute();
+$all_reviews_result = $stmt->get_result();
+$all_reviews = $all_reviews_result->fetch_all(MYSQLI_ASSOC);
+?>
+					     <?php if (!empty($all_reviews)): ?>
+                    <div class="accordion-item">
+                <h2 class="accordion-header">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#reviewssummary" aria-expanded="false" aria-controls="reviewssummary">
+                 All Reviews
+                  </button>
+                </h2>
+                <div id="reviewssummary" class="accordion-collapse collapse">
+                  <div class="accordion-body">
+                     <div class="product-reviews">
+<div class="reviews-summary">
+  <div class="row">
+    <div class="col-lg-4">
+      <div class="overall-rating">
+        <div class="rating-number"><?php echo number_format($average_rating, 1); ?></div>
+        <div class="rating-stars">
+          <?php
+          for ($i = 1; $i <= 5; $i++) {
+            if ($average_rating >= $i) {
+              echo '<i class="bi bi-star-fill"></i>';
+            } elseif ($average_rating >= $i - 0.5) {
+              echo '<i class="bi bi-star-half"></i>';
+            } else {
+              echo '<i class="bi bi-star"></i>';
+            }
+          }
+          ?>
+        </div>
+        <div class="rating-count">
+          Based on <?php echo (int)$review_count; ?> review<?php echo ($review_count == 1 ? '' : 's'); ?>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-8">
+      <div class="rating-breakdown">
+        <?php
+          for ($i = 5; $i >= 1; $i--) {
+              echo getRatingBar($i, $ratings[$i], $review_count);
+          }
+        ?>
+      </div>
+    </div>
+  </div>
+</div>
+                      </div>
+
+<div class="reviews-list mt-5" id="reviews-list">
+  <h4>Customer Reviews</h4>
+
+  <?php foreach ($all_reviews as $i => $review): ?>
+    <div class="review-item mb-4" style="<?php echo $i > 2 ? 'display:none;' : ''; ?>">
+      <div class="review-header d-flex justify-content-between align-items-center">
+        <div class="reviewer-info d-flex align-items-center">
+          <div>
+            <h5 class="reviewer-name mb-0"><?php echo htmlspecialchars($review['user_name']); ?></h5>
+            <div class="review-date"><?php echo date('m/d/Y', strtotime($review['date'])); ?></div>
+          </div>
+        </div>
+        <div class="review-rating">
+          <?php
+            $rating = (int)$review['rating'];
+            for ($j = 1; $j <= 5; $j++) {
+              echo $j <= $rating ? '<i class="bi bi-star-fill"></i>' : '<i class="bi bi-star"></i>';
+            }
+          ?>
+        </div>
+      </div>
+      <div class="review-content mt-2">
+        <p><?php echo nl2br(htmlspecialchars($review['review'])); ?></p>
+      </div>
+    </div>
+  <?php endforeach; ?>
+
+  <?php if (count($all_reviews) > 3): ?>
+    <div class="text-center">
+      <button id="loadMoreReviews" class="btn btn-outline-primary btn-sm">Load More</button>
+    </div>
+  <?php endif; ?>
+
+
+</div>
+
+
+
+        </div>
+		
+      </div>
+    </div>
+	
+
+    <?php else: ?>
+  <p>No reviews yet.</p>
+    <?php endif; ?>
+	</div>
+  </div>
+  <?php }  ?>
+
+</div>
+   </div>
+     </div>
+	 </div>
+
 	    </div>
       </div>
      
@@ -879,6 +802,7 @@ if ($result && mysqli_num_rows($result) > 0) {
         $pricing = $row['pricing'];
         $price = $row['price'];
         $tags = $row['tags'];
+
         $user = $row['display_name'];
         $user_picture = $imagePath.$row['profile_picture'];
         $created_date = $row['created_at'];
