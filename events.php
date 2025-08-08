@@ -279,23 +279,33 @@ $user_review = $existing_review_result->fetch_assoc();
                 </h2>
                 <div id="specifications" class="accordion-collapse collapse">
                   <div class="accordion-body">
-    <div class="product-short-description mb-1">
+   <div class="product-short-description mb-1">
     <?php 
-    // Strip HTML tags for the short version to avoid broken HTML
-    $wordss = explode(' ', strip_tags($course_requirrement));
+    // Fix broken HTML and extract clean plain text using DOMDocument
+    libxml_use_internal_errors(true);
+
+    $doc = new DOMDocument();
+    $doc->loadHTML('<?xml encoding="utf-8" ?>' . $course_requirrement);
+    $text = $doc->textContent;
+
+    // Get first 10 words of the text only
+    $wordss = explode(' ', trim($text));
     $shortDescs = implode(' ', array_slice($wordss, 0, 10));
-    $isLongs = str_word_count(strip_tags($course_requirrement)) > 10;
+    $isLongs = str_word_count($text) > 10;
     ?>
 
+    <!-- Short description shown always -->
     <span class="short-description"><?php echo $shortDescs; ?><?php if ($isLongs) echo '...'; ?></span>
 
+    <!-- Full description (rich HTML from TinyMCE), hidden by default -->
     <?php if ($isLongs): ?>
-        <span class="full-description" style="display: none;"><?php echo $course_requirrement; ?></span>
+        <div class="full-description" style="display: none;"><?php echo $course_requirrement; ?></div>
         <br>
         <button type="button" class="btn btn-link btn-sm p-0 read-more-btn" style="text-decoration: none;">Read More</button>
         <button type="button" class="btn btn-link btn-sm p-0 read-less-btn" style="text-decoration: none; display:none;">Read Less</button>
     <?php endif; ?>
 </div>
+
                         
                 </div>
                 </div>
