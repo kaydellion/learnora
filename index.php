@@ -116,27 +116,26 @@ $query = "
 SELECT 
     t.*, 
     u.name AS display_name, 
-    u.photo AS profile_picture, 
     tt.price, 
+    u.photo AS profile_picture, 
     l.category_name AS category, 
     sc.category_name AS subcategory, 
-    ti.picture 
-FROM {$siteprefix}training AS t
-LEFT JOIN {$siteprefix}instructors AS u ON t.instructors = u.s
-LEFT JOIN {$siteprefix}categories AS l ON t.category = l.id 
-LEFT JOIN {$siteprefix}categories AS sc ON t.subcategory = sc.id 
-LEFT JOIN {$siteprefix}training_tickets AS tt ON t.training_id = tt.training_id
-LEFT JOIN {$siteprefix}training_images AS ti ON t.training_id = ti.training_id 
+    ti.picture
+FROM {$siteprefix}training t
+LEFT JOIN {$siteprefix}categories l 
+    ON t.category = l.id
+LEFT JOIN {$siteprefix}instructors u 
+    ON t.instructors = u.id
+LEFT JOIN {$siteprefix}categories sc 
+    ON t.subcategory = sc.id
+LEFT JOIN {$siteprefix}training_tickets tt 
+    ON t.training_id = tt.training_id
+LEFT JOIN {$siteprefix}training_images ti 
+    ON t.training_id = ti.training_id
+INNER JOIN {$siteprefix}training_event_dates ted 
+    ON t.training_id = ted.training_id
 WHERE t.status = 'approved'
-  AND EXISTS (
-      SELECT 1 
-      FROM {$siteprefix}training_event_dates AS d
-      WHERE d.training_id = t.training_id
-        AND (
-            d.event_date > CURDATE() 
-            OR (d.event_date = CURDATE() AND d.end_time >= CURTIME())
-        )
-  )
+  AND CONCAT(ted.event_date, ' ', ted.start_time) >= NOW() 
 GROUP BY t.training_id
 ORDER BY t.training_id DESC
 LIMIT 20
