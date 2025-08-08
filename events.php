@@ -253,23 +253,42 @@ $cancel_words = explode(' ', strip_tags($cancel_text));
               <!-- Product Meta -->
               <div class="product-meta">
 <div class="product-short-description mb-1">
-    <?php 
-    // Strip HTML tags for the short version to avoid broken HTML
-    $words = explode(' ', strip_tags($description));
-    $shortDesc = implode(' ', array_slice($words, 0, 10));
-    $isLong = str_word_count(strip_tags($description)) > 10;
+<?php
+// Fetch from DB (already contains TinyMCE HTML)
+$description_html = $description;
+
+// Count words in plain text
+$plainText = strip_tags($description_html);
+$wordCount = str_word_count($plainText);
+
+if ($wordCount > 30) {
+    // Split words
+    $words = explode(' ', $plainText);
+
+    // Get first 30 words
+    $first30 = implode(' ', array_slice($words, 0, 30));
+
+    // Build preview HTML with TinyMCE styles
     ?>
-
-    <span class="short-description"><?php echo $shortDesc; ?><?php if ($isLong) echo '...'; ?></span>
-
-    <?php if ($isLong): ?>
-        <span class="full-description" style="display: none;"><?php echo $description; ?></span>
-        <br>
-        <button type="button" class="btn btn-link btn-sm p-0 read-more-btn" style="text-decoration: none;">Read More</button>
-        <button type="button" class="btn btn-link btn-sm p-0 read-less-btn" style="text-decoration: none; display:none;">Read Less</button>
-    <?php endif; ?>
+    <div>
+        <div class="preview" style="display:inline;">
+            <?php
+            // We use full HTML, but CSS will hide anything after 30 words
+            echo '<span class="preview-text">' . $first30 . '...</span>';
+            ?>
+        </div>
+        <div class="more-text" style="display:none;">
+            <?php echo $description_html; ?>
+        </div>
+        <a href="javascript:void(0);" class="toggle-btn">Read More</a>
+    </div>
+<?php
+} else {
+    // If 30 words or fewer, just display the HTML directly
+    echo "<div>$description_html</div>";
+}
+?>
 </div>
-
 
               <!-- Product Price -->
               <div class="product-price-container">
@@ -577,7 +596,7 @@ $cancel_words = explode(' ', strip_tags($cancel_text));
       
 	  
 	      <div class="product-description mb-1">
-      <?php if (!empty(trim(strip_tags($course_description)))): ?>
+      <?php if (!empty($course_description)): ?>
     <div class="accordion mb-3" id="benefitAccordion">
         <div class="accordion-item">
             <h2 class="accordion-header" id="headingBenefit">
@@ -586,22 +605,45 @@ $cancel_words = explode(' ', strip_tags($cancel_text));
                 </button>
             </h2>
             <div id="collapseBenefit" class="accordion-collapse collapse show" aria-labelledby="headingBenefit" data-bs-parent="#benefitAccordion">
-                <div class="accordion-body">
-                    <?php 
-                    // Strip tags from short version to avoid breaking HTML
-                    $descs_words = explode(' ', strip_tags($course_description));
-                    $descs_short = implode(' ', array_slice($descs_words, 0, 10));
-                    $descs_is_long = str_word_count(strip_tags($course_description)) > 10;
-                    ?>
-                    
-                    <span class="desc-short"><?php echo $descs_short; ?><?php if ($descs_is_long) echo '...'; ?></span>
+                
+            <div class="accordion-body">
+                 <div class="product-short-description mb-1">
+<?php
+// Fetch from DB (already contains TinyMCE HTML)
+$description_html = $course_description;
 
-                    <?php if ($descs_is_long): ?>
-                        <span class="desc-full" style="display: none;"><?php echo $course_description; ?></span>
-                        <br>
-                        <button type="button" class="btn btn-link btn-sm p-0 read-more-desc" style="text-decoration: none;">Read More</button>
-                        <button type="button" class="btn btn-link btn-sm p-0 read-less-desc" style="text-decoration: none; display:none;">Read Less</button>
-                    <?php endif; ?>
+// Count words in plain text
+$plainText = strip_tags($description_html);
+$wordCount = str_word_count($plainText);
+
+if ($wordCount > 30) {
+    // Split words
+    $words = explode(' ', $plainText);
+
+    // Get first 30 words
+    $first30 = implode(' ', array_slice($words, 0, 30));
+
+    // Build preview HTML with TinyMCE styles
+    ?>
+    <div>
+        <div class="preview" style="display:inline;">
+            <?php
+            // We use full HTML, but CSS will hide anything after 30 words
+            echo '<span class="preview-text">' . $first30 . '...</span>';
+            ?>
+        </div>
+        <div class="more-text" style="display:none;">
+            <?php echo $description_html; ?>
+        </div>
+        <a href="javascript:void(0);" class="toggle-btn">Read More</a>
+    </div>
+<?php
+} else {
+    // If 30 words or fewer, just display the HTML directly
+    echo "<div>$description_html</div>";
+}
+?>
+</div>
                 </div>
             </div>
         </div>
@@ -609,7 +651,7 @@ $cancel_words = explode(' ', strip_tags($cancel_text));
 <?php endif; ?>
                     </div>
                     <div class="product-description mb-1">
-<?php if (!empty(trim(strip_tags($course_requirrement)))): ?>
+<?php if (!empty($course_requirrement)): ?>
     <div class="accordion mb-3" id="requirementsAccordion">
         <div class="accordion-item">
             <h2 class="accordion-header" id="headingRequirements">
@@ -619,7 +661,44 @@ $cancel_words = explode(' ', strip_tags($cancel_text));
             </h2>
             <div id="collapseRequirements" class="accordion-collapse collapse" aria-labelledby="headingRequirements" data-bs-parent="#requirementsAccordion">
                 <div class="accordion-body">
-                  <?php echo $course_requirrement; ?>
+            <div class="product-short-description mb-1">
+<?php
+// Fetch from DB (already contains TinyMCE HTML)
+$description_html = $course_requirrement;
+
+// Count words in plain text
+$plainText = strip_tags($description_html);
+$wordCount = str_word_count($plainText);
+
+if ($wordCount > 30) {
+    // Split words
+    $words = explode(' ', $plainText);
+
+    // Get first 30 words
+    $first30 = implode(' ', array_slice($words, 0, 30));
+
+    // Build preview HTML with TinyMCE styles
+    ?>
+    <div>
+        <div class="preview" style="display:inline;">
+            <?php
+            // We use full HTML, but CSS will hide anything after 30 words
+            echo '<span class="preview-text">' . $first30 . '...</span>';
+            ?>
+        </div>
+        <div class="more-text" style="display:none;">
+            <?php echo $description_html; ?>
+        </div>
+        <a href="javascript:void(0);" class="toggle-btn">Read More</a>
+    </div>
+<?php
+} else {
+    // If 30 words or fewer, just display the HTML directly
+    echo "<div>$description_html</div>";
+}
+?>
+</div>
+
                 </div>
             </div>
         </div>
@@ -627,7 +706,7 @@ $cancel_words = explode(' ', strip_tags($cancel_text));
 <?php endif; ?>
     </div>
 
-<?php if (!empty(trim(strip_tags($learning_objectives)))): ?>
+<?php if (!empty($learning_objectives)): ?>
     <div class="accordion mb-3" id="objectivesAccordion">
         <div class="accordion-item">
             <h2 class="accordion-header" id="headingObjectives">
@@ -637,7 +716,43 @@ $cancel_words = explode(' ', strip_tags($cancel_text));
             </h2>
             <div id="collapseObjectives" class="accordion-collapse collapse" aria-labelledby="headingObjectives" data-bs-parent="#objectivesAccordion">
                 <div class="accordion-body">
-                    <?php echo $learning_objectives; ?>
+                        <div class="product-short-description mb-1">
+<?php
+// Fetch from DB (already contains TinyMCE HTML)
+$description_html = $learning_objectives;
+
+// Count words in plain text
+$plainText = strip_tags($description_html);
+$wordCount = str_word_count($plainText);
+
+if ($wordCount > 30) {
+    // Split words
+    $words = explode(' ', $plainText);
+
+    // Get first 30 words
+    $first30 = implode(' ', array_slice($words, 0, 30));
+
+    // Build preview HTML with TinyMCE styles
+    ?>
+    <div>
+        <div class="preview" style="display:inline;">
+            <?php
+            // We use full HTML, but CSS will hide anything after 30 words
+            echo '<span class="preview-text">' . $first30 . '...</span>';
+            ?>
+        </div>
+        <div class="more-text" style="display:none;">
+            <?php echo $description_html; ?>
+        </div>
+        <a href="javascript:void(0);" class="toggle-btn">Read More</a>
+    </div>
+<?php
+} else {
+    // If 30 words or fewer, just display the HTML directly
+    echo "<div>$description_html</div>";
+}
+?>
+</div>
                 </div>
             </div>
         </div>
@@ -663,7 +778,7 @@ $cancel_words = explode(' ', strip_tags($cancel_text));
 <?php endif; ?>
 
 
-<?php if (!empty(trim(strip_tags($additional_notes)))): ?>
+<?php if (!empty($additional_notes)): ?>
     <div class="accordion mb-3" id="notesAccordion">
         <div class="accordion-item">
             <h2 class="accordion-header" id="headingNotes">
@@ -673,7 +788,44 @@ $cancel_words = explode(' ', strip_tags($cancel_text));
             </h2>
             <div id="collapseNotes" class="accordion-collapse collapse" aria-labelledby="headingNotes" data-bs-parent="#notesAccordion">
                 <div class="accordion-body">
-                    <?php echo $additional_notes; ?>
+                                         <div class="product-short-description mb-1">
+<?php
+// Fetch from DB (already contains TinyMCE HTML)
+$description_html = $additional_notes;
+
+// Count words in plain text
+$plainText = strip_tags($description_html);
+$wordCount = str_word_count($plainText);
+
+if ($wordCount > 30) {
+    // Split words
+    $words = explode(' ', $plainText);
+
+    // Get first 30 words
+    $first30 = implode(' ', array_slice($words, 0, 30));
+
+    // Build preview HTML with TinyMCE styles
+    ?>
+    <div>
+        <div class="preview" style="display:inline;">
+            <?php
+            // We use full HTML, but CSS will hide anything after 30 words
+            echo '<span class="preview-text">' . $first30 . '...</span>';
+            ?>
+        </div>
+        <div class="more-text" style="display:none;">
+            <?php echo $description_html; ?>
+        </div>
+        <a href="javascript:void(0);" class="toggle-btn">Read More</a>
+    </div>
+<?php
+} else {
+    // If 30 words or fewer, just display the HTML directly
+    echo "<div>$description_html</div>";
+}
+?>
+</div>
+           
                 </div>
             </div>
         </div>
@@ -1263,7 +1415,9 @@ document.getElementById('webShareBtn').addEventListener('click', function() {
 </script>
 
 
-  
+
+
+
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {

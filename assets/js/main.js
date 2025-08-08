@@ -1016,33 +1016,25 @@ function showToast(message) {
   const bootstrapToast = new bootstrap.Toast(toast, { delay: 5000 });
   bootstrapToast.show();
 }
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".toggle-btn").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+            let moreText = this.previousElementSibling;
+            let previewText = moreText.previousElementSibling;
 
-//function for read more or see less
-//function for read more or see less
-document.addEventListener('DOMContentLoaded', function () {
-    document.querySelectorAll('.product-short-description').forEach(function (container) {
-        const readMoreBtn = container.querySelector('.read-more-btn');
-        const readLessBtn = container.querySelector('.read-less-btn');
-        const shortDesc = container.querySelector('.short-description');
-        const fullDesc = container.querySelector('.full-description');
-
-        if (readMoreBtn && readLessBtn && shortDesc && fullDesc) {
-            readMoreBtn.addEventListener('click', function () {
-                shortDesc.style.display = 'none';
-                fullDesc.style.display = 'inline';
-                readMoreBtn.style.display = 'none';
-                readLessBtn.style.display = 'inline';
-            });
-
-            readLessBtn.addEventListener('click', function () {
-                shortDesc.style.display = 'inline';
-                fullDesc.style.display = 'none';
-                readMoreBtn.style.display = 'inline';
-                readLessBtn.style.display = 'none';
-            });
-        }
+            if (moreText.style.display === "none") {
+                moreText.style.display = "block";
+                previewText.style.display = "none";
+                this.textContent = "Read Less";
+            } else {
+                moreText.style.display = "none";
+                previewText.style.display = "inline";
+                this.textContent = "Read More";
+            }
+        });
     });
 });
+
 
 document.addEventListener('DOMContentLoaded', function() {
     var priceElement = document.getElementById('paidPrice');
@@ -2054,6 +2046,7 @@ document.addEventListener('DOMContentLoaded', function() {
   document.querySelectorAll('.collapsible-section').forEach(setupReadMore);
 });
 
+/*
 
 document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('.product-description').forEach(function (container) {
@@ -2077,6 +2070,8 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 });
+
+*/
 //reviews load more
 document.addEventListener('DOMContentLoaded', function() {
   var reviews = document.querySelectorAll('.reviews-list .review-item');
