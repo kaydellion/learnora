@@ -240,7 +240,32 @@ $user_review = $existing_review_result->fetch_assoc();
                 </div>
 				 </div>
                 <?php } ?>
-                <?php
+
+                
+           <?php
+                if (!empty($target_audience)) {
+
+                    ?>
+                  <!-- Specifications Accordion -->
+               <div class="accordion-item">
+                <h2 class="accordion-header">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#targetAudience" aria-expanded="false" aria-controls="targetAudience">
+                  Target Audience
+                  </button>
+                </h2>
+                <div id="targetAudience" class="accordion-collapse collapse">
+                  <div class="accordion-body">
+                     <div class="product-description mb-1">
+        <?php echo $target_audience; ?>
+    </div>
+                        
+                </div>
+                </div>
+              </div>
+        
+			<?php } ?>
+			
+                     <?php
                 if (!empty($course_requirrement)) {
 
                     ?>
@@ -272,44 +297,12 @@ $user_review = $existing_review_result->fetch_assoc();
     </div>
 
                 </div>
-        
-        <?php if ($descs_is_long): ?>
-            <span class="desc-full" style="display: none;"><?php echo $course_description; ?></span>
-            <br>
-            <button type="button" class="btn btn-link btn-sm p-0 read-more-desc" style="text-decoration: none;">Read More</button>
-            <button type="button" class="btn btn-link btn-sm p-0 read-less-desc" style="text-decoration: none; display:none;">Read Less</button>
-        <?php endif; ?>
-    </div>
                         
                 </div>
                 </div>
-              </div>
         
 			<?php } ?>
 
-           <?php
-                if (!empty($target_audience)) {
-
-                    ?>
-                  <!-- Specifications Accordion -->
-               <div class="accordion-item">
-                <h2 class="accordion-header">
-                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#targetAudience" aria-expanded="false" aria-controls="targetAudience">
-                  Target Audience
-                  </button>
-                </h2>
-                <div id="targetAudience" class="accordion-collapse collapse">
-                  <div class="accordion-body">
-                     <div class="product-description mb-1">
-        <?php echo $target_audience; ?>
-    </div>
-                        
-                </div>
-                </div>
-              </div>
-        
-			<?php } ?>
-			
 			      
                    <?php if (!empty($learning_objectives)) { ?>
         <!-- Description Accordion -->
