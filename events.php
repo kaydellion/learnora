@@ -635,7 +635,7 @@ $cancel_words = explode(' ', strip_tags($cancel_text));
                     Learning Objectives
                 </button>
             </h2>
-            <div id="collapseObjectives" class="accordion-collapse collapse show" aria-labelledby="headingObjectives" data-bs-parent="#objectivesAccordion">
+            <div id="collapseObjectives" class="accordion-collapse collapse" aria-labelledby="headingObjectives" data-bs-parent="#objectivesAccordion">
                 <div class="accordion-body">
                     <?php echo $learning_objectives; ?>
                 </div>
@@ -694,7 +694,7 @@ $cancel_words = explode(' ', strip_tags($cancel_text));
                     Course Video
                 </button>
             </h2>
-            <div id="collapseVideo" class="accordion-collapse collapse" aria-labelledby="headingVideo" data-bs-parent="#videoAccordion">
+            <div id="collapseVideo" class="accordion-collapse collapse show" aria-labelledby="headingVideo" data-bs-parent="#videoAccordion">
                 <div class="accordion-body">
                     <div class="product-video">
                         <video controls width="100%">
