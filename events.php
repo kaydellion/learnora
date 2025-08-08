@@ -544,14 +544,14 @@ $cancel_words = explode(' ', strip_tags($cancel_text));
       <ul class="nav nav-tabs mb-3" id="courseTab" role="tablist">
         <li class="nav-item" role="presentation">
           <button class="nav-link active" id="info-tab" data-bs-toggle="tab" data-bs-target="#info" type="button" role="tab" aria-controls="info" aria-selected="true">
-            Course Description
+            Course Info
           </button>
         </li>
 		
-          <?php if (!empty($target_audience)) { ?>
+          <?php if (!empty($training_video)) { ?>
         <li class="nav-item" role="presentation">
-          <button class="nav-link" id="audience-tab" data-bs-toggle="tab" data-bs-target="#audience" type="button" role="tab" aria-controls="audience" aria-selected="false">
-           Who Should Attend / Target Audience
+          <button class="nav-link" id="video-tab" data-bs-toggle="tab" data-bs-target="#video" type="button" role="tab" aria-controls="video" aria-selected="false">
+           Course Video
           </button>
         </li>
 
@@ -620,16 +620,89 @@ $cancel_words = explode(' ', strip_tags($cancel_text));
         </div>
     </div>
 <?php endif; ?>
-
-
     </div>
+
+<?php if (!empty(trim(strip_tags($learning_objectives)))): ?>
+    <div class="accordion mb-3" id="objectivesAccordion">
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingObjectives">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseObjectives" aria-expanded="false" aria-controls="collapseObjectives">
+                    Learning Objectives
+                </button>
+            </h2>
+            <div id="collapseObjectives" class="accordion-collapse collapse" aria-labelledby="headingObjectives" data-bs-parent="#objectivesAccordion">
+                <div class="accordion-body">
+                    <?php echo $learning_objectives; ?>
+                </div>
+            </div>
+        </div>
+    </div>
+<?php endif; ?>
+
+
+    <?php if (!empty(trim($target_audience))): ?>
+    <div class="accordion mb-3" id="audienceAccordion">
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingAudience">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAudience" aria-expanded="false" aria-controls="collapseAudience">
+                    Target Audience
+                </button>
+            </h2>
+            <div id="collapseAudience" class="accordion-collapse collapse" aria-labelledby="headingAudience" data-bs-parent="#audienceAccordion">
+                <div class="accordion-body">
+                    <?php echo $target_audience; ?>
+                </div>
+            </div>
+        </div>
+    </div>
+<?php endif; ?>
+
+
+<?php if (!empty(trim(strip_tags($additional_notes)))): ?>
+    <div class="accordion mb-3" id="notesAccordion">
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingNotes">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNotes" aria-expanded="false" aria-controls="collapseNotes">
+                    Additional Notes
+                </button>
+            </h2>
+            <div id="collapseNotes" class="accordion-collapse collapse" aria-labelledby="headingNotes" data-bs-parent="#notesAccordion">
+                <div class="accordion-body">
+                    <?php echo $additional_notes; ?>
+                </div>
+            </div>
+        </div>
+    </div>
+<?php endif; ?>
+
 
         </div>
 
 
-         <div class="tab-pane fade" id="audience" role="tabpanel" aria-labelledby="audience-tab">
+         <div class="tab-pane fade" id="video" role="tabpanel" aria-labelledby="video-tab">
            <div class="product-description mb-1">
-             <span><?php echo $target_audience; ?></span>
+         <?php if (!empty($training_video)): ?>
+    <div class="accordion mb-3" id="videoAccordion">
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingVideo">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseVideo" aria-expanded="false" aria-controls="collapseVideo">
+                    Course Video
+                </button>
+            </h2>
+            <div id="collapseVideo" class="accordion-collapse collapse" aria-labelledby="headingVideo" data-bs-parent="#videoAccordion">
+                <div class="accordion-body">
+                    <div class="product-video">
+                        <video controls width="100%">
+                            <source src="<?php echo $training_video; ?>" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<?php endif; ?>
+
            </div>
          </div>
 
