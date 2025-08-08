@@ -256,12 +256,22 @@ $user_review = $existing_review_result->fetch_assoc();
                      <div class="product-description mb-1">
         <?php 
         // Strip tags from short version to avoid breaking HTML
-        $descs_words = explode(' ', strip_tags($course_description));
+        $descs_words = explode(' ', strip_tags($$course_requirrement));
         $descs_short = implode(' ', array_slice($descs_words, 0, 10));
-        $descs_is_long = str_word_count(strip_tags($course_description)) > 10;
+        $descs_is_long = str_word_count(strip_tags($course_requirrement)) > 10;
         ?>
         
         <span class="desc-short"><?php echo $descs_short; ?><?php if ($descs_is_long) echo '...'; ?></span>
+
+        <?php if ($descs_is_long): ?>
+            <span class="desc-full" style="display: none;"><?php echo $course_requirrement; ?></span>
+            <br>
+            <button type="button" class="btn btn-link btn-sm p-0 read-more-desc" style="text-decoration: none;">Read More</button>
+            <button type="button" class="btn btn-link btn-sm p-0 read-less-desc" style="text-decoration: none; display:none;">Read Less</button>
+        <?php endif; ?>
+    </div>
+
+                </div>
         
         <?php if ($descs_is_long): ?>
             <span class="desc-full" style="display: none;"><?php echo $course_description; ?></span>
@@ -276,6 +286,29 @@ $user_review = $existing_review_result->fetch_assoc();
               </div>
         
 			<?php } ?>
+
+           <?php
+                if (!empty($target_audience)) {
+
+                    ?>
+                  <!-- Specifications Accordion -->
+               <div class="accordion-item">
+                <h2 class="accordion-header">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#targetAudience" aria-expanded="false" aria-controls="targetAudience">
+                  Target Audience
+                  </button>
+                </h2>
+                <div id="targetAudience" class="accordion-collapse collapse">
+                  <div class="accordion-body">
+                     <div class="product-description mb-1">
+        <?php echo $target_audience; ?>
+    </div>
+                        
+                </div>
+                </div>
+              </div>
+        
+			<?php } ?>
 			
 			      
                    <?php if (!empty($learning_objectives)) { ?>
@@ -283,7 +316,7 @@ $user_review = $existing_review_result->fetch_assoc();
               <div class="accordion-item">
                 <h2 class="accordion-header">
                   <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#objective" aria-expanded="true" aria-controls="objective">
-                    Course Description
+                
                   </button>
                 </h2>
                 <div id="objective" class="accordion-collapse collapse show">
