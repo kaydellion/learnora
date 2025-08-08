@@ -195,21 +195,25 @@ $user_review = $existing_review_result->fetch_assoc();
             <div class="product-info-wrapper" id="product-info-sticky">
               <!-- Product Meta -->
               <div class="product-meta">
-            <div class="product-short-description">
+<div class="product-short-description">
     <?php 
-        $words = explode(' ', $description);
-        $shortDesc = implode(' ', array_slice($words, 0, 10));
-        $isLong = str_word_count($description) > 10;
+        // Plain version for short description (strips TinyMCE HTML)
+        $plainText = trim(strip_tags($description));
+        $words = explode(' ', $plainText);
+        $shortText = implode(' ', array_slice($words, 0, 10));
+        $isLong = str_word_count($plainText) > 10;
     ?>
 
-    <span class="short-description"><?php echo $shortDesc; ?><?php if ($isLong) echo '...'; ?></span>
+    <p>
+        <span class="short-description"><?php echo $shortText; ?><?php if ($isLong) echo '...'; ?></span>
 
-    <?php if ($isLong): ?>
-        <span class="full-description" style="display: none;"><?php echo $description; ?></span>
-        <br>
-        <button type="button" class="btn btn-link btn-sm p-0 read-more-btn" style="text-decoration: none;">Read More</button>
-        <button type="button" class="btn btn-link btn-sm p-0 read-less-btn" style="text-decoration: none; display: none;">Read Less</button>
-    <?php endif; ?>
+        <?php if ($isLong): ?>
+            <span class="full-description" style="display: none;"><?php echo $description; ?></span>
+            <br>
+            <button type="button" class="btn btn-link btn-sm p-0 read-more-btn" style="text-decoration: none;">Read More</button>
+            <button type="button" class="btn btn-link btn-sm p-0 read-less-btn" style="text-decoration: none; display:none;">Read Less</button>
+        <?php endif; ?>
+    </p>
 </div>
               <!-- Product Price -->
               <div class="product-price-container">
