@@ -614,21 +614,7 @@ $cancel_words = explode(' ', strip_tags($cancel_text));
             </h2>
             <div id="collapseRequirements" class="accordion-collapse collapse" aria-labelledby="headingRequirements" data-bs-parent="#requirementsAccordion">
                 <div class="accordion-body">
-                    <?php 
-                    // Strip tags for short version to avoid breaking HTML
-                    $req_words = explode(' ', strip_tags($course_requirrement));
-                    $req_short = implode(' ', array_slice($req_words, 0, 10));
-                    $req_is_long = str_word_count(strip_tags($course_requirrement)) > 10;
-                    ?>
-                    
-                    <span class="desc-short"><?php echo $req_short; ?><?php if ($req_is_long) echo '...'; ?></span>
-
-                    <?php if ($req_is_long): ?>
-                        <span class="desc-full" style="display: none;"><?php echo $course_requirrement; ?></span>
-                        <br>
-                        <button type="button" class="btn btn-link btn-sm p-0 read-more-desc" style="text-decoration: none;">Read More</button>
-                        <button type="button" class="btn btn-link btn-sm p-0 read-less-desc" style="text-decoration: none; display:none;">Read Less</button>
-                    <?php endif; ?>
+                  <?php echo $course_requirrement; ?>
                 </div>
             </div>
         </div>
