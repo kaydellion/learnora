@@ -72,6 +72,7 @@ if (isset($_GET['slug'])) {
                 $level = $row['level'];
                 $language = $row['Language'];
                 $instructor_user = $row['instructors'];
+                $learning_objectives = $row['learning_objectives'];
                 $instructor_name = $row['display_name'];
                 $instructor_picture =  $imagePath .$row['profile_picture'];
                 $target_audience = $row['target_audience'];
