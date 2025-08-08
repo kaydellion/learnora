@@ -115,7 +115,7 @@
 $query = "SELECT t.*, u.name AS display_name, tt.price, u.photo AS profile_picture, l.category_name AS category,
  sc.category_name AS subcategory, ti.picture FROM {$siteprefix}training t 
  LEFT JOIN {$siteprefix}categories l ON t.category = l.id 
- LEFT JOIN {$siteprefix}instructors u ON t.instructors = u.id 
+ LEFT JOIN {$siteprefix}instructors u ON t.instructors = u.s
  LEFT JOIN {$siteprefix}categories sc ON t.subcategory = sc.id 
  LEFT JOIN {$siteprefix}training_tickets tt ON t.training_id = tt.training_id 
  LEFT JOIN {$siteprefix}training_images ti ON t.training_id = ti.training_id 
