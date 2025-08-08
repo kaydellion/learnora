@@ -635,7 +635,7 @@ $cancel_words = explode(' ', strip_tags($cancel_text));
                     Learning Objectives
                 </button>
             </h2>
-            <div id="collapseObjectives" class="accordion-collapse collapse" aria-labelledby="headingObjectives" data-bs-parent="#objectivesAccordion">
+            <div id="collapseObjectives" class="accordion-collapse collapse show" aria-labelledby="headingObjectives" data-bs-parent="#objectivesAccordion">
                 <div class="accordion-body">
                     <?php echo $learning_objectives; ?>
                 </div>
@@ -1123,6 +1123,75 @@ $rating_data = calculateRating($training_id, $con, $siteprefix);
     </div>
   </div>
 </section>
+
+<section id="recent-posts" class="recent-posts section">
+  <!-- Section Title -->
+  <div class="container section-title" data-aos="fade-up">
+    <h2>Latest Articles</h2>
+    <p></p>
+  </div><!-- End Section Title -->
+
+  <div class="container" data-aos="fade-up" data-aos-delay="100">
+    <div class="row gy-4">
+      <?php
+      // Get training categories from current event
+      $trainingCategoryIds = array_filter(array_map('intval', explode(',', $category)));
+      $foundArticles = false;
+
+      if (!empty($trainingCategoryIds)) {
+          $conditions = [];
+          foreach ($trainingCategoryIds as $catId) {
+              $conditions[] = "FIND_IN_SET($catId, fp.categories)";
+          }
+          $whereClause = implode(' OR ', $conditions);
+
+          $sql = "SELECT fp.*, u.display_name 
+                  FROM {$siteprefix}forum_posts fp 
+                  LEFT JOIN {$siteprefix}users u ON fp.user_id = u.s 
+                  WHERE ($whereClause)
+                  ORDER BY fp.created_at DESC 
+                  LIMIT 3";
+
+          $result = mysqli_query($con, $sql);
+
+          while ($row = mysqli_fetch_assoc($result)) {
+              $foundArticles = true;
+              $s = $row['s'];
+              $title = htmlspecialchars($row['title']);
+              $date = date('d M Y', strtotime($row['created_at']));
+              $uploader = htmlspecialchars($row['display_name']);
+              $alt_title = htmlspecialchars($row['slug']);
+              $image_path = $imagePath . $row['featured_image'];
+
+              // Fetch category names
+              $catNames = [];
+              $catIds = [];
+
+              if (!empty($row['categories'])) {
+                  $catIds = preg_split('/\s*,\s*/', trim($row['categories']));
+                  $catIds = array_filter(array_map('intval', $catIds));
+                  if (!empty($catIds)) {
+                      $catIdList = implode(',', $catIds);
+                      $catSql = "SELECT id, category_name FROM {$siteprefix}categories WHERE id IN ($catIdList)";
+                      $catRes = mysqli_query($con, $catSql);
+                      while ($catRow = mysqli_fetch_assoc($catRes)) {
+                          $catNames[] = $catRow['category_name'];
+                      }
+                  }
+              }
+
+              include 'blog-card.php'; // Your card template
+          }
+      }
+
+      if (!$foundArticles) {
+          echo '<div class="col-12"><div class="alert alert-info text-center">No related article found.</div></div>';
+      }
+      ?>
+    </div>
+  </div>
+</section><!-- /Recent Posts Section -->
+
  
     
            <!-- Report Product Modal -->
@@ -1140,6 +1209,7 @@ $rating_data = calculateRating($training_id, $con, $siteprefix);
           <div class="mb-1">
             <label for="reason" class="form-label">Reason for Reporting</label>
             <select class="form-select" name="reason" id="reason" required>
+               <option value="">Select Reason</option>
               <option value="Inappropriate Content">Inappropriate Content</option>
               <option value="Copyright Violation">Copyright Violation</option>
               <option value="Spam or Misleading">Spam or Misleading</option>
@@ -1165,7 +1235,7 @@ $rating_data = calculateRating($training_id, $con, $siteprefix);
         const customReasonContainer = document.getElementById("customReasonContainer");
 
         reasonSelect.addEventListener("change", function () {
-            if (this.value === "Other") {
+            if (this.value !== "") {
                 customReasonContainer.style.display = "block";
             } else {
                 customReasonContainer.style.display = "none";
@@ -1173,6 +1243,7 @@ $rating_data = calculateRating($training_id, $con, $siteprefix);
         });
     });
 </script>
+
 
 <script>
 

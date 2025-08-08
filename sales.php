@@ -59,10 +59,10 @@ if ($result && $result->num_rows > 0) {
         </div>
         <!-- Total Resources Sold -->
         <div class="col-md-3">
-            <a href="resources-sold.php">
+            <a href="event-sold.php">
             <div class="card text-white bg-secondary mb-3">
                 <div class="card-body">
-                    <h5 class="card-title text-white">Resources Sold</h5>
+                    <h5 class="card-title text-white">Events Sold</h5>
                     <p class="card-text text-white"><?php echo $total_resources_sold; ?></p>
                 </div>
             </div>

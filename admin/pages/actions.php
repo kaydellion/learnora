@@ -1191,6 +1191,20 @@ if(isset($_POST['update-profile'])){
 }
 
 
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['inform_trainer'])) {
+
+       $trainerEmail = $_POST['trainer_email'];
+    $trainerName = $_POST['trainer_name'];
+    $subject = $_POST['subject'];
+    $message = nl2br($_POST['message']);
+   sendEmail($trainerEmail, $trainerName, $siteName, $siteMail, $message, $subject);
+    $statusAction = "Message Sent";
+    $statusMessage = "Your message has been sent to the trainer successfully.";
+    showSuccessModal2($statusAction, $statusMessage);
+    header("refresh:2; url=inhouse-proposal.php");
+
+}
+
 
 // manual payment rejection
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['reject_payment'])) {

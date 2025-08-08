@@ -27,6 +27,7 @@ if (!$result) {
                         <th>Title</th>
                         <th>Name</th>
                         <th>Reason</th>
+                        <th>Main Reason</th>
                         <th>Date</th>
                         <th>Actions</th>
                     </tr>
@@ -38,7 +39,7 @@ if (!$result) {
                                 <td><?php echo $row['product_title']; ?></td>
                                 <td><?php echo $row['user_name']; ?></td>
                                 <td><?php echo $row['reason']; ?></td>
-        
+                                <td><?php echo $row['main_reason']; ?></td>
                                 <td><?php echo date('Y-m-d H:i:s', strtotime($row['report_date'])); ?></td>
                                 <td>
                                     <!-- View Button -->
@@ -60,6 +61,7 @@ if (!$result) {
                                             <p><strong>Title:</strong> <?php echo $row['product_title']; ?></p>
                                             <p><strong>Name:</strong> <?php echo $row['user_name']; ?></p>
                                             <p><strong>Reason:</strong> <?php echo $row['reason']; ?></p>
+                                            <p><strong>Main Reason:</strong> <?php echo $row['main_reason']; ?></p>
                                             <p><strong>Date:</strong> <?php echo date('Y-m-d H:i:s', strtotime($row['report_date'])); ?></p>
                                         </div>
                                         <div class="modal-footer">

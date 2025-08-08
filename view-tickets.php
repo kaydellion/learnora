@@ -14,15 +14,20 @@ $sql = "SELECT
     tem.end_time, 
     tt.ticket_name,
     tt.benefits,
-    u.first_name,
-    u.last_name
+    tu.first_name AS training_creator_first_name,
+    tu.last_name AS training_creator_last_name,
+    ou.first_name AS order_user_first_name,
+    ou.last_name AS order_user_last_name
 FROM {$siteprefix}order_items oi
 JOIN {$siteprefix}training t ON oi.training_id = t.training_id
 LEFT JOIN {$siteprefix}training_event_dates tem ON t.training_id = tem.training_id
 LEFT JOIN {$siteprefix}training_tickets tt ON tt.s = oi.item_id
 LEFT JOIN {$siteprefix}orders o ON o.order_id = oi.order_id
-LEFT JOIN {$siteprefix}users u ON u.s = o.user
-WHERE oi.training_id = '$training_id' AND oi.order_id = '$order_id' AND oi.item_id = '$item_id'
+LEFT JOIN {$siteprefix}users ou ON ou.s = o.user        
+LEFT JOIN {$siteprefix}users tu ON tu.s = t.user        
+WHERE oi.training_id = '$training_id' 
+  AND oi.order_id = '$order_id' 
+  AND oi.item_id = '$item_id'
 LIMIT 1";
 
 $res = mysqli_query($con, $sql);
@@ -85,7 +90,8 @@ foreach ($fields as $key => $label) {
 }
 
 // User full name
-$buyer_name = trim($row['first_name'] . ' ' . $row['last_name']);
+$buyer_name = trim($row['order_user_first_name'] . ' ' . $row['order_user_last_name']);
+$trainer_name = trim($row['training_creator_first_name'] . ' ' . $row['training_creator_last_name']);
 ?>
 
 <!DOCTYPE html>
@@ -113,7 +119,7 @@ $buyer_name = trim($row['first_name'] . ' ' . $row['last_name']);
             margin-bottom: 10px;
         }
         .ticket-title {
-            font-size: 24px;
+            font-size: 20px;
             font-weight: bold;
         }
         .ticket-section p {
@@ -142,6 +148,8 @@ $buyer_name = trim($row['first_name'] . ' ' . $row['last_name']);
         </div>
 
         <div class="ticket-section">
+            <p><strong>Events:</strong> <?= htmlspecialchars($row['title']) ?></p>
+            <p><strong>Trainer:</strong> <?= htmlspecialchars($trainer_name) ?></p>
             <p><strong>Buyer Name:</strong> <?= htmlspecialchars($buyer_name) ?></p>
             <p><strong>Date:</strong> <?= $date_str ?></p>
             <p><strong>Time:</strong> <?= $time_str ?></p>

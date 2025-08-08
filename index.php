@@ -97,34 +97,8 @@
       </div>
     </section><!-- /Hero Section -->
 
-       <!-- Promo Cards Section -->
-    <section id="promo-cards" class="promo-cards section">
 
-      <div class="container" data-aos="fade-up" data-aos-delay="100">
-
-        <div class="row g-4">
-               <?php
-                $query = "SELECT * FROM ".$siteprefix."event_types";
-                $result = mysqli_query($con, $query);
-                if ($result) {
-                    while ($row = mysqli_fetch_assoc($result)) {
-                        $category_id = $row['s'];
-                        $category_name = $row['name'];
-                        $alt_names = $row['slug'];
-                        $slugs = $alt_names;
-
-                        include "type-card.php"; // Include the promo card template
-
-                    }
-                  }
-
-                  ?>
-         
-              </div>
-              </div>
-          </section>
-
-    <!-- Best Sellers Section -->
+      <!-- Best Sellers Section -->
     <section id="best-sellers" class="best-sellers section">
 
       <!-- Section Title -->
@@ -212,6 +186,34 @@ $rating_data = calculateRating($training_id, $con, $siteprefix);
       </div>
 
     </section><!-- /Best Sellers Section -->
+       <!-- Promo Cards Section -->
+    <section id="promo-cards" class="promo-cards section">
+
+      <div class="container" data-aos="fade-up" data-aos-delay="100">
+
+        <div class="row g-4">
+               <?php
+                $query = "SELECT * FROM ".$siteprefix."event_types";
+                $result = mysqli_query($con, $query);
+                if ($result) {
+                    while ($row = mysqli_fetch_assoc($result)) {
+                        $category_id = $row['s'];
+                        $category_name = $row['name'];
+                        $alt_names = $row['slug'];
+                        $slugs = $alt_names;
+
+                        include "type-card.php"; // Include the promo card template
+
+                    }
+                  }
+
+                  ?>
+         
+              </div>
+              </div>
+          </section>
+
+  
 
      <section id="recent-posts" class="recent-posts section">
 
@@ -269,6 +271,133 @@ while ($row = mysqli_fetch_assoc($result)) {
 
     </section><!-- /Recent Posts Section -->
 
+
+    
+ <!-- Recent Reports Swiper Section -->
+    <section id="best-sellers" class="best-sellers section">
+  <div class="container" data-aos="fade-up" data-aos-delay="100">
+    <div class="section-title text-center mb-4">
+      <h2>Recently Enrolled Trainings</h2>
+      <p>Explore the latest training programs our learners are signing up for. Stay ahead with trending and in-demand courses!</p>
+    </div>
+    <div class="recent-reports-slider swiper init-swiper">
+      <script type="application/json" class="swiper-config">
+        {
+          "loop": true,
+          "autoplay": {
+            "delay": 4000,
+            "disableOnInteraction": false
+          },
+          "grabCursor": true,
+          "speed": 600,
+          "slidesPerView": "auto",
+          "spaceBetween": 20,
+          "navigation": {
+            "nextEl": ".recent-swiper-button-next",
+            "prevEl": ".recent-swiper-button-prev"
+          },
+          "breakpoints": {
+            "320": {
+              "slidesPerView": 2,
+              "spaceBetween": 10
+            },
+            "576": {
+              "slidesPerView": 2,
+              "spaceBetween": 15
+            },
+            "768": {
+              "slidesPerView": 3,
+              "spaceBetween": 20
+            },
+            "992": {
+              "slidesPerView": 4,
+              "spaceBetween": 20
+            }
+          }
+        }
+      </script>
+      <div class="swiper-wrapper">
+          <?php
+    $query = "SELECT DISTINCT 
+                            t.*, 
+                            ti.picture, 
+                            u.display_name, tt.price, 
+                            u.profile_photo as profile_picture,
+                            l.category_name AS category,
+                            sc.category_name AS subcategory
+                        FROM ".$siteprefix."orders o
+                        JOIN ".$siteprefix."order_items oi ON o.order_id = oi.order_id
+                        JOIN ".$siteprefix."training t ON t.training_id= oi.training_id
+                        LEFT JOIN ".$siteprefix."training_images ti ON t.training_id = ti.training_id
+                        LEFT JOIN ".$siteprefix."users u ON t.user = u.s
+                        LEFT JOIN ".$siteprefix."categories l ON t.category = l.id
+                        LEFT JOIN ".$siteprefix."training_tickets tt ON t.training_id= tt.training_id
+                        LEFT JOIN ".$siteprefix."categories sc ON t.subcategory = sc.id
+                        WHERE o.status = 'paid' AND t.status = 'approved'
+                        GROUP BY t.training_id
+                        ORDER BY o.date DESC LIMIT 10
+                    ";
+$result = mysqli_query($con, $query);
+if ($result) {
+while ($row = mysqli_fetch_assoc($result)) {
+        $training_id = $row['training_id'];
+        $title = $row['title'];
+        $alt_title = $row['alt_title'];
+        $description = $row['description'];
+        $category = $row['category'];
+        $subcategory = $row['subcategory'];
+        $pricing = $row['pricing'];
+        $price = $row['price'];
+        $tags = $row['tags'];
+        $user = $row['display_name'];
+        $user_picture = $imagePath.$row['profile_picture'];
+        $created_date = $row['created_at'];
+        $status = $row['status'];
+        $image_path = $imagePath.$row['picture'];
+        $slug = $alt_title;
+        $event_type = $row['event_type'] ?? '';
+    
+
+           // Fetch price variations for this report
+    $priceSql = "SELECT price FROM {$siteprefix}training_tickets WHERE training_id = '$training_id'";
+    $priceRes = mysqli_query($con, $priceSql);
+    $prices = [];
+    while ($priceRow = mysqli_fetch_assoc($priceRes)) {
+        $prices[] = floatval($priceRow['price']);
+    }
+
+    // Determine price display
+   if (count($prices) === 1) {
+        $priceDisplay = $sitecurrency . number_format($prices[0], 2);
+        $price = $prices[0];
+    } if (count($prices) > 1) {
+        $minPrice = min($prices);
+        $maxPrice = max($prices);
+        $priceDisplay = $sitecurrency . number_format($minPrice, 2) . ' - ' . $sitecurrency . number_format($maxPrice, 2);
+        $price = $minPrice; // Use min price for sorting or other logic
+    }
+
+            $sql_resource_type = "SELECT name FROM {$siteprefix}event_types WHERE s = $event_type";
+            $result_resource_type = mysqli_query($con, $sql_resource_type);
+
+            while ($typeRow = mysqli_fetch_assoc($result_resource_type)) {
+                $resourceTypeNames = $typeRow['name'];
+            }
+$rating_data = calculateRating($training_id, $con, $siteprefix);
+    $average_rating = $rating_data['average_rating'];
+    $review_count = $rating_data['review_count'];
+        // Each slide
+            include "swiper-card.php"; // Use your existing product card template
+          }
+        }
+        ?>
+      </div>
+      <div class="recent-swiper-button-next swiper-button-next"></div>
+      <div class="recent-swiper-button-prev swiper-button-prev"></div>
+    </div>
+  </div>
+</section>
+ 
 
 
     <!---- affiliate prompt -->

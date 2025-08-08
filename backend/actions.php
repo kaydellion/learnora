@@ -61,6 +61,21 @@ $withdrawal_result = mysqli_query($con, $withdrawal_query);
 $withdrawal_row = mysqli_fetch_assoc($withdrawal_result);
 $total_withdrawal = $withdrawal_row['total_withdrawal'] ?? 0;
 
+// Get count of resources sold
+$sql = "SELECT COUNT(DISTINCT r.training_id) as count
+    FROM {$siteprefix}training r
+    JOIN {$siteprefix}order_items oi ON r.training_id = oi.training_id
+    JOIN {$siteprefix}orders o ON oi.order_id = o.order_id
+    WHERE r.user = ? AND o.status = 'paid'";
+$stmt = $con->prepare($sql);
+$stmt->bind_param("s", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
+$row = $result->fetch_assoc();
+$resources_sold_count = $row['count'];
+
+$total_resources_sold = $resources_sold_count;
+
 
 // Fetch Cleared Transactions
 $cleared_query = "SELECT SUM(amount) AS total_cleared FROM ".$siteprefix."withdrawal WHERE user='$user_id' AND status='paid'";
@@ -366,10 +381,7 @@ if (isset($_POST['submit_report'])) {
     $reason = mysqli_real_escape_string($con, $_POST['reason']);
     $custom_reason = isset($_POST['custom_reason']) ? mysqli_real_escape_string($con, trim($_POST['custom_reason'])) : null;
 
-    // Use custom reason if "Other" is selected
-    if ($reason === "Other" && !empty($custom_reason)) {
-        $reason = $custom_reason;
-    }
+    
 
     $date = date('Y-m-d H:i:s');
 
@@ -390,8 +402,8 @@ if (isset($_POST['submit_report'])) {
     }
 
     // Insert the report into the database
-    $insert_query = "INSERT INTO " . $siteprefix . "product_reports (product_id, user_id, reason, report_date) 
-                     VALUES ('$product_id', '$user_id', '$reason', '$date')";
+    $insert_query = "INSERT INTO " . $siteprefix . "product_reports (product_id, user_id, reason, main_reason, report_date) 
+                     VALUES ('$product_id', '$user_id', '$reason', '$custom_reason', '$date')";
 
     if (mysqli_query($con, $insert_query)) {
         // Fetch admin email
@@ -417,6 +429,7 @@ if (isset($_POST['submit_report'])) {
             <p><strong>Product Title:</strong> $product_title</p>
             <p><strong>User:</strong> $user_name ($user_email)</p>
             <p><strong>Reason:</strong> $reason</p>
+            <p><strong>Other Reason:</strong> $custom_reason</p>
             <p><strong>Date:</strong> $date</p>
         ";
 
@@ -427,14 +440,14 @@ if (isset($_POST['submit_report'])) {
         $statusAction = "Success!";
         $statusMessage = "Your report for <strong>$product_title</strong> has been submitted successfully.";
         showSuccessModal($statusAction, $statusMessage);
-        header("refresh:2; url=events/$product_alt_title");
+        header("Refresh:2; url=" . $siteurl . "events/" . $product_alt_title);
 
     } else {
         // Error message
         $statusAction = "Error!";
         $statusMessage = "An error occurred while submitting your report. Please try again.";
         showErrorModal($statusAction, $statusMessage);
-        header("refresh:2; url=events/$product_alt_title");
+        header("Refresh:2; url=" . $siteurl . "events/" . $product_alt_title);
 
     }
 }
@@ -1910,9 +1923,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_request'])) {
                 ";
                 // Send email to admin
                 sendEmail($siteMail, $sitename, $siteName, $siteMail, $emailMessage, $emailSubject);
+                 sendEmail($siteMail, $adminName, $siteName, $siteMail, $emailMessage, $emailSubject);
 
                  showSuccessModal("Success!", "In-House Training Proposal submitted successfully!");
-                    header("refresh:1;");
+                    header("refresh:1; url=marketplace.php");
 
 
     }

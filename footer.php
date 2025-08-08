@@ -105,7 +105,7 @@
             <div class="d-flex flex-wrap justify-content-lg-end justify-content-center align-items-center gap-4">
               <div class="payment-methods">
                 <div class="payment-icons">
-                  <i class="bi bi-credit-card" aria-label="Credit Card"></i>
+                  <i class="bi bi-master-card" aria-label="MasterCard"></i>
                   <i class="bi bi-paypal" aria-label="PayPal"></i>
                   <i class="bi bi-apple" aria-label="Apple Pay"></i>
                   <i class="bi bi-paystack" aria-label="Paystack"></i>
