@@ -482,7 +482,6 @@ $query = "SELECT t.*,
           LEFT JOIN {$siteprefix}training_tickets tt ON t.training_id = tt.training_id
           LEFT JOIN {$siteprefix}training_images ti ON t.training_id = ti.training_id
           WHERE (FIND_IN_SET(l.id, '$categoryIDList'))
-            AND t.training_id != '$training_id'
             AND t.status = 'approved'
             AND EXISTS (
                 SELECT 1 
