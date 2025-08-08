@@ -2056,25 +2056,28 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 
-document.addEventListener('DOMContentLoaded', function() {
-  var readMoreBtn = document.querySelector('.desc-read-more');
-  var readLessBtn = document.querySelector('.desc-read-less');
-  var shortDesc = document.querySelector('.desc-short');
-  var fullDesc = document.querySelector('.desc-full');
-  if(readMoreBtn && readLessBtn && shortDesc && fullDesc) {
-    readMoreBtn.addEventListener('click', function() {
-      shortDesc.style.display = 'none';
-      fullDesc.style.display = 'inline';
-      readMoreBtn.style.display = 'none';
-      readLessBtn.style.display = 'inline';
+
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.product-description').forEach(function (container) {
+        var readMoreBtn = container.querySelector('.read-more-desc');
+        var readLessBtn = container.querySelector('.read-less-desc');
+        var shortDesc = container.querySelector('.desc-short');
+        var fullDesc = container.querySelector('.desc-full');
+        if (readMoreBtn && readLessBtn && shortDesc && fullDesc) {
+            readMoreBtn.addEventListener('click', function () {
+                shortDesc.style.display = 'none';
+                fullDesc.style.display = 'inline';
+                readMoreBtn.style.display = 'none';
+                readLessBtn.style.display = 'inline';
+            });
+            readLessBtn.addEventListener('click', function () {
+                shortDesc.style.display = 'inline';
+                fullDesc.style.display = 'none';
+                readMoreBtn.style.display = 'inline';
+                readLessBtn.style.display = 'none';
+            });
+        }
     });
-    readLessBtn.addEventListener('click', function() {
-      shortDesc.style.display = 'inline';
-      fullDesc.style.display = 'none';
-      readMoreBtn.style.display = 'inline';
-      readLessBtn.style.display = 'none';
-    });
-  }
 });
 //reviews load more
 document.addEventListener('DOMContentLoaded', function() {
