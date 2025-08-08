@@ -447,7 +447,121 @@ while ($row = mysqli_fetch_assoc($result)) {
 
     </section><!-- /Recent Posts Section -->
 
+     <!-- Best Sellers Section -->
+    <section id="best-sellers" class="best-sellers section">
 
+      <!-- Section Title -->
+      <div class="container section-title" data-aos="fade-up">
+        <h2>Related Events</h2>
+        <p>Explore events that complement your learning journey. Connect with industry experts and fellow learners.</p>
+      </div><!-- End Section Title -->
+
+      <div class="container" data-aos="fade-up" data-aos-delay="100">
+
+        <div class="row g-4">
+          <!-- Product 1 -->
+          <?php
+
+$escapedCategoryIDs = array_map('intval', $current_categories);
+
+
+$categoryIDList = implode(',', $escapedCategoryIDs);
+
+
+$query = "SELECT t.*, 
+                u.name AS display_name, 
+                tt.price, 
+                u.photo AS profile_picture, 
+                l.category_name AS category, 
+                sc.category_name AS subcategory, 
+                ti.picture 
+          FROM {$siteprefix}training t
+          LEFT JOIN {$siteprefix}categories l ON FIND_IN_SET(l.id, t.category)
+          LEFT JOIN {$siteprefix}categories sc ON FIND_IN_SET(sc.id, t.subcategory)
+          LEFT JOIN {$siteprefix}instructors u ON t.instructors = u.s
+          LEFT JOIN {$siteprefix}training_tickets tt ON t.training_id = tt.training_id
+          LEFT JOIN {$siteprefix}training_images ti ON t.training_id = ti.training_id
+          WHERE (FIND_IN_SET(l.id, '$categoryIDList'))
+            AND t.training_id != '$training_id'
+            AND t.status = 'approved'
+            AND EXISTS (
+                SELECT 1 
+                FROM {$siteprefix}training_event_dates d
+                WHERE d.training_id = t.training_id
+                AND (
+                    d.event_date > CURDATE() 
+                    OR (d.event_date = CURDATE() AND d.end_time >= CURTIME())
+                )
+            )
+          GROUP BY t.training_id
+          LIMIT 4";
+
+$result = mysqli_query($con, $query);
+if ($result && mysqli_num_rows($result) > 0) {
+    while ($row = mysqli_fetch_assoc($result)) {
+        $training_id = $row['training_id'];
+        $title = $row['title'];
+        $alt_title = $row['alt_title'];
+        $description = $row['description'];
+        $category = $row['category'];
+        $subcategory = $row['subcategory'];
+        $pricing = $row['pricing'];
+        $price = $row['price'];
+        $tags = $row['tags'];
+
+        $user = $row['display_name'];
+        $user_picture = $imagePath.$row['profile_picture'];
+        $created_date = $row['created_at'];
+        $status = $row['status'];
+        $image_path = $imagePath.$row['picture'];
+        $slug = $alt_title;
+        $event_type = $row['event_type'] ?? '';
+    
+
+           // Fetch price variations for this report
+    $priceSql = "SELECT price FROM {$siteprefix}training_tickets WHERE training_id = '$training_id'";
+    $priceRes = mysqli_query($con, $priceSql);
+    $prices = [];
+    while ($priceRow = mysqli_fetch_assoc($priceRes)) {
+        $prices[] = floatval($priceRow['price']);
+    }
+
+    // Determine price display
+   if (count($prices) === 1) {
+        $priceDisplay = $sitecurrency . number_format($prices[0], 2);
+        $price = $prices[0];
+    } if (count($prices) > 1) {
+        $minPrice = min($prices);
+        $maxPrice = max($prices);
+        $priceDisplay = $sitecurrency . number_format($minPrice, 2) . ' - ' . $sitecurrency . number_format($maxPrice, 2);
+        $price = $minPrice; // Use min price for sorting or other logic
+    }
+
+            $sql_resource_type = "SELECT name FROM {$siteprefix}event_types WHERE s = $event_type";
+            $result_resource_type = mysqli_query($con, $sql_resource_type);
+
+            while ($typeRow = mysqli_fetch_assoc($result_resource_type)) {
+                $resourceTypeNames = $typeRow['name'];
+            }
+$rating_data = calculateRating($training_id, $con, $siteprefix);
+    $average_rating = $rating_data['average_rating'];
+    $review_count = $rating_data['review_count'];
+        include "event-card.php"; // Include the product card template
+        }
+      
+     
+?>
+       </div>
+  <div class="text-center mt-1" data-aos="fade-up">
+		  
+		  <?php } else { echo '<div class="alert alert-warning" role="alert">
+    No related products found. <a href="'.$siteurl.'marketplace.php" class="alert-link">View more reports in marketplace</a>
+      </div>';
+       }?>
+        </div>
+      </div>
+
+    </section>
 
 
 
