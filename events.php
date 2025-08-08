@@ -279,24 +279,17 @@ $user_review = $existing_review_result->fetch_assoc();
                 </h2>
                 <div id="specifications" class="accordion-collapse collapse">
                   <div class="accordion-body">
-<div class="product-short-description mb-1">
+    <div class="product-short-description mb-1">
     <?php 
-    // Clean up only for the short version — remove empty tags
-    function clean_html_for_preview($html) {
-        // Remove empty HTML tags (like <ul></ul>, <p></p>, etc.)
-        return preg_replace('/<(\w+)[^>]*>\s*<\/\1>/', '', $html);
-    }
-
-    // Clean and extract short preview
-    $cleaned_html = clean_html_for_preview($course_requirrement);
-    $short_words = explode(' ', strip_tags($cleaned_html));
-    $short_preview = implode(' ', array_slice($short_words, 0, 10));
-    $is_long = str_word_count(strip_tags($cleaned_html)) > 10;
+    // Strip HTML tags for the short version to avoid broken HTML
+    $wordss = explode(' ', strip_tags($course_requirrement));
+    $shortDescs = implode(' ', array_slice($wordss, 0, 10));
+    $isLongs = str_word_count(strip_tags($course_requirrement)) > 10;
     ?>
 
-    <span class="short-description"><?php echo $short_preview; ?><?php if ($is_long) echo '...'; ?></span>
+    <span class="short-description"><?php echo $shortDescs; ?><?php if ($isLongs) echo '...'; ?></span>
 
-    <?php if ($is_long): ?>
+    <?php if ($isLongs): ?>
         <span class="full-description" style="display: none;"><?php echo $course_requirrement; ?></span>
         <br>
         <button type="button" class="btn btn-link btn-sm p-0 read-more-btn" style="text-decoration: none;">Read More</button>
@@ -310,7 +303,42 @@ $user_review = $existing_review_result->fetch_assoc();
         
 			<?php } ?>
 			
-			
+			  <?php
+                if (!empty($additional_notes)) {
+
+                    ?>
+                  <!-- Specifications Accordion -->
+               <div class="accordion-item">
+                <h2 class="accordion-header">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#additionalNotes" aria-expanded="false" aria-controls="additionalNotes">
+                    Additional Notes
+                  </button>
+                </h2>
+                <div id="additionalNotes" class="accordion-collapse collapse">
+                  <div class="accordion-body">
+    <div class="product-short-description mb-1">
+    <?php 
+    // Strip HTML tags for the short version to avoid broken HTML
+    $wordss = explode(' ', strip_tags($additional_notes));
+    $shortDescs = implode(' ', array_slice($wordss, 0, 10));
+    $isLongs = str_word_count(strip_tags($additional_notes)) > 10;
+    ?>
+
+    <span class="short-description"><?php echo $shortDescs; ?><?php if ($isLongs) echo '...'; ?></span>
+
+    <?php if ($isLongs): ?>
+        <span class="full-description" style="display: none;"><?php echo $additional_notes; ?></span>
+        <br>
+        <button type="button" class="btn btn-link btn-sm p-0 read-more-btn" style="text-decoration: none;">Read More</button>
+        <button type="button" class="btn btn-link btn-sm p-0 read-less-btn" style="text-decoration: none; display:none;">Read Less</button>
+    <?php endif; ?>
+</div>
+                        
+                </div>
+                </div>
+              </div>
+        
+			<?php } ?>
 
 			      
 

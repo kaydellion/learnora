@@ -1018,31 +1018,33 @@ function showToast(message) {
 }
 
 //function for read more or see less
-//function for read more or see less
+
 document.addEventListener('DOMContentLoaded', function () {
+    // Find all product short description containers
     document.querySelectorAll('.product-short-description').forEach(function (container) {
         const readMoreBtn = container.querySelector('.read-more-btn');
         const readLessBtn = container.querySelector('.read-less-btn');
-        const shortDesc = container.querySelector('.short-description');
         const fullDesc = container.querySelector('.full-description');
+        const shortDesc = container.querySelector('.short-description');
 
-        if (readMoreBtn && readLessBtn && shortDesc && fullDesc) {
+        if (readMoreBtn && readLessBtn && fullDesc && shortDesc) {
             readMoreBtn.addEventListener('click', function () {
-                shortDesc.style.display = 'none';
                 fullDesc.style.display = 'inline';
+                shortDesc.style.display = 'none';
                 readMoreBtn.style.display = 'none';
                 readLessBtn.style.display = 'inline';
             });
 
             readLessBtn.addEventListener('click', function () {
-                shortDesc.style.display = 'inline';
                 fullDesc.style.display = 'none';
+                shortDesc.style.display = 'inline';
                 readMoreBtn.style.display = 'inline';
                 readLessBtn.style.display = 'none';
             });
         }
     });
 });
+
 
 document.addEventListener('DOMContentLoaded', function() {
     var priceElement = document.getElementById('paidPrice');
