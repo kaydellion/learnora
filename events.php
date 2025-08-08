@@ -279,23 +279,23 @@ $user_review = $existing_review_result->fetch_assoc();
                 </h2>
                 <div id="specifications" class="accordion-collapse collapse">
                   <div class="accordion-body">
-                     <div class="product-description mb-1">
-        <?php 
-        // Strip tags from short version to avoid breaking HTML
-        $descs_words = explode(' ', strip_tags($course_requirrement));
-        $descs_short = implode(' ', array_slice($descs_words, 0, 10));
-        $descs_is_long = str_word_count(strip_tags($course_requirrement)) > 10;
-        ?>
-        
-        <span class="desc-short"><?php echo $descs_short; ?><?php if ($descs_is_long) echo '...'; ?></span>
-        
-        <?php if ($descs_is_long): ?>
-            <span class="desc-full" style="display: none;"><?php echo $course_requirrement; ?></span>
-            <br>
-            <button type="button" class="btn btn-link btn-sm p-0 read-more-desc" style="text-decoration: none;">Read More</button>
-            <button type="button" class="btn btn-link btn-sm p-0 read-less-desc" style="text-decoration: none; display:none;">Read Less</button>
-        <?php endif; ?>
-    </div>
+    <div class="product-short-description mb-1">
+    <?php 
+    // Strip HTML tags for the short version to avoid broken HTML
+    $wordss = explode(' ', strip_tags($course_requirrement));
+    $shortDescs = implode(' ', array_slice($wordss, 0, 10));
+    $isLongs = str_word_count(strip_tags($course_requirrement)) > 10;
+    ?>
+
+    <span class="short-description"><?php echo $shortDescs; ?><?php if ($isLongs) echo '...'; ?></span>
+
+    <?php if ($isLong): ?>
+        <span class="full-description" style="display: none;"><?php echo $course_requirrement; ?></span>
+        <br>
+        <button type="button" class="btn btn-link btn-sm p-0 read-more-btn" style="text-decoration: none;">Read More</button>
+        <button type="button" class="btn btn-link btn-sm p-0 read-less-btn" style="text-decoration: none; display:none;">Read Less</button>
+    <?php endif; ?>
+</div>
                         
                 </div>
                 </div>
