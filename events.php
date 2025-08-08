@@ -303,6 +303,8 @@ $user_review = $existing_review_result->fetch_assoc();
         
 			<?php } ?>
 			
+			
+
 			      
 
                 <!--- training video -->
