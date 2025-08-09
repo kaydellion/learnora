@@ -250,7 +250,7 @@ foreach ($categories as $catId) {
     }
     }
 
-
+    }
     if ($delivery_format === 'video' && !empty($_POST['video_module_title_existing'])) {
     foreach ($_POST['video_module_title_existing'] as $moduleId => $title) {
         $desc      = $_POST['video_module_desc_existing'][$moduleId] ?? '';
