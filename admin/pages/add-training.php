@@ -440,7 +440,7 @@
         <?php foreach ($instructors as $inst): ?>
           <option value="<?php echo htmlspecialchars($inst['s']); ?>"
             data-name="<?php echo htmlspecialchars($inst['name']); ?>"
-            data-photo="<?php echo $siteurl.$inst['photo']; ?>">
+            data-photo="<?php echo $siteurl . 'uploads/' . $inst['photo']; ?>">
             <?php echo htmlspecialchars($inst['name']); ?>
           </option>
         <?php endforeach; ?>
