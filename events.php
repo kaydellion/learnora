@@ -184,7 +184,8 @@ $stmt->bind_param("s", $id);
 $stmt->execute();
 $result = $stmt->get_result();
 while ($row = $result->fetch_assoc()) {
-    $images[] = $row['picture']; // store paths
+$images[] = $siteurl . $imagePath . $row['picture']; // store full image URL
+
 }
 $stmt->close();
 ?>
@@ -195,8 +196,8 @@ $stmt->close();
         <div class="thumbnails-container">
             <?php if (!empty($images)): ?>
                 <?php foreach ($images as $index => $img): ?>
-                    <div class="thumbnail-item <?= $index === 0 ? 'active' : '' ?>" data-image="<?= htmlspecialchars($img) ?>">
-                        <img src="<?= htmlspecialchars($img) ?>" alt="Product Thumbnail" class="img-fluid">
+                    <div class="thumbnail-item <?= $index === 0 ? 'active' : '' ?>" data-image="<?= $img ?>">
+                        <img src="<?= $img ?>" alt="Product Thumbnail" class="img-fluid">
                     </div>
                 <?php endforeach; ?>
             <?php else: ?>
