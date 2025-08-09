@@ -2000,12 +2000,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['edit_event'])) {
     $video_embed_url = mysqli_real_escape_string($con, $_POST['video_embed_url']);
     $pricing = mysqli_real_escape_string($con, $_POST['pricing']);
 
-    
-    // Check the current status of the report in the database
-    $currentStatusQuery = "SELECT status FROM ".$siteprefix."training WHERE training_id = '$training_Id'";
-    $currentStatusResult = mysqli_query($con, $currentStatusQuery);
-    $currentStatusRow = mysqli_fetch_assoc($currentStatusResult);
-    $currentStatus = $currentStatusRow['status'];
+
 
     if ($delivery_format === 'video' && !empty($_POST['video_module_title_existing'])) {
     foreach ($_POST['video_module_title_existing'] as $moduleId => $title) {

@@ -107,7 +107,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['edit_event'])) {
 
     
     // Check the current status of the report in the database
-    $currentStatusQuery = "SELECT status FROM ".$siteprefix."training WHERE training_id = '$training_Id'";
+    $currentStatusQuery = "SELECT status FROM ".$siteprefix."training WHERE training_id = '$training_id'";
     $currentStatusResult = mysqli_query($con, $currentStatusQuery);
     $currentStatusRow = mysqli_fetch_assoc($currentStatusResult);
     $currentStatus = $currentStatusRow['status'];
