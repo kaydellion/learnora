@@ -2278,21 +2278,13 @@ document.getElementById('addTicketBtn').addEventListener('click', function () {
 function addVideoModule() {
   const container = document.getElementById('videoModules');
   const firstModule = container.querySelector('.video-module');
-
-  // Get clean HTML version of firstModule (restore textarea)
-  const cleanModule = firstModule.cloneNode(true);
-  cleanModule.querySelectorAll('.editor').forEach(el => {
-    const id = el.id;
-    if (tinymce.get(id)) {
-      tinymce.get(id).remove(); // Remove TinyMCE from the original before cloning
-    }
-    el.value = ''; // Clear any text
-  });
+  const newModule = firstModule.cloneNode(true); // deep clone
 
   const moduleCount = container.querySelectorAll('.video-module').length + 1;
-  cleanModule.querySelector('.module-number').textContent = moduleCount;
+  newModule.querySelector('.module-number').textContent = moduleCount;
 
-  cleanModule.querySelectorAll('input, textarea').forEach(el => {
+  // Reset all fields
+  newModule.querySelectorAll('input, textarea').forEach(el => {
     if (el.type === 'checkbox' || el.type === 'radio') {
       el.checked = false;
     } else {
@@ -2300,32 +2292,37 @@ function addVideoModule() {
     }
   });
 
-  // Give unique IDs to each textarea
-  cleanModule.querySelectorAll('.editor').forEach((el, index) => {
-    el.id = 'editor_video_' + moduleCount + '_' + index;
-  });
+  // Give new textarea a unique ID for TinyMCE
+  const textarea = newModule.querySelector('.editor');
+  const newId = 'video_editor_' + moduleCount;
+  textarea.id = newId;
 
-  container.appendChild(cleanModule);
-  reinitTinyMCE();
+  container.appendChild(newModule);
+
+  // Initialize TinyMCE only for the new textarea
+  tinymce.init({
+    selector: '#' + newId,
+    toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
+    tinycomments_mode: 'embedded',
+    tinycomments_author: 'Author name',
+    mergetags_list: [
+      { value: 'First.Name', title: 'First Name' },
+      { value: 'Email', title: 'Email' },
+    ],
+    ai_request: (request, respondWith) => respondWith.string(() => Promise.reject('See docs to implement AI Assistant')),
+  });
 }
 
 function addTextModule() {
   const container = document.getElementById('textModules');
   const firstModule = container.querySelector('.text-module');
-
-  const cleanModule = firstModule.cloneNode(true);
-  cleanModule.querySelectorAll('.editor').forEach(el => {
-    const id = el.id;
-    if (tinymce.get(id)) {
-      tinymce.get(id).remove();
-    }
-    el.value = '';
-  });
+  const newModule = firstModule.cloneNode(true); // deep clone
 
   const moduleCount = container.querySelectorAll('.text-module').length + 1;
-  cleanModule.querySelector('.module-number').textContent = moduleCount;
+  newModule.querySelector('.module-number').textContent = moduleCount;
 
-  cleanModule.querySelectorAll('input, textarea').forEach(el => {
+  // Reset all fields
+  newModule.querySelectorAll('input, textarea').forEach(el => {
     if (el.type === 'checkbox' || el.type === 'radio') {
       el.checked = false;
     } else {
@@ -2333,12 +2330,25 @@ function addTextModule() {
     }
   });
 
-  cleanModule.querySelectorAll('.editor').forEach((el, index) => {
-    el.id = 'editor_text_' + moduleCount + '_' + index;
-  });
+  // Give new textarea a unique ID for TinyMCE
+  const textarea = newModule.querySelector('.editor');
+  const newId = 'text_editor_' + moduleCount;
+  textarea.id = newId;
 
-  container.appendChild(cleanModule);
-  reinitTinyMCE();
+  container.appendChild(newModule);
+
+  // Initialize TinyMCE only for the new textarea
+  tinymce.init({
+    selector: '#' + newId,
+    toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
+    tinycomments_mode: 'embedded',
+    tinycomments_author: 'Author name',
+    mergetags_list: [
+      { value: 'First.Name', title: 'First Name' },
+      { value: 'Email', title: 'Email' },
+    ],
+    ai_request: (request, respondWith) => respondWith.string(() => Promise.reject('See docs to implement AI Assistant')),
+  });
 }
 
 
