@@ -2283,6 +2283,9 @@ function addVideoModule() {
   const moduleCount = container.querySelectorAll('.video-module').length + 1;
   newModule.querySelector('.module-number').textContent = moduleCount;
 
+  // Clean cloned TinyMCE
+  newModule.querySelectorAll('.tox').forEach(el => el.remove());
+
   // Reset fields
   newModule.querySelectorAll('input, textarea').forEach(el => {
     if (el.type === 'checkbox' || el.type === 'radio') {
@@ -2291,7 +2294,6 @@ function addVideoModule() {
       el.value = '';
     }
 
-    // If it's a TinyMCE textarea, make it visible & unique
     if (el.classList.contains('editor')) {
       el.removeAttribute('aria-hidden');
       el.style.display = '';
@@ -2311,6 +2313,9 @@ function addTextModule() {
   const moduleCount = container.querySelectorAll('.text-module').length + 1;
   newModule.querySelector('.module-number').textContent = moduleCount;
 
+  // Clean cloned TinyMCE
+  newModule.querySelectorAll('.tox').forEach(el => el.remove());
+
   // Reset fields
   newModule.querySelectorAll('input, textarea').forEach(el => {
     if (el.type === 'checkbox' || el.type === 'radio') {
@@ -2319,7 +2324,6 @@ function addTextModule() {
       el.value = '';
     }
 
-    // If it's a TinyMCE textarea, make it visible & unique
     if (el.classList.contains('editor')) {
       el.removeAttribute('aria-hidden');
       el.style.display = '';
@@ -2344,6 +2348,7 @@ function initTinyMCE(selector) {
     ai_request: (request, respondWith) => respondWith.string(() => Promise.reject('See docs to implement AI Assistant')),
   });
 }
+
 
 function previewProfilePicture(event) {
   var reader = new FileReader();
