@@ -48,7 +48,7 @@
                         </div>
             <div class="mb-3">
               <label class="form-label">Cover Image</label>
-              <input type="file" class="form-control" name="cover_images" accept="image/*"  required>
+             <input type="file" class="form-control" id="imageInput" name="images[]" multiple accept="image/*">
             </div>
             <div class="mb-3">
               <label class="form-label">Description</label>

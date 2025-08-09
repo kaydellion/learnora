@@ -105,7 +105,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['edit_event'])) {
     $video_embed_url = mysqli_real_escape_string($con, $_POST['video_embed_url']);
     $pricing = mysqli_real_escape_string($con, $_POST['pricing']);
 
-    $fileKey = 'cover_images';
+    
 
 
     if ($delivery_format === 'video' && !empty($_POST['video_module_title_existing'])) {
@@ -213,6 +213,34 @@ if (!empty($_POST['text_module_title_existing'])) {
 
 
 // Handle image uploads
+
+    $fileKeys = 'images';
+    if (empty($_FILES[$fileKeys]['name'][0])) {
+       // Array of default images
+     //  $defaultImages = ['default1.jpg', 'default2.jpg', 'default3.jpg', 'default4.jpg', 'default5.jpg'];
+        // Pick a random default image
+     //  $randomImage = $defaultImages[array_rand($defaultImages)];
+     //   $reportImages = [$randomImage];
+        $reportImages = [];
+    }else{
+    $reportImages = handleMultipleFileUpload($fileKeys, $uploadDir);
+     }
+
+     $uploadedFiles = [];
+    foreach ($reportImages as $image) {
+        $stmt = $con->prepare("INSERT INTO  ".$siteprefix."training_images (training_id, picture, updated_at) VALUES (?, ?, current_timestamp())");
+        $stmt->bind_param("ss", $training_id, $image);
+        if ($stmt->execute()) {
+            $uploadedFiles[] = $image;
+        } else {
+            $message.="Error: " . $stmt->error;
+            $hasError = true;
+        }
+        $stmt->close();
+    }
+
+
+
 if (empty($_FILES[$fileKey]['name'])) {
     // Use default images if no images are uploaded
     $defaultImages = ['default1.jpg', 'default2.jpg', 'default3.jpg', 'default4.jpg', 'default5.jpg'];
@@ -529,7 +557,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_event'])) {
         // Directories for uploads
     $uploadDir = '../../uploads/';
     $fileuploadDir = '../../documents/';
-  
+   
     $message = "";
     $physical_address = $physical_state = $physical_lga = $physical_country = $foreign_address = '';
     $web_address = '';
@@ -921,31 +949,31 @@ if ($instructor_id === 'add_new') {
         }
     }
 
- 
-    $fileKey = 'cover_images';
-       // Handle image uploads
-    if (empty($_FILES[$fileKey]['name'])) {
+  $fileKeys = 'images';
+  // Handle image uploads
+    if (empty($_FILES[$fileKeys]['name'][0])) {
         // Use default images if no images are uploaded
         $defaultImages = ['default1.jpg', 'default2.jpg', 'default3.jpg', 'default4.jpg', 'default5.jpg'];
         $randomImage = $defaultImages[array_rand($defaultImages)];
         $reportImages = [$randomImage];
     }else{
-$reportImage= $_FILES['cover_images']['name'];
+
     // Insert images into the database
-    $fileName = uniqid() . '_' . basename($reportImage);
-    $reportImages = handleFileUpload($fileKey, $uploadDir,$fileName);
+    $reportImages = handleMultipleFileUpload($fileKeys, $uploadDir);
     }
 
- 
-  
+    $uploadedFiles = [];
+    foreach ($reportImages as $image) {
         $stmt = $con->prepare("INSERT INTO " . $siteprefix . "training_images (training_id, picture, updated_at) VALUES (?, ?, current_timestamp())");
-        $stmt->bind_param("ss", $training_id, $reportImages);
+        $stmt->bind_param("ss", $training_id, $image);
         if ($stmt->execute()) {
-            $uploadedFiles[] = $reportImages;
+            $uploadedFiles[] = $image;
         } else {
             $message .= "Error inserting image: " . $stmt->error . "<br>";
         }
         $stmt->close();
+    }
+
  
 
     $insertTraining = mysqli_query($con, "INSERT INTO {$siteprefix}training (
