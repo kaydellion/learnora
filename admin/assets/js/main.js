@@ -2275,24 +2275,24 @@ document.getElementById('addTicketBtn').addEventListener('click', function () {
 
 
 
-
 function addVideoModule() {
   const container = document.getElementById('videoModules');
   const firstModule = container.querySelector('.video-module');
-  const newModule = firstModule.cloneNode(true); // deep clone
 
-  // Remove TinyMCE DOM wrappers from the clone
-  newModule.querySelectorAll('.tox-tinymce').forEach(el => el.remove());
-
-  // Ensure clean textareas for re-init
-  newModule.querySelectorAll('textarea').forEach(el => {
-    el.classList.add('editor');
-    el.removeAttribute('id'); // prevent duplicate TinyMCE IDs
-    el.value = '';
+  // Get clean HTML version of firstModule (restore textarea)
+  const cleanModule = firstModule.cloneNode(true);
+  cleanModule.querySelectorAll('.editor').forEach(el => {
+    const id = el.id;
+    if (tinymce.get(id)) {
+      tinymce.get(id).remove(); // Remove TinyMCE from the original before cloning
+    }
+    el.value = ''; // Clear any text
   });
 
-  // Reset all inputs
-  newModule.querySelectorAll('input').forEach(el => {
+  const moduleCount = container.querySelectorAll('.video-module').length + 1;
+  cleanModule.querySelector('.module-number').textContent = moduleCount;
+
+  cleanModule.querySelectorAll('input, textarea').forEach(el => {
     if (el.type === 'checkbox' || el.type === 'radio') {
       el.checked = false;
     } else {
@@ -2300,31 +2300,32 @@ function addVideoModule() {
     }
   });
 
-  // Update module number
-  const moduleCount = container.querySelectorAll('.video-module').length + 1;
-  newModule.querySelector('.module-number').textContent = moduleCount;
+  // Give unique IDs to each textarea
+  cleanModule.querySelectorAll('.editor').forEach((el, index) => {
+    el.id = 'editor_video_' + moduleCount + '_' + index;
+  });
 
-  container.appendChild(newModule);
+  container.appendChild(cleanModule);
   reinitTinyMCE();
 }
 
 function addTextModule() {
   const container = document.getElementById('textModules');
   const firstModule = container.querySelector('.text-module');
-  const newModule = firstModule.cloneNode(true); // deep clone
 
-  // Remove TinyMCE DOM wrappers from the clone
-  newModule.querySelectorAll('.tox-tinymce').forEach(el => el.remove());
-
-  // Ensure clean textareas for re-init
-  newModule.querySelectorAll('textarea').forEach(el => {
-    el.classList.add('editor');
-    el.removeAttribute('id'); // prevent duplicate TinyMCE IDs
+  const cleanModule = firstModule.cloneNode(true);
+  cleanModule.querySelectorAll('.editor').forEach(el => {
+    const id = el.id;
+    if (tinymce.get(id)) {
+      tinymce.get(id).remove();
+    }
     el.value = '';
   });
 
-  // Reset all inputs
-  newModule.querySelectorAll('input').forEach(el => {
+  const moduleCount = container.querySelectorAll('.text-module').length + 1;
+  cleanModule.querySelector('.module-number').textContent = moduleCount;
+
+  cleanModule.querySelectorAll('input, textarea').forEach(el => {
     if (el.type === 'checkbox' || el.type === 'radio') {
       el.checked = false;
     } else {
@@ -2332,13 +2333,14 @@ function addTextModule() {
     }
   });
 
-  // Update module number
-  const moduleCount = container.querySelectorAll('.text-module').length + 1;
-  newModule.querySelector('.module-number').textContent = moduleCount;
+  cleanModule.querySelectorAll('.editor').forEach((el, index) => {
+    el.id = 'editor_text_' + moduleCount + '_' + index;
+  });
 
-  container.appendChild(newModule);
+  container.appendChild(cleanModule);
   reinitTinyMCE();
 }
+
 
 function reinitTinyMCE() {
   tinymce.remove('.editor'); // destroy all editors
