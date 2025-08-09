@@ -26,7 +26,8 @@
                   </thead>
                   <tbody class="table-border-bottom-0">
                   <?php
-                  $query = "SELECT t.*, u.name as display_name,lu.display_name AS nameupload, tt.price, u.photo as profile_picture, l.category_name AS category, sc.category_name AS subcategory, ti.picture 
+                  //fetch training data
+                  $query = "SELECT t.*, u.name as display_name,lu.display_name AS nameupload, tt.price, u.photo as profile_picture, l.category_name AS category, sc.category_name AS subcategory
     FROM ".$siteprefix."training t
     LEFT JOIN ".$siteprefix."categories l ON t.category = l.id 
     LEFT JOIN ".$siteprefix."instructors u ON t.instructors = u.s
