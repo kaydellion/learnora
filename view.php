@@ -1,8 +1,14 @@
+<?php 
+include "header.php"; 
 
-<?php include "header.php"; ?>
-    <section id="best-sellers" class="best-sellers section">
-<?php
-$id = $_GET['id'];
+// Ensure user session or ID is available
+if ($active_log == 0) {
+    echo "<script>alert('Please log in to view this page.'); window.location.href='login.php';</script>";
+    exit;
+}
+
+// Escape ID to avoid SQL injection
+$id = mysqli_real_escape_string($con, $_GET['id']);
 
 // Get training info
 $sql = "SELECT t.*, u.name AS instructor_name, u.photo AS instructor_photo
@@ -16,6 +22,7 @@ if (!$result || mysqli_num_rows($result) == 0) {
     echo "Training not found";
     exit;
 }
+
 $row = mysqli_fetch_assoc($result);
 
 // Format details
@@ -53,107 +60,109 @@ foreach ($fields as $col => $label) {
 }
 ?>
 
-<div class="container mt-4">
-    <h2><?= htmlspecialchars($row['title']); ?></h2>
+<section id="best-sellers" class="best-sellers section">
+    <div class="container mt-4">
+        <h2><?= htmlspecialchars($row['title']); ?></h2>
 
-    <ul class="nav nav-tabs" id="courseTabs" role="tablist">
-        <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#overview">Overview</button></li>
-        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#videos">Videos</button></li>
-        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#text">Text Modules</button></li>
-        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#format">Format Details</button></li>
-        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#quizTab">Quiz</button></li>
-    </ul>
+        <!-- Tabs -->
+        <ul class="nav nav-tabs" id="courseTabs" role="tablist">
+            <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#overview">Overview</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#videos">Videos</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#text">Text Modules</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#format">Format Details</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#quizTab">Quiz</button></li>
+        </ul>
 
-    <div class="tab-content p-3 border border-top-0">
-        <!-- Overview Tab -->
-        <div class="tab-pane fade show active" id="overview">
-            <p><?= nl2br(htmlspecialchars($row['course_description'])); ?></p>
-            <p><strong>Instructor:</strong> <?= htmlspecialchars($row['instructor_name']?? ''); ?></p>
-            <?php if (!empty($row['instructor_photo'])): ?>
-                <img src="uploads/<?= $row['instructor_photo']; ?>" width="100" />
-            <?php endif; ?>
-            <p><strong>Language:</strong> <?= htmlspecialchars($row['Language']?? ''); ?></p>
-            <p><strong>Level:</strong> <?= htmlspecialchars($row['level']?? ''); ?></p>
-        </div>
+        <div class="tab-content p-3 border border-top-0">
+            <!-- Overview Tab -->
+            <div class="tab-pane fade show active" id="overview">
+                <p><?= nl2br(htmlspecialchars($row['course_description'])); ?></p>
+                <p><strong>Instructor:</strong> <?= htmlspecialchars($row['instructor_name'] ?? ''); ?></p>
+                <?php if (!empty($row['instructor_photo'])): ?>
+                    <img src="uploads/<?= htmlspecialchars($row['instructor_photo']); ?>" width="100" />
+                <?php endif; ?>
+                <p><strong>Language:</strong> <?= htmlspecialchars($row['Language'] ?? ''); ?></p>
+                <p><strong>Level:</strong> <?= htmlspecialchars($row['level'] ?? ''); ?></p>
+            </div>
 
-        <!-- Videos Tab -->
-        <div class="tab-pane fade" id="videos">
-            <h5>Promo & Trailer Videos</h5>
-            <?php
-            $videos = mysqli_query($con, "SELECT video_type, video_path FROM {$siteprefix}training_videos WHERE training_id = '$id'");
-            while ($v = mysqli_fetch_assoc($videos)) {
-                $label = ucfirst($v['video_type']);
-                echo "<p><strong>$label:</strong></p>";
-                echo "<video controls width='100%' src='uploads/{$v['video_path']}'></video><hr>";
-            }
-
-            echo "<h5>Video Lessons</h5>";
-            $lessons = mysqli_query($con, "SELECT file_path, video_url FROM {$siteprefix}training_Video_Lessons WHERE training_id = '$id'");
-            while ($l = mysqli_fetch_assoc($lessons)) {
-                if (!empty($l['video_url'])) {
-                    echo "<p><iframe width='100%' height='315' src='{$l['video_url']}' frameborder='0' allowfullscreen></iframe></p>";
-                } elseif (!empty($l['file_path'])) {
-                    echo "<p><video controls width='100%' src='documents/{$l['file_path']}'></video></p>";
+            <!-- Videos Tab -->
+            <div class="tab-pane fade" id="videos">
+                <h5>Promo & Trailer Videos</h5>
+                <?php
+                $videos = mysqli_query($con, "SELECT video_type, video_path FROM {$siteprefix}training_videos WHERE training_id = '$id'");
+                while ($v = mysqli_fetch_assoc($videos)) {
+                    $label = ucfirst($v['video_type']);
+                    $videoPath = htmlspecialchars($v['video_path']);
+                    echo "<p><strong>$label:</strong></p>";
+                    echo "<video controls width='100%' src='uploads/{$videoPath}'></video><hr>";
                 }
-            }
-            ?>
-        </div>
 
-        <!-- Text Modules Tab -->
-        <div class="tab-pane fade" id="text">
-            <h5>Downloadable PDFs / Docs</h5>
-            <?php
-            $texts = mysqli_query($con, "SELECT file_path FROM {$siteprefix}training_text_modules WHERE training_id = '$id'");
-            while ($t = mysqli_fetch_assoc($texts)) {
-                $name = basename($t['file_path']);
-                echo "<p><a href='documents/{$t['file_path']}' target='_blank'>📄 $name</a></p>";
-            }
-            ?>
-        </div>
+                echo "<h5>Video Lessons</h5>";
+                $lessons = mysqli_query($con, "SELECT file_path, video_url FROM {$siteprefix}training_Video_Lessons WHERE training_id = '$id'");
+                while ($l = mysqli_fetch_assoc($lessons)) {
+                    $filePath = htmlspecialchars($l['file_path']);
+                    $videoUrl = htmlspecialchars($l['video_url']);
+                    if (!empty($videoUrl)) {
+                        echo "<p><iframe width='100%' height='315' src='{$videoUrl}' frameborder='0' allowfullscreen></iframe></p>";
+                    } elseif (!empty($filePath)) {
+                        echo "<p><video controls width='100%' src='documents/{$filePath}'></video></p>";
+                    }
+                }
+                ?>
+            </div>
 
-        <!-- Format Tab -->
-        <div class="tab-pane fade" id="format">
-            <ul>
-                <?= $details ?: "<li>No delivery information provided.</li>"; ?>
-            </ul>
-        </div>
-   
-<div class="tab-pane fade" id="quizTab">
-    <?php
-  $quiz_check_sql = "SELECT qa.score 
-                   FROM {$siteprefix}quiz_answers qa 
-                   INNER JOIN {$siteprefix}training_quizzes tq 
-                       ON qa.quiz_id = tq.s 
-                   WHERE qa.user_id = '$user_id' AND tq.training_id = '$id' 
-                   LIMIT 1";
-$quiz_check_result = mysqli_query($con, $quiz_check_sql);
+            <!-- Text Modules Tab -->
+            <div class="tab-pane fade" id="text">
+                <h5>Downloadable PDFs / Docs</h5>
+                <?php
+                $texts = mysqli_query($con, "SELECT file_path FROM {$siteprefix}training_text_modules WHERE training_id = '$id'");
+                while ($t = mysqli_fetch_assoc($texts)) {
+                    $fileName = htmlspecialchars(basename($t['file_path']));
+                    $filePath = htmlspecialchars($t['file_path']);
+                    echo "<p><a href='documents/{$filePath}' target='_blank'>📄 {$fileName}</a></p>";
+                }
+                ?>
+            </div>
 
-if (mysqli_num_rows($quiz_check_result) > 0) {
-    $quiz_score_row = mysqli_fetch_assoc($quiz_check_result);
-    $score = $quiz_score_row['score'];
+            <!-- Format Tab -->
+            <div class="tab-pane fade" id="format">
+                <ul>
+                    <?= $details ?: "<li>No delivery information provided.</li>"; ?>
+                </ul>
+            </div>
 
-    echo "<div class='alert alert-info'>";
-    echo "<h5>✅ You’ve already submitted this quiz.</h5>";
+            <!-- Quiz Tab -->
+            <div class="tab-pane fade" id="quizTab">
+                <?php
+                $quiz_check_sql = "SELECT qa.score 
+                                   FROM {$siteprefix}quiz_answers qa 
+                                   INNER JOIN {$siteprefix}training_quizzes tq 
+                                       ON qa.quiz_id = tq.s
+                                   WHERE qa.user_id = '$user_id' AND tq.training_id = '$id' 
+                                   LIMIT 1";
+                $quiz_check_result = mysqli_query($con, $quiz_check_sql);
 
-    if ($score === null || $score === '') {
-        echo "<p><strong>Status:</strong> You’ve not been given a score yet.</p>";
-    } else {
-        echo "<p><strong>Your Score:</strong> $score</p>";
-    }
+                if (mysqli_num_rows($quiz_check_result) > 0) {
+                    $quiz_score_row = mysqli_fetch_assoc($quiz_check_result);
+                    $score = $quiz_score_row['score'];
 
-    echo "</div>";
-} else {
-    include "quiz-tab.php"; // Show quiz form if not yet submitted
-}
- ?>
+                    echo "<div class='alert alert-info'>";
+                    echo "<h5>✅ You’ve already submitted this quiz.</h5>";
 
+                    if ($score === null || $score === '') {
+                        echo "<p><strong>Status:</strong> You’ve not been given a score yet.</p>";
+                    } else {
+                        echo "<p><strong>Your Score:</strong> $score</p>";
+                    }
+
+                    echo "</div>";
+                } else {
+                    include "quiz-tab.php"; // Show quiz form if not yet submitted
+                }
+                ?>
+            </div>
         </div>
     </div>
-</div>
-
-
-
-        </section>
-
+</section>
 
 <?php include "footer.php"; ?>

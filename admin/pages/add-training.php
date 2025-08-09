@@ -54,10 +54,9 @@
               <label class="form-label">Description</label>
               <textarea class="form-control editor" name="description"></textarea>
             </div>
-            <div class="mb-3">
-              <label class="form-label">Who Should Attend</label>
+           
               <input type="hidden" class="form-control" name="who_should_attend" placeholder="E.g. Beginners, Entrepreneurs, etc.">
-            </div>
+       
             <div class="mb-3">
               <label class="form-label">Event Dates & Times</label>
               <div id="dateTimeRepeater">
@@ -99,13 +98,116 @@
               </select>
             </div>
 
-            <h6>Delivery Format</h6>
+
+             <?php
+          // Fetch event types from the database
+          $eventTypes = [];
+          $eventTypeQuery = mysqli_query($con, "SELECT s, name FROM {$siteprefix}event_types");
+          while ($row = mysqli_fetch_assoc($eventTypeQuery)) {
+              $eventTypes[] = $row;
+          }
+          ?>
+          <!-- ...existing code... -->
+
+          <div class="mb-3">
+            <label class="form-label">Type of Training & Events</label>
+            <select class="form-control" name="event_type" required>
+              <option value="">Select Type</option>
+              <?php foreach ($eventTypes as $type): ?>
+                <option value="<?php echo htmlspecialchars($type['s']); ?>">
+                  <?php echo htmlspecialchars($type['name']); ?>
+                </option>
+              <?php endforeach; ?>
+            </select>
+          </div>
+
+          <div class="mb-3">
+  <label class="form-label">Pricing</label>
+  <select class="form-control" name="pricing" id="pricingSelect" onchange="togglePricingFields()" required>
+    <option value="">Select Pricing</option>
+    <option value="donation">Donation</option>
+    <option value="free">Free</option>
+    <option value="paid">Paid</option>
+  </select>
+</div>
+
+<!-- Donation Info -->
+<div class="mb-3" id="donationFields" style="display:none;">
+  <p>This event allows attendees to pay any amount they choose as a donation.</p>
+</div>
+
+<!-- Free Info -->
+<div class="mb-3" id="freeFields" style="display:none;">
+  <p>This event is free for all attendees.</p>
+</div>
+
+
+<!-- Paid Ticket Fields -->
+<div class="mb-3" id="paidFields" style="display:none;">
+  <label class="form-label">Ticket Name</label>
+  <input type="text" class="form-control mb-2" name="ticket_name[]" placeholder="e.g. General Admission">
+  <label class="form-label">Benefits</label>
+  <input type="text" class="form-control mb-2 editor" name="ticket_benefits[]" placeholder="e.g. Certificate, Lunch, Materials">
+  <label class="form-label">Price</label>
+  <input type="number" class="form-control mb-2" name="ticket_price[]" min="0" step="0.01" placeholder="e.g. 5000">
+  <label class="form-label">Number of Seats Available</label>
+  <input type="number" class="form-control" name="ticket_seats[]" min="1" placeholder="e.g. 100">
+
+  <div class="mb-3" id="ticketWrapper">
+
+              </div>
+  <!-- Add Another Ticket Button -->
+<button type="button" id="addTicketBtn" class="btn btn-secondary">Add Another Ticket</button>
+</div>
+
+                         <div class="mb-3">
+                          <label>Category </label>
+                        <select class="form-select select-multiple w-100" name="category[]" id="category-select" multiple required>
+                          <option  disabled>- Select Category -</option>
+                          <?php
+                    $sql = "SELECT * FROM " . $siteprefix . "categories WHERE parent_id IS NULL ";
+                     $sql2 = mysqli_query($con, $sql);
+                     while ($row = mysqli_fetch_array($sql2)) {
+                     echo '<option value="' . $row['id'] . '">' . $row['category_name'] . '</option>'; }?>
+                        </select>
+                        </div>
+
+                        <div class="mb-3" id="subcategory-container" style="display:none;">
+                            <label>SubCategory </label>
+                          <select  class="form-select select-multiple" name="subcategory[]" id="subcategory-select" multiple required>
+                            <option  disabled>- Select Subcategory -</option>
+                          </select>
+                        </div>
+
+    
+
+            <h6>Course Content Details</h6>
+       <div class="mb-3">
+              <label class="form-label">Who Should Attend & Target Audience</label>
+              <textarea class="form-control editor" name="target_audience" placeholder='E.g. "Beginners in Python", "Entrepreneurs", etc.'></textarea>
+            </div>
+        
+              <textarea hidden class="form-control" name="course_description" rows="4"></textarea>
+            
             <div class="mb-3">
+              <label class="form-label">Learning Objectives / Outcomes</label>
+              <textarea class="form-control editor" name="learning_objectives" rows="3" placeholder="List what the learner will be able to do after completing the course."></textarea>
+            </div>
+          
+            <div class="mb-3">
+              <label class="form-label">Course Requirements / Prerequisites</label>
+              <textarea class="form-control editor" name="prerequisites" rows="2" placeholder="Any knowledge, tools, or skills needed before starting."></textarea>
+            </div>
+
+                        <div class="mb-3">
+                          <label>Delivery Format </label>
               <select class="form-control" name="delivery_format" id="deliveryFormat" onchange="toggleDeliveryFields()" required>
                 <option value="">Select Format</option>
                 <option value="physical">Physical (In-person)</option>
                 <option value="online">Online (Webinar/Virtual)</option>
                 <option value="hybrid">Hybrid (Physical & Online)</option>
+                   <option value="video">Video</option>
+                <option value="text">Text</option>
                 
               </select>
             </div> 
@@ -166,23 +268,69 @@
               </div>
             </div>
 
-            <h6>Course Content Details</h6>
-            <div class="mb-3">
-              <label class="form-label">Course Description</label>
-              <textarea class="form-control editor" name="course_description" rows="4"></textarea>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Learning Objectives / Outcomes</label>
-              <textarea class="form-control editor" name="learning_objectives" rows="3" placeholder="List what the learner will be able to do after completing the course."></textarea>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Target Audience</label>
-              <input type="text" class="form-control" name="target_audience" placeholder='E.g. "Beginners in Python", "Entrepreneurs", etc.'>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Course Requirements / Prerequisites</label>
-              <textarea class="form-control editor" name="prerequisites" rows="2" placeholder="Any knowledge, tools, or skills needed before starting."></textarea>
-            </div>
+            <!-- Video Fields -->
+<div id="videoFields" style="display:none;">
+  <label>Total Number of Videos:</label>
+  <input type="number" class="form-control" name="total_videos" min="1">
+
+  <div id="videoModules">
+    <!-- Template -->
+    <div class="video-module mb-3">
+      <h5>Module <span class="module-number">1</span></h5>
+      <label>Lesson / Module Title:</label>
+      <input type="text" class="form-control" name="video_module_title[]">
+
+      <label>Description/Notes:</label>
+      <textarea class="form-control editor" name="video_module_desc[]"></textarea>
+
+      <label>Total Duration:</label>
+      <input type="text" class="form-control" name="video_duration[]">
+
+      <label>Upload/Link Video Files:</label>
+      <input type="file" name="video_file[]" class="form-control mb-2" accept="video/*">
+      <input type="url" class="form-control mt-2" placeholder="Or paste link" name="video_link[]">
+
+      <label>Video Quality</label><br>
+      <label><input type="checkbox" name="video_quality[0][]" value="720p"> 720p</label>
+      <label><input type="checkbox" name="video_quality[0][]" value="1080p"> 1080p</label>
+      <label><input type="checkbox" name="video_quality[0][]" value="4K"> 4K</label>
+
+      <br>
+      <label>Include Subtitles?</label><br>
+      <label><input type="checkbox" name="video_subtitles[0]" value="Yes"> Yes</label>
+      <label><input type="checkbox" name="video_subtitles[0]" value="No"> No</label>
+    </div>
+  </div>
+
+  <button type="button" class="btn btn-secondary mt-3" onclick="addVideoModule()">ADD MORE</button>
+</div>
+
+<!-- Text Fields -->
+<div id="textFields" style="display:none;">
+  <label>Number of Lessons/Modules:</label>
+  <input type="number" class="form-control" name="total_lessons" min="1">
+
+  <div id="textModules">
+    <!-- Template -->
+    <div class="text-module mb-3">
+      <h5>Module <span class="module-number">1</span></h5>
+      <label>Lesson / Module Title:</label>
+      <input type="text" class="form-control" name="text_module_title[]">
+
+      <label>Description/Notes:</label>
+      <textarea class="form-control editor" name="text_module_desc[]"></textarea>
+
+      <label>Estimated Reading Time:</label>
+      <input type="text" class="form-control" name="text_reading_time[]">
+
+      <label>Upload Text Content (PDF/Text):</label>
+      <input type="file" name="text_file[]">
+    </div>
+  </div>
+
+  <button type="button" class="btn btn-secondary mt-3" onclick="addTextModule()">ADD MORE</button>
+</div>
+
 
             <h6>Course Content Uploads</h6>
             <div class="mb-3">
@@ -272,85 +420,7 @@
               <input type="file" class="form-control" name="trailer_video" accept="video/*">
             </div>
 
-          <?php
-          // Fetch event types from the database
-          $eventTypes = [];
-          $eventTypeQuery = mysqli_query($con, "SELECT s, name FROM {$siteprefix}event_types");
-          while ($row = mysqli_fetch_assoc($eventTypeQuery)) {
-              $eventTypes[] = $row;
-          }
-          ?>
-          <!-- ...existing code... -->
-
-          <div class="mb-3">
-            <label class="form-label">Type of Training & Events</label>
-            <select class="form-control" name="event_type" required>
-              <option value="">Select Type</option>
-              <?php foreach ($eventTypes as $type): ?>
-                <option value="<?php echo htmlspecialchars($type['s']); ?>">
-                  <?php echo htmlspecialchars($type['name']); ?>
-                </option>
-              <?php endforeach; ?>
-            </select>
-          </div>
-
-          <div class="mb-3">
-  <label class="form-label">Pricing</label>
-  <select class="form-control" name="pricing" id="pricingSelect" onchange="togglePricingFields()" required>
-    <option value="">Select Pricing</option>
-    <option value="donation">Donation</option>
-    <option value="free">Free</option>
-    <option value="paid">Paid</option>
-  </select>
-</div>
-
-<!-- Donation Info -->
-<div class="mb-3" id="donationFields" style="display:none;">
-  <p>This event allows attendees to pay any amount they choose as a donation.</p>
-</div>
-
-<!-- Free Info -->
-<div class="mb-3" id="freeFields" style="display:none;">
-  <p>This event is free for all attendees.</p>
-</div>
-
-
-<!-- Paid Ticket Fields -->
-<div class="mb-3" id="paidFields" style="display:none;">
-  <label class="form-label">Ticket Name</label>
-  <input type="text" class="form-control mb-2" name="ticket_name[]" placeholder="e.g. General Admission">
-  <label class="form-label">Benefits</label>
-  <input type="text" class="form-control mb-2 editor" name="ticket_benefits[]" placeholder="e.g. Certificate, Lunch, Materials">
-  <label class="form-label">Price</label>
-  <input type="number" class="form-control mb-2" name="ticket_price[]" min="0" step="0.01" placeholder="e.g. 5000">
-  <label class="form-label">Number of Seats Available</label>
-  <input type="number" class="form-control" name="ticket_seats[]" min="1" placeholder="e.g. 100">
-
-  <div class="mb-3" id="ticketWrapper">
-
-              </div>
-  <!-- Add Another Ticket Button -->
-<button type="button" id="addTicketBtn" class="btn btn-secondary">Add Another Ticket</button>
-</div>
-
-                         <div class="mb-3">
-                          <label>Category </label>
-                        <select class="form-select select-multiple w-100" name="category[]" id="category-select" multiple required>
-                          <option  disabled>- Select Category -</option>
-                          <?php
-                    $sql = "SELECT * FROM " . $siteprefix . "categories WHERE parent_id IS NULL ";
-                     $sql2 = mysqli_query($con, $sql);
-                     while ($row = mysqli_fetch_array($sql2)) {
-                     echo '<option value="' . $row['id'] . '">' . $row['category_name'] . '</option>'; }?>
-                        </select>
-                        </div>
-
-                        <div class="mb-3" id="subcategory-container" style="display:none;">
-                            <label>SubCategory </label>
-                          <select  class="form-select select-multiple" name="subcategory[]" id="subcategory-select" multiple required>
-                            <option  disabled>- Select Subcategory -</option>
-                          </select>
-                        </div>
+         
 
                             <?php
     // Fetch instructors from the database

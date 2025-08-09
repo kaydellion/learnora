@@ -919,39 +919,28 @@ if ($insertTraining) {
 
 
 //follow seller
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['follow_seller_submit'])) {
-   
+   if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action'])) {
+    $action = $_POST['action'];
+    $target_user_id = $_POST['seller_id'];
+      $user_id = $_POST['user_id']; // Replace with your session variable for user ID
 
-    $user_id = $_POST['user_id']; // Replace with your session variable for user ID
-    $seller_id = $_POST['seller_id'];
-    $actioning = isset($_POST['actioning']) ? $_POST['actioning'] : null;
+    if ($action === 'follow') {
+        // Add a new follower
+        $followQuery = "INSERT INTO ".$siteprefix."followers (user_id, seller_id, followed_at, category_id, subcategory_id) VALUES (?, ?, NOW(), '', '')";
+        $stmt = $con->prepare($followQuery);
+        $stmt->bind_param("ii", $user_id, $target_user_id);
+        $stmt->execute();
 
-    if (empty($user_id) || empty($seller_id)) {
-        echo "<script>alert('Invalid request.');</script>";
-        exit();
+        echo "<script>alert('You are now following the seller.');</script>";
+    } elseif ($action === 'unfollow') {
+        // Remove the follower
+        $unfollowQuery = "DELETE FROM {$siteprefix}followers WHERE user_id = ? AND seller_id = ?";
+        $stmt = $con->prepare($unfollowQuery);
+        $stmt->bind_param("ii", $user_id, $target_user_id);
+        $stmt->execute();
+        echo "<script>alert('You have unfollowed the seller.');</script>";
     }
 
-    if ($actioning === "follow") {
-        // Add a new follow record
-        $insertQuery = "INSERT INTO ".$siteprefix."followers (user_id, seller_id, followed_at, category_id, subcategory_id) VALUES (?, ?, NOW(), '', '')";
-        $stmt = $con->prepare($insertQuery);
-        $stmt->bind_param("ii", $user_id, $seller_id);
-        if ($stmt->execute()) {
-            echo "<script>alert('You are now following the seller.');</script>";
-        } else {
-            echo "<script>alert('Failed to follow the seller.');</script>";
-        }
-    } elseif ($actioning === "unfollow") {
-        // Remove the follow record
-        $deleteQuery = "DELETE FROM ".$siteprefix."followers WHERE user_id = ? AND seller_id = ?";
-        $stmt = $con->prepare($deleteQuery);
-        $stmt->bind_param("ii", $user_id, $seller_id);
-        if ($stmt->execute()) {
-            echo "<script>alert('You have unfollowed the seller.');</script>";
-        } else {
-            echo "<script>alert('Failed to unfollow the seller.');</script>";
-        }
-    }
 }
 
 

@@ -1,0 +1,158 @@
+ <div class="mb-3">
+           <?php
+// Assume $quiz_method is already fetched from training table
+$text_content = ''; // default
+
+// If quiz method is 'text', fetch the actual text content
+if ($quiz_method === 'text') {
+  $query = mysqli_query($con, "SELECT * FROM {$siteprefix}training_quizzes WHERE training_id = '$training_id' AND type = 'text' LIMIT 1");
+  $quizData = mysqli_fetch_assoc($query);
+  $text_content = $quizData['text_path'] ?? '';
+}
+?>
+
+
+<div class="mb-3">
+  <div>
+    <label class="form-label">Quizzes & Assignments</label>
+  </div>
+  <label>Choose how to provide quiz/assignment content:</label>
+  <select onchange="toggleQuizOption(this.value)" name="quiz_method" class="form-control mb-3">
+    <option value="">-- Select Option --</option>
+    <option value="text" <?= $quiz_method === 'text' ? 'selected' : '' ?>>Text Entry</option>
+    <option value="upload" <?= $quiz_method === 'upload' ? 'selected' : '' ?>>Upload Files</option>
+    <option value="form" <?= $quiz_method === 'form' ? 'selected' : '' ?>>Use Form Builder</option>
+  </select>
+</div>
+
+<!-- Option 1: Text Entry -->
+<div id="quizText" style="<?= $quiz_method === 'text' ? '' : 'display:none;' ?>">
+  <label>Text Entry:</label>
+  <textarea name="quiz_text[]" placeholder="e.g., Write a short essay on the impact of AI on job markets..." class="form-control editor"><?= $text_content ?></textarea>
+</div>
+          
+<?php
+$uploaded_files = [];
+
+if ($quiz_method === 'upload') {
+  $query = mysqli_query($con, "SELECT * FROM {$siteprefix}training_quizzes WHERE training_id = '$training_id' AND type = 'upload'");
+  while ($row = mysqli_fetch_assoc($query)) {
+    $uploaded_files[] = $row;
+  }
+}
+?>
+
+<!-- Option 2: Upload Files -->
+<div id="quizUpload" style="<?= $quiz_method === 'upload' ? '' : 'display:none;' ?>">
+  <label>Upload Quiz or Assignment Files:</label>
+  <input type="file" name="quiz_files[]" multiple class="form-control mb-2">
+  <small>You can upload multiple files (PDF, Word, Text).</small>
+
+  <?php if (!empty($uploaded_files)): ?>
+    <ul class="list-group mt-3">
+      <?php foreach ($uploaded_files as $file): 
+        $file_url = htmlspecialchars($file['file_path']);
+        $file_id = (int)$file['s'];
+      ?>
+        <li class="list-group-item d-flex justify-content-between align-items-center" id="quiz_<?php echo $file_id; ?>">
+          <div>
+            📁 <a href="<?= $file_url ?>" target="_blank"><?= basename($file_url) ?></a>
+          </div>
+          <button type="button" class="btn btn-sm btn-danger delete-quiz-file" data-quiz-id="<?= $file_id ?>">
+            Delete
+          </button>
+        </li>
+      <?php endforeach; ?>
+    </ul>
+  <?php endif; ?>
+</div>
+
+<div id="quizFormButton" style="<?= $quiz_method === 'form' ? '' : 'display:none;' ?>">
+  <label>Use the Form Builder to Add Structured Questions:</label><br>
+  <button type="button" onclick="openQuizModal()" class="btn btn-success"><i class="bx bx-plus me-1"></i>Add Quiz/Assignment Questions</button>
+</div>
+<?php
+$quiz = mysqli_fetch_assoc(mysqli_query($con, "SELECT * FROM {$siteprefix}training_quizzes WHERE s = '$quiz_id'"));
+$quiz_instructions = $quiz['instructions'];
+$questions = mysqli_query($con, "SELECT * FROM {$siteprefix}training_quiz_questions WHERE quiz_id = '$quiz_id'");
+$existing_questions = [];
+while ($row = mysqli_fetch_assoc($questions)) {
+    $existing_questions[] = $row;
+}
+?>
+<div id="quizModal" class="modal" style="display:none;">
+  <div class="modal-content">
+    <span class="close" onclick="closeQuizModal()">&times;</span>
+    <h3>🧠 Add Quiz Questions</h3>
+
+    <div id="quizBuilderModal">
+      <div class="mb-3">
+        <label>Instructions:</label>
+        <textarea name="quiz_instructions" placeholder="Quiz Instructions" class="form-control mb-2 editor"><?php echo htmlspecialchars($quiz_instructions); ?></textarea>
+      </div>
+
+      <?php if (!empty($existing_questions)): ?>
+        <?php foreach ($existing_questions as $index => $q): ?>
+          <div class="question-block">
+            <input type="hidden" name="question_id[]" value="<?= $q['id']; ?>">
+
+            <div class="mb-3">
+              <label>Question:</label>
+              <textarea name="questions[]" class="form-control mb-2 editor" id="question_editor_<?= $index+1; ?>"><?= htmlspecialchars($q['question']); ?></textarea>
+            </div>
+
+            <div class="mb-3">
+              <input type="text" class="form-control mb-2" name="option_a[]" placeholder="Option A" value="<?= htmlspecialchars($q['option_a']); ?>">
+              <input type="text" class="form-control mb-2" name="option_b[]" placeholder="Option B" value="<?= htmlspecialchars($q['option_b']); ?>">
+              <input type="text" class="form-control mb-2" name="option_c[]" placeholder="Option C" value="<?= htmlspecialchars($q['option_c']); ?>">
+              <input type="text" class="form-control mb-2" name="option_d[]" placeholder="Option D" value="<?= htmlspecialchars($q['option_d']); ?>">
+            </div>
+
+            <div class="mb-3">
+              <label>Correct Answer:</label>
+              <select name="correct_answer[]" class="form-select mb-3">
+                <option value="a" <?= $q['correct_answer'] == 'a' ? 'selected' : '' ?>>A</option>
+                <option value="b" <?= $q['correct_answer'] == 'b' ? 'selected' : '' ?>>B</option>
+                <option value="c" <?= $q['correct_answer'] == 'c' ? 'selected' : '' ?>>C</option>
+                <option value="d" <?= $q['correct_answer'] == 'd' ? 'selected' : '' ?>>D</option>
+              </select>
+            </div>
+
+            <button type="button" class="btn btn-danger remove-question">🗑️ Remove</button>
+            <hr>
+          </div>
+        <?php endforeach; ?>
+      <?php else: ?>
+        <div class="question-block">
+          <div class="mb-3">
+            <label>Question:</label>
+            <textarea name="questions[]" class="form-control mb-2 editor" id="question_editor_1"></textarea>
+          </div>
+          <div class="mb-3">
+            <input type="text" class="form-control mb-2" name="option_a[]" placeholder="Option A">
+            <input type="text" class="form-control mb-2" name="option_b[]" placeholder="Option B">
+            <input type="text" class="form-control mb-2" name="option_c[]" placeholder="Option C">
+            <input type="text" class="form-control mb-2" name="option_d[]" placeholder="Option D">
+          </div>
+          <div class="mb-3">
+            <label>Correct Answer:</label>
+            <select name="correct_answer[]" class="form-select mb-3">
+              <option value="a">A</option>
+              <option value="b">B</option>
+              <option value="c">C</option>
+              <option value="d">D</option>
+            </select>
+          </div>
+          <hr>
+        </div>
+      <?php endif; ?>
+    </div>
+
+    <button type="button" onclick="addQuizQuestionModal()" class="btn btn-secondary">
+      <i class="bx bx-plus me-1"></i> Add Another Question
+    </button>
+    <br><br>
+
+    <button type="button" onclick="closeQuizModal()" class="btn btn-primary">✅ Done</button>
+  </div>
+</div>

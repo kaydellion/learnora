@@ -194,10 +194,6 @@ $totalFollowings = $followingsData['total_followings'] ?? 0;
                     <div class="product-count me-2" style="background-color: orange; color: white; padding: 5px 10px; border-radius: 5px;">
                         Found <?php echo $report_count; ?> event(s)
                         </div>
-                      
-
-
-                        
 
                 </div>
                 <div class="col-lg-12 mt-2 d-block d-md-none">
@@ -206,8 +202,6 @@ $totalFollowings = $followingsData['total_followings'] ?? 0;
         <span class="product-count me-2" style="background-color: orange; color: white; padding: 5px 10px; border-radius: 5px;">Followings: <?php echo $totalFollowings; ?></span>
     </div>
 </div>
-   
-
         </div>
       </div>
 		 </div>
@@ -409,7 +403,7 @@ $seller_linkedin = $seller['seller_linkedin'];
         <?php } ?>
             </div>
 
-            <a href="<?php echo $siteurl; ?>merchant-store.php?seller_id=<?php echo $seller_id; ?>" class="btn btn-primary btn-sm w-100">View Profile</a>
+            <a href="<?php echo $siteurl; ?>trainer-store?seller_id=<?php echo $seller_id; ?>" class="btn btn-primary btn-sm w-100">View Profile</a>
           </div>
         </div>
       </div>

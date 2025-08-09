@@ -208,7 +208,7 @@ while (true) {
                     $emailSubject = "New Resource Posted by $sellerName";
                     $emailMessage = "
                         <p>We are excited to inform you that $sellerName has just posted a new resource titled <strong>$title</strong>.</p>
-                        <p>You can check it out here: <a href='$siteurl/merchant-store.php?seller_id=$user_id'>$sellerName</a></p>
+                        <p>You can check it out here: <a href='$siteurl/trainer-store?seller_id=$user_id'>$sellerName</a></p>
                         <p>Thank you for following $sellerName!</p>";
     
                     // Send the email
@@ -530,7 +530,7 @@ if ($sellerResult && mysqli_num_rows($sellerResult) > 0) {
           
             <p>We hope this message finds you well.</p>
             <p>We're excited to let you know that your product, <strong>“$title”</strong>, has been successfully reviewed and is now live on the Project Report Hub marketplace!</p>
-            <p>Access your document here: <a href='$siteurl/merchant-store.php?seller_id=$seller_id'>$title</a></p>
+            <p>Access your document here: <a href='$siteurl/trainer-store?seller_id=$seller_id'>$title</a></p>
             <p>To help you generate visibility and boost your initial sales, we highly recommend promoting your document on the following platforms:</p>
             <ul>
                 <li><strong>LinkedIn:</strong> Publish a LinkedIn Pulse article (rather than a simple post) introducing your document. Be sure to tag friends and colleagues in the comments to maximize engagement and reach.</li>
@@ -573,7 +573,7 @@ if ($sellerResult && mysqli_num_rows($sellerResult) > 0) {
                 $emailSubject = "New Resource Posted by $sellerName";
                 $emailMessage = "
                     <p>We are excited to inform you that $sellerName has just posted a new resource titled <strong>$title</strong>.</p>
-                    <p>You can check it out here: <a href='$siteurl.merchant-store.php?seller_id=$user_id'>$sellerName</a></p>
+                    <p>You can check it out here: <a href='$siteurl.trainer-store?seller_id=$user_id'>$sellerName</a></p>
                     <p>Thank you for following $sellerName!</p>";
 
                 // Send the email

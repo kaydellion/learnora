@@ -156,6 +156,78 @@ document.querySelectorAll('a.read').forEach(link => {
   });
 });
 
+
+
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('.delete-video-module').forEach(function (button) {
+    button.addEventListener('click', function () {
+      const moduleId = this.getAttribute('data-module-id');
+
+      if (!moduleId) {
+        alert('Module ID not found.');
+        return;
+      }
+
+      if (!confirm('Are you sure you want to delete this video module?')) {
+        return;
+      }
+
+      fetch(`delete_image.php?action=deletevideomodule&module_id=${moduleId}`, {
+        method: 'GET',
+      })
+      .then(response => response.text())
+      .then(data => {
+        const cleaned = data.trim().toLowerCase();
+        if (cleaned.includes('success')) {
+          this.closest('.video-module')?.remove();
+          alert('Video module deleted successfully.');
+        } else {
+          alert('Failed to delete video module: ' + cleaned);
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred.');
+      });
+    });
+  });
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('.delete-text-module').forEach(function (button) {
+    button.addEventListener('click', function () {
+      const moduleId = this.getAttribute('data-module-id');
+
+      if (!moduleId) {
+        alert('Module ID not found.');
+        return;
+      }
+
+      if (!confirm('Are you sure you want to delete this text module?')) {
+        return;
+      }
+
+      fetch(`delete_image.php?action=deletetextmodule&module_id=${moduleId}`, {
+        method: 'GET',
+      })
+      .then(response => response.text())
+      .then(data => {
+        if (data.trim().toLowerCase().includes('success')) {
+          this.closest('.text-module')?.remove();
+          alert('Text module deleted successfully.');
+        } else {
+          alert('Failed to delete text module: ' + data);
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred.');
+      });
+    });
+  });
+});
+
+
 document.addEventListener('DOMContentLoaded', function () {
   document.querySelectorAll('.delete-video-trailer').forEach(function (button) {
     button.addEventListener('click', function () {
@@ -2175,7 +2247,7 @@ document.getElementById('addTicketBtn').addEventListener('click', function () {
       <input type="text" class="form-control mb-2" name="ticket_name[]" placeholder="e.g. General Admission">
 
       <label class="form-label">Benefits</label>
-      <input type="text" class="form-control mb-2" name="ticket_benefits[]" placeholder="e.g. Certificate, Lunch">
+      <textarea class="form-control editor mb-2" name="ticket_benefits[]" placeholder="e.g. Certificate, Lunch"></textarea>
 
       <label class="form-label">Price</label>
       <input type="number" class="form-control mb-2" name="ticket_price[]" min="0" step="0.01" placeholder="e.g. 5000">
@@ -2185,7 +2257,83 @@ document.getElementById('addTicketBtn').addEventListener('click', function () {
     </div>
   `;
   wrapper.insertAdjacentHTML('beforeend', ticketHTML);
+  
+  // Re-init TinyMCE for new textarea
+  tinymce.remove('.editor');
+  tinymce.init({
+    selector: '.editor',
+    toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
+    tinycomments_mode: 'embedded',
+    tinycomments_author: 'Author name',
+    mergetags_list: [
+      { value: 'First.Name', title: 'First Name' },
+      { value: 'Email', title: 'Email' },
+    ],
+    ai_request: (request, respondWith) => respondWith.string(() => Promise.reject('See docs to implement AI Assistant')),
+  });
 });
+
+
+
+
+function addVideoModule() {
+  const container = document.getElementById('videoModules');
+  const firstModule = container.querySelector('.video-module');
+  const newModule = firstModule.cloneNode(true); // deep clone
+
+  const moduleCount = container.querySelectorAll('.video-module').length + 1;
+  newModule.querySelector('.module-number').textContent = moduleCount;
+
+  // Reset all fields
+  newModule.querySelectorAll('input, textarea').forEach(el => {
+    if (el.type === 'checkbox' || el.type === 'radio') {
+      el.checked = false;
+    } else {
+      el.value = '';
+    }
+  });
+
+  container.appendChild(newModule);
+  reinitTinyMCE();
+}
+
+function addTextModule() {
+  const container = document.getElementById('textModules');
+  const firstModule = container.querySelector('.text-module');
+  const newModule = firstModule.cloneNode(true); // deep clone
+
+  const moduleCount = container.querySelectorAll('.text-module').length + 1;
+  newModule.querySelector('.module-number').textContent = moduleCount;
+
+  newModule.querySelectorAll('input, textarea').forEach(el => {
+    if (el.type === 'checkbox' || el.type === 'radio') {
+      el.checked = false;
+    } else {
+      el.value = '';
+    }
+  });
+
+  container.appendChild(newModule);
+  reinitTinyMCE();
+}
+
+function reinitTinyMCE() {
+  // Destroy all editors
+  tinymce.remove('.editor');
+  // Reinitialize
+  tinymce.init({
+    selector: '.editor',
+    toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
+    tinycomments_mode: 'embedded',
+    tinycomments_author: 'Author name',
+    mergetags_list: [
+      { value: 'First.Name', title: 'First Name' },
+      { value: 'Email', title: 'Email' },
+    ],
+    ai_request: (request, respondWith) => respondWith.string(() => Promise.reject('See docs to implement AI Assistant')),
+  });
+}
+
 
 function previewProfilePicture(event) {
   var reader = new FileReader();
@@ -2223,17 +2371,43 @@ function displayInstructorInfo() {
     addFields.style.display = "none";
   }
 }
-  function toggleDeliveryFields() {
-    const format = document.getElementById('deliveryFormat').value;
+function toggleDeliveryFields() {
+  const format = document.getElementById('deliveryFormat').value;
 
-    document.getElementById('physicalFields').style.display = (format === 'physical') ? 'block' : 'none';
-    document.getElementById('onlineFields').style.display = (format === 'online') ? 'block' : 'none';
-    document.getElementById('hybridFields').style.display = (format === 'hybrid') ? 'block' : 'none';
+  // List of all section IDs
+  const sections = [
+    'physicalFields',
+    'onlineFields',
+    'hybridFields',
+    'videoFields',
+    'textFields'
+  ];
 
-    if (format === 'hybrid') {
-      toggleHybridLocationFields(); // call to update hybrid subfields
-    }
+  // Hide all first
+  sections.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+
+  // Show only the selected one
+  if (format === 'physical') {
+    document.getElementById('physicalFields').style.display = 'block';
+  } 
+  else if (format === 'online') {
+    document.getElementById('onlineFields').style.display = 'block';
+  } 
+  else if (format === 'hybrid') {
+    document.getElementById('hybridFields').style.display = 'block';
+    toggleHybridLocationFields(); // Still call this if needed
+  } 
+  else if (format === 'video') {
+    document.getElementById('videoFields').style.display = 'block';
+  } 
+  else if (format === 'text') {
+    document.getElementById('textFields').style.display = 'block';
   }
+}
+
 
   function toggleHybridLocationFields() {
     const type = document.getElementById('hybridLocationType').value;

@@ -107,6 +107,111 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['edit_event'])) {
 
     $fileKey = 'cover_images';
 
+
+    if ($delivery_format === 'video' && !empty($_POST['video_module_title_existing'])) {
+    foreach ($_POST['video_module_title_existing'] as $moduleId => $title) {
+        $desc      = $_POST['video_module_desc_existing'][$moduleId] ?? '';
+        $duration  = $_POST['video_duration_existing'][$moduleId] ?? '';
+        $videoLink = $_POST['video_link_existing'][$moduleId] ?? '';
+        $qualities = isset($_POST['video_quality_existing'][$moduleId]) ? implode(',', $_POST['video_quality_existing'][$moduleId]) : '';
+        $subtitles = $_POST['video_subtitles_existing'][$moduleId] ?? '';
+
+        $filePath = '';
+
+        // Check if a new file was uploaded
+        if (!empty($_FILES['video_file_existing']['name'][$moduleId])) {
+            // Restructure file array for handleFileUpload()
+            $tmpFileKey = 'single_video_update';
+            $_FILES[$tmpFileKey] = [
+                'name'     => $_FILES['video_file_existing']['name'][$moduleId],
+                'type'     => $_FILES['video_file_existing']['type'][$moduleId],
+                'tmp_name' => $_FILES['video_file_existing']['tmp_name'][$moduleId],
+                'error'    => $_FILES['video_file_existing']['error'][$moduleId],
+                'size'     => $_FILES['video_file_existing']['size'][$moduleId]
+            ];
+
+            // Upload file
+            $fileName = handleFileUpload($tmpFileKey, $fileuploadDir);
+            if ($fileName && strpos($fileName, 'Failed') === false && strpos($fileName, 'error') === false) {
+                $filePath = $fileuploadDir . $fileName;
+
+                // Remove old file
+                $oldFileQuery = $con->prepare("SELECT file_path FROM {$siteprefix}training_video_modules WHERE id = ?");
+                $oldFileQuery->bind_param("i", $moduleId);
+                $oldFileQuery->execute();
+                $oldFileResult = $oldFileQuery->get_result()->fetch_assoc();
+                if (!empty($oldFileResult['file_path']) && file_exists($oldFileResult['file_path'])) {
+                    unlink($oldFileResult['file_path']);
+                }
+                $oldFileQuery->close();
+            }
+        }
+
+        // Build update query dynamically
+        if ($filePath) {
+            $stmt = $con->prepare("
+                UPDATE {$siteprefix}training_video_modules 
+                SET title = ?, description = ?, duration = ?, file_path = ?, video_link = ?, video_quality = ?, subtitles = ?, updated_at = NOW()
+                WHERE id = ?
+            ");
+            $stmt->bind_param("sssssssi", $title, $desc, $duration, $filePath, $videoLink, $qualities, $subtitles, $moduleId);
+        } else {
+            $stmt = $con->prepare("
+                UPDATE {$siteprefix}training_video_modules 
+                SET title = ?, description = ?, duration = ?, video_link = ?, video_quality = ?, subtitles = ?, updated_at = NOW()
+                WHERE id = ?
+            ");
+            $stmt->bind_param("ssssssi", $title, $desc, $duration, $videoLink, $qualities, $subtitles, $moduleId);
+        }
+
+        $stmt->execute();
+        $stmt->close();
+    }
+}
+
+if (!empty($_POST['text_module_title_existing'])) {
+    foreach ($_POST['text_module_title_existing'] as $moduleId => $title) {
+        $desc       = $_POST['text_module_desc_existing'][$moduleId] ?? '';
+        $reading    = $_POST['text_reading_time_existing'][$moduleId] ?? '';
+        $filePath   = '';
+
+        if (!empty($_FILES['text_file_existing']['name'][$moduleId])) {
+            $tmpFileKey = 'single_text_upload';
+            $_FILES[$tmpFileKey] = [
+                'name'     => $_FILES['text_file_existing']['name'][$moduleId],
+                'type'     => $_FILES['text_file_existing']['type'][$moduleId],
+                'tmp_name' => $_FILES['text_file_existing']['tmp_name'][$moduleId],
+                'error'    => $_FILES['text_file_existing']['error'][$moduleId],
+                'size'     => $_FILES['text_file_existing']['size'][$moduleId]
+            ];
+
+            $fileName = handleFileUpload($tmpFileKey, $fileuploadDir);
+            if ($fileName && strpos($fileName, 'Failed') === false) {
+                $filePath = $fileuploadDir . $fileName;
+            }
+        }
+
+        if (!empty($filePath)) {
+            $stmt = $con->prepare("
+                UPDATE {$siteprefix}training_texts_modules
+                SET title=?, description=?, reading_time=?, file_path=?, updated_at=NOW()
+                WHERE id=?
+            ");
+            $stmt->bind_param("ssssi", $title, $desc, $reading, $filePath, $moduleId);
+        } else {
+            $stmt = $con->prepare("
+                UPDATE {$siteprefix}training_texts_modules
+                SET title=?, description=?, reading_time=?, updated_at=NOW()
+                WHERE id=?
+            ");
+            $stmt->bind_param("sssi", $title, $desc, $reading, $moduleId);
+        }
+        $stmt->execute();
+        $stmt->close();
+    }
+}
+
+
 // Handle image uploads
 if (empty($_FILES[$fileKey]['name'])) {
     // Use default images if no images are uploaded
@@ -643,6 +748,87 @@ elseif ($quiz_method === 'form' && !empty($_POST['questions'])) {
             "INSERT INTO {$siteprefix}training_quiz_questions (quiz_id, question, option_a, option_b, option_c, option_d, correct_answer)
              VALUES ('$quiz_id', '$q', '$a', '$b', '$c', '$d', '$correct')"
         );
+    }
+}
+
+if ($delivery_format === 'video') {
+    foreach ($_POST['video_module_title'] as $index => $title) {
+        $desc        = $_POST['video_module_desc'][$index] ?? '';
+        $duration    = $_POST['video_duration'][$index] ?? '';
+        $videoLink   = $_POST['video_link'][$index] ?? '';
+        $qualities   = isset($_POST['video_quality'][$index]) ? implode(',', $_POST['video_quality'][$index]) : '';
+        $subtitles   = $_POST['video_subtitles'][$index] ?? '';
+
+        // Prepare file path
+        $filePath = '';
+        if (!empty($_FILES['video_file']['name'][$index])) {
+            // Temporarily restructure the file array for this index
+            $tmpFileKey = 'single_video_upload';
+            $_FILES[$tmpFileKey] = [
+                'name'     => $_FILES['video_file']['name'][$index],
+                'type'     => $_FILES['video_file']['type'][$index],
+                'tmp_name' => $_FILES['video_file']['tmp_name'][$index],
+                'error'    => $_FILES['video_file']['error'][$index],
+                'size'     => $_FILES['video_file']['size'][$index]
+            ];
+
+            $fileName = handleFileUpload($tmpFileKey, $fileuploadDir); // using your function
+            if ($fileName && strpos($fileName, 'Failed') === false && strpos($fileName, 'error') === false) {
+                $filePath = $fileuploadDir . $fileName;
+            }
+        }
+
+        // Insert into DB
+        $stmt = $con->prepare("
+            INSERT INTO {$siteprefix}training_video_modules
+            (training_id, module_number, title, description, duration, file_path, video_link, video_quality, subtitles, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())
+        ");
+        $module_number = $index + 1;
+        $stmt->bind_param("sisssssss", $training_id, $module_number, $title, $desc, $duration, $filePath, $videoLink, $qualities, $subtitles);
+        $stmt->execute();
+        $stmt->close();
+    }
+}
+
+elseif ($delivery_format === 'text') {
+    // Loop through all text modules
+    foreach ($_POST['text_module_title'] as $index => $title) {
+        $desc         = $_POST['text_module_desc'][$index] ?? '';
+        $readingTime  = $_POST['text_reading_time'][$index] ?? '';
+
+        // Handle file upload for this index using your function
+        $filePath = '';
+        if (!empty($_FILES['text_file']['name'][$index])) {
+            // Create a temporary single-file array for this index
+            $tmpFileKey = 'single_text_upload';
+            $_FILES[$tmpFileKey] = [
+                'name'     => $_FILES['text_file']['name'][$index],
+                'type'     => $_FILES['text_file']['type'][$index],
+                'tmp_name' => $_FILES['text_file']['tmp_name'][$index],
+                'error'    => $_FILES['text_file']['error'][$index],
+                'size'     => $_FILES['text_file']['size'][$index]
+            ];
+
+            $fileName = handleFileUpload($tmpFileKey, $fileuploadDir);
+            if ($fileName && strpos($fileName, 'Failed') === false && strpos($fileName, 'error') === false) {
+                $filePath = $fileuploadDir . $fileName;
+            }
+        }
+
+        // Insert into text table
+        $stmt = $con->prepare("
+            INSERT INTO {$siteprefix}training_texts_modules
+            (training_id, module_number, title, description, reading_time, file_path, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())
+        ");
+        $module_number = $index + 1;
+        $stmt->bind_param("sissss", $training_id, $module_number, $title, $desc, $readingTime, $filePath);
+
+        if (!$stmt->execute()) {
+            echo "Error inserting text module {$module_number}: " . $stmt->error . "<br>";
+        }
+        $stmt->close();
     }
 }
 

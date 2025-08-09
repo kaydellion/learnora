@@ -20,6 +20,17 @@ function handleFileUpload($fileKey, $uploadDir, $fileName = null) {
     }
 }
 
+
+// === File Upload Helpers ===
+function handleSingleFileUpload($file, $uploadDir) {
+    $fileName = time() . '_' . basename($file['name']);
+    $targetPath = rtrim($uploadDir, '/') . '/' . $fileName;
+    if (move_uploaded_file($file['tmp_name'], $targetPath)) {
+        return $targetPath;
+    }
+    return '';
+}
+
 function renderForumCommentsModern($parent_id, $forum_id, $con, $siteprefix, $imagePath, $level = 0) {
     $parent_condition = ($parent_id === '0' || $parent_id === 0 || $parent_id === '' || $parent_id === null)
         ? "(parent_comment_id='' OR parent_comment_id='0')" 

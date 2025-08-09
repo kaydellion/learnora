@@ -57,10 +57,7 @@
               <label class="form-label">Description</label>
               <textarea class="form-control editor" name="description" ></textarea>
             </div>
-            <div class="mb-3">
-              <label class="form-label">Who Should Attend</label>
               <input type="hidden" class="form-control" name="who_should_attend" placeholder="E.g. Beginners, Entrepreneurs, etc.">
-            </div>
             <div class="mb-3">
               <label class="form-label">Event Dates & Times</label>
               <div id="dateTimeRepeater">

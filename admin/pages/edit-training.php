@@ -311,6 +311,99 @@ if (!$training_data_set) {
   </div>
 </div>
 
+<div id="textFields" style="display:none;">
+  <div id="textModulesExisting">
+<?php
+$textResult = $con->query("SELECT * FROM {$siteprefix}training_texts_modules WHERE training_id = '{$training_id}' ORDER BY module_number ASC");
+while ($row = $textResult->fetch_assoc()):
+?>
+  <div class="text-module mb-3 border p-3" data-module-id="<?php echo $row['id']; ?>">
+    <div class="d-flex justify-content-between align-items-center">
+      <h5>Module <span class="module-number"><?php echo $row['module_number']; ?></span></h5>
+      <button type="button" class="btn btn-sm btn-danger delete-text-module" data-module-id="<?php echo $row['id']; ?>">
+        Delete Module
+      </button>
+    </div>
+
+    <label>Lesson / Module Title:</label>
+    <input type="text" class="form-control" name="text_module_title_existing[<?php echo $row['id']; ?>]" value="<?php echo htmlspecialchars($row['title']); ?>">
+
+    <label>Description/Notes:</label>
+    <textarea class="form-control editor" name="text_module_desc_existing[<?php echo $row['id']; ?>]"><?php echo htmlspecialchars($row['description']); ?></textarea>
+
+    <label>Estimated Reading Time:</label>
+    <input type="text" class="form-control" name="text_reading_time_existing[<?php echo $row['id']; ?>]" value="<?php echo htmlspecialchars($row['reading_time']); ?>">
+
+    <?php if (!empty($row['file_path'])): ?>
+      <ul class="list-group mt-2">
+        <li class="list-group-item d-flex justify-content-between align-items-center" id="textlesson_<?php echo $row['id']; ?>">
+          📄 <a href="<?php echo $admindocumentPath . $row['file_path']; ?>" target="_blank">View Uploaded File</a>
+        </li>
+      </ul>
+    <?php endif; ?>
+
+    <label>Upload Text Content (PDF/Text):</label>
+    <input type="file" name="text_file_existing[<?php echo $row['id']; ?>]" class="form-control" accept=".pdf,.txt">
+  </div>
+<?php endwhile; ?>
+</div>
+</div>
+
+
+<div id="videoFields" style="display:none;">
+<div id="videoModules">
+<?php while ($row = $result->fetch_assoc()): ?>
+  <div class="video-module mb-3 border p-3" data-module-id="<?php echo $row['id']; ?>">
+    <div class="d-flex justify-content-between align-items-center">
+      <h5>Module <span class="module-number"><?php echo $row['module_number']; ?></span></h5>
+      <!-- New delete module button -->
+      <button type="button" class="btn btn-sm btn-danger delete-video-module" data-module-id="<?php echo $row['id']; ?>">
+        Delete Module
+      </button>
+    </div>
+
+    <label>Lesson / Module Title:</label>
+    <input type="text" class="form-control" name="video_module_title_existing[<?php echo $row['id']; ?>]" value="<?php echo htmlspecialchars($row['title']); ?>">
+
+    <label>Description/Notes:</label>
+    <textarea class="form-control editor" name="video_module_desc_existing[<?php echo $row['id']; ?>]"><?php echo htmlspecialchars($row['description']); ?></textarea>
+
+    <label>Total Duration:</label>
+    <input type="text" class="form-control" name="video_duration_existing[<?php echo $row['id']; ?>]" value="<?php echo htmlspecialchars($row['duration']); ?>">
+
+    <?php if (!empty($row['file_path'])): ?>
+      <ul class="list-group mt-2">
+        <li class="list-group-item d-flex justify-content-between align-items-center" id="lesson_<?php echo $row['id']; ?>">
+          📁 <a href="<?php echo $admindocumentPath . $row['file_path']; ?>" target="_blank">View Uploaded Video</a>
+        
+        </li>
+      </ul>
+    <?php elseif (!empty($row['video_link'])): ?>
+      <ul class="list-group mt-2">
+        <li class="list-group-item d-flex justify-content-between align-items-center" id="lesson_<?php echo $row['id']; ?>">
+          🔗 <a href="<?php echo $row['video_link']; ?>" target="_blank">View Embedded URL</a>
+         
+        </li>
+      </ul>
+    <?php endif; ?>
+
+    <label>Upload/Link Video Files:</label>
+    <input type="file" name="video_file_existing[<?php echo $row['id']; ?>]" class="form-control mb-2" accept="video/*">
+    <input type="url" class="form-control mt-2" placeholder="Or paste link" name="video_link_existing[<?php echo $row['id']; ?>]" value="<?php echo htmlspecialchars($row['video_link']); ?>">
+
+    <!-- Quality checkboxes -->
+    <?php
+    $qualities = explode(',', $row['video_quality']);
+    ?>
+    <label>Video Quality</label><br>
+    <label><input type="checkbox" name="video_quality_existing[<?php echo $row['id']; ?>][]" value="720p" <?php echo in_array('720p', $qualities) ? 'checked' : ''; ?>> 720p</label>
+    <label><input type="checkbox" name="video_quality_existing[<?php echo $row['id']; ?>][]" value="1080p" <?php echo in_array('1080p', $qualities) ? 'checked' : ''; ?>> 1080p</label>
+    <label><input type="checkbox" name="video_quality_existing[<?php echo $row['id']; ?>][]" value="4K" <?php echo in_array('4K', $qualities) ? 'checked' : ''; ?>> 4K</label>
+  </div>
+<?php endwhile; ?>
+</div>
+</div>
+
       <?php
 $lessonQuery = mysqli_query($con, "SELECT * FROM {$siteprefix}training_video_lessons WHERE training_id = '$training_id'");
 $embedValue = ''; // to store the embed url for pre-filling

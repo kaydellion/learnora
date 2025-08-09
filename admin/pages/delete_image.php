@@ -82,6 +82,36 @@ if (isset($_GET['action']) && $_GET['action'] === 'deletevideotrailer' && isset(
     echo "error: invalid request";
 }
 
+if (isset($_GET['action']) && $_GET['action'] === 'deletevideomodule' && !empty($_GET['module_id'])) {
+    $moduleId = intval($_GET['module_id']);
+
+    $stmt = $con->prepare("DELETE FROM {$siteprefix}training_video_modules WHERE id = ?");
+    $stmt->bind_param("i", $moduleId);
+
+    if ($stmt->execute()) {
+        echo "success";
+    } else {
+        echo "Failed to delete module.";
+    }
+
+    $stmt->close();
+} else {
+    echo "Invalid request.";
+}
+
+
+if ($_GET['action'] === 'deletetextmodule' && !empty($_GET['module_id'])) {
+    $id = intval($_GET['module_id']);
+    $stmt = $con->prepare("DELETE FROM {$siteprefix}training_texts_modules WHERE id=?");
+    $stmt->bind_param("i", $id);
+    if ($stmt->execute()) {
+        echo "success";
+    } else {
+        echo "error";
+    }
+    $stmt->close();
+    exit;
+}
 
 
 // Check if the correct action is provided
