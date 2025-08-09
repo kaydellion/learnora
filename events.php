@@ -235,7 +235,7 @@ $stmt->close();
 			
 			
                 
-<div class="col-12">
+<div class="col-12 mb-3 mt-2">
   <div class="table-requirements">
 
     <!-- Visa Requirement Section -->
