@@ -2278,12 +2278,12 @@ document.getElementById('addTicketBtn').addEventListener('click', function () {
 function addVideoModule() {
   const container = document.getElementById('videoModules');
   const firstModule = container.querySelector('.video-module');
-  const newModule = firstModule.cloneNode(true);
+  const newModule = firstModule.cloneNode(true); // deep clone
 
   const moduleCount = container.querySelectorAll('.video-module').length + 1;
   newModule.querySelector('.module-number').textContent = moduleCount;
 
-  // Reset all fields
+  // Reset fields
   newModule.querySelectorAll('input, textarea').forEach(el => {
     if (el.type === 'checkbox' || el.type === 'radio') {
       el.checked = false;
@@ -2292,38 +2292,34 @@ function addVideoModule() {
     }
   });
 
-  // Get textarea and give it a unique ID
-  const textarea = newModule.querySelector('.editor');
-  const newId = 'video_editor_' + moduleCount;
-  textarea.id = newId;
+  // Update checkbox name attributes
+  newModule.querySelectorAll('input[type="checkbox"]').forEach(el => {
+    if (el.name.startsWith('video_quality')) {
+      el.name = `video_quality[${moduleCount - 1}][]`;
+    }
+    if (el.name.startsWith('video_subtitles')) {
+      el.name = `video_subtitles[${moduleCount - 1}]`;
+    }
+  });
+
+  // Give each textarea.editor a unique ID
+  newModule.querySelectorAll('.editor').forEach((textarea, index) => {
+    textarea.id = `video_editor_${moduleCount}_${index}`;
+  });
 
   container.appendChild(newModule);
-
-  // Init TinyMCE for the new textarea only
-  tinymce.init({
-    selector: `#${newId}`,
-   toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
-    tinycomments_mode: 'embedded',
-    tinycomments_author: 'Author name',
-    mergetags_list: [
-      { value: 'First.Name', title: 'First Name' },
-      { value: 'Email', title: 'Email' },
-    ],
-    ai_request: (request, respondWith) =>
-      respondWith.string(() =>
-        Promise.reject('See docs to implement AI Assistant')
-      ),
-  });
+  reinitTinyMCE();
 }
 
 function addTextModule() {
   const container = document.getElementById('textModules');
   const firstModule = container.querySelector('.text-module');
-  const newModule = firstModule.cloneNode(true);
+  const newModule = firstModule.cloneNode(true); // deep clone
 
   const moduleCount = container.querySelectorAll('.text-module').length + 1;
   newModule.querySelector('.module-number').textContent = moduleCount;
 
+  // Reset fields
   newModule.querySelectorAll('input, textarea').forEach(el => {
     if (el.type === 'checkbox' || el.type === 'radio') {
       el.checked = false;
@@ -2332,33 +2328,31 @@ function addTextModule() {
     }
   });
 
-  // Get textarea and give it a unique ID
-  const textarea = newModule.querySelector('.editor');
-  const newId = 'text_editor_' + moduleCount;
-  textarea.id = newId;
+  // Give each textarea.editor a unique ID
+  newModule.querySelectorAll('.editor').forEach((textarea, index) => {
+    textarea.id = `text_editor_${moduleCount}_${index}`;
+  });
 
   container.appendChild(newModule);
+  reinitTinyMCE();
+}
 
-  // Init TinyMCE for the new textarea only
+function reinitTinyMCE() {
+  // Destroy all editors before reinitializing
+  tinymce.remove('.editor');
+
   tinymce.init({
-    selector: `#${newId}`,
-   toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
+    selector: '.editor',
+    toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
     tinycomments_mode: 'embedded',
     tinycomments_author: 'Author name',
     mergetags_list: [
       { value: 'First.Name', title: 'First Name' },
       { value: 'Email', title: 'Email' },
     ],
-    ai_request: (request, respondWith) =>
-      respondWith.string(() =>
-        Promise.reject('See docs to implement AI Assistant')
-      ),
+    ai_request: (request, respondWith) => respondWith.string(() => Promise.reject('See docs to implement AI Assistant')),
   });
 }
-
-
-
-
 
 function previewProfilePicture(event) {
   var reader = new FileReader();
