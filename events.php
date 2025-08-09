@@ -175,19 +175,58 @@ $user_review = $existing_review_result->fetch_assoc();
             </div>
           
 
-            <div class="product-gallery mb-3">
-            
-              <!-- Main Image -->
-              <div class="main-image-wrapper">
-                <div class="image-zoom-container">
-                  <a href="<?php echo $siteurl.$image_paths; ?>" class="glightbox" data-gallery="product-gallery">
-                    <img src="<?php echo $siteurl.$image_paths; ?>" alt="Product Image" class="img-fluid main-image drift-zoom" id="main-product-image" data-zoom="<?php echo $siteurl.$image_paths; ?>">
-                    <div class="zoom-overlay">
-                      <i class="bi bi-zoom-in"></i>
+            <?php
+// Fetch images for this training
+$images = [];
+$sql = "SELECT picture FROM {$siteprefix}training_images WHERE training_id = ?";
+$stmt = $con->prepare($sql);
+$stmt->bind_param("s", $id);
+$stmt->execute();
+$result = $stmt->get_result();
+while ($row = $result->fetch_assoc()) {
+    $images[] = $row['picture']; // store paths
+}
+$stmt->close();
+?>
+
+<div class="product-gallery mb-3">
+    <!-- Vertical Thumbnails -->
+    <div class="thumbnails-vertical">
+        <div class="thumbnails-container">
+            <?php if (!empty($images)): ?>
+                <?php foreach ($images as $index => $img): ?>
+                    <div class="thumbnail-item <?= $index === 0 ? 'active' : '' ?>" data-image="<?= htmlspecialchars($img) ?>">
+                        <img src="<?= htmlspecialchars($img) ?>" alt="Product Thumbnail" class="img-fluid">
                     </div>
-                  </a>
-                </div>
-              </div>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <p>No images available.</p>
+            <?php endif; ?>
+        </div>
+    </div>
+
+    <!-- Main Image -->
+    <div class="main-image-wrapper">
+        <div class="image-zoom-container">
+            <?php if (!empty($images)): ?>
+                <a href="<?= htmlspecialchars($images[0]) ?>" class="glightbox" data-gallery="product-gallery">
+                    <img src="<?= htmlspecialchars($images[0]) ?>" alt="Product Image" class="img-fluid main-image drift-zoom" id="main-product-image" data-zoom="<?= htmlspecialchars($images[0]) ?>">
+                    <div class="zoom-overlay">
+                        <i class="bi bi-zoom-in"></i>
+                    </div>
+                </a>
+            <?php endif; ?>
+        </div>
+        <div class="image-nav">
+            <button class="image-nav-btn prev-image">
+                <i class="bi bi-chevron-left"></i>
+            </button>
+            <button class="image-nav-btn next-image">
+                <i class="bi bi-chevron-right"></i>
+            </button>
+        </div>
+    </div>
+</div>
 			  </div>
 			   </div>
             </div>
