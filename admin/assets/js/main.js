@@ -2281,11 +2281,18 @@ function addVideoModule() {
   const firstModule = container.querySelector('.video-module');
   const newModule = firstModule.cloneNode(true); // deep clone
 
-  const moduleCount = container.querySelectorAll('.video-module').length + 1;
-  newModule.querySelector('.module-number').textContent = moduleCount;
+  // Remove TinyMCE DOM wrappers from the clone
+  newModule.querySelectorAll('.tox-tinymce').forEach(el => el.remove());
 
-  // Reset all fields
-  newModule.querySelectorAll('input, textarea').forEach(el => {
+  // Ensure clean textareas for re-init
+  newModule.querySelectorAll('textarea').forEach(el => {
+    el.classList.add('editor');
+    el.removeAttribute('id'); // prevent duplicate TinyMCE IDs
+    el.value = '';
+  });
+
+  // Reset all inputs
+  newModule.querySelectorAll('input').forEach(el => {
     if (el.type === 'checkbox' || el.type === 'radio') {
       el.checked = false;
     } else {
@@ -2293,8 +2300,12 @@ function addVideoModule() {
     }
   });
 
+  // Update module number
+  const moduleCount = container.querySelectorAll('.video-module').length + 1;
+  newModule.querySelector('.module-number').textContent = moduleCount;
+
   container.appendChild(newModule);
- 
+  reinitTinyMCE();
 }
 
 function addTextModule() {
@@ -2302,10 +2313,18 @@ function addTextModule() {
   const firstModule = container.querySelector('.text-module');
   const newModule = firstModule.cloneNode(true); // deep clone
 
-  const moduleCount = container.querySelectorAll('.text-module').length + 1;
-  newModule.querySelector('.module-number').textContent = moduleCount;
+  // Remove TinyMCE DOM wrappers from the clone
+  newModule.querySelectorAll('.tox-tinymce').forEach(el => el.remove());
 
-  newModule.querySelectorAll('input, textarea').forEach(el => {
+  // Ensure clean textareas for re-init
+  newModule.querySelectorAll('textarea').forEach(el => {
+    el.classList.add('editor');
+    el.removeAttribute('id'); // prevent duplicate TinyMCE IDs
+    el.value = '';
+  });
+
+  // Reset all inputs
+  newModule.querySelectorAll('input').forEach(el => {
     if (el.type === 'checkbox' || el.type === 'radio') {
       el.checked = false;
     } else {
@@ -2313,14 +2332,16 @@ function addTextModule() {
     }
   });
 
+  // Update module number
+  const moduleCount = container.querySelectorAll('.text-module').length + 1;
+  newModule.querySelector('.module-number').textContent = moduleCount;
+
   container.appendChild(newModule);
- 
+  reinitTinyMCE();
 }
 
 function reinitTinyMCE() {
-  // Destroy all editors
-  tinymce.remove('.editor');
-  // Reinitialize
+  tinymce.remove('.editor'); // destroy all editors
   tinymce.init({
     selector: '.editor',
     toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
@@ -2330,9 +2351,13 @@ function reinitTinyMCE() {
       { value: 'First.Name', title: 'First Name' },
       { value: 'Email', title: 'Email' },
     ],
-    ai_request: (request, respondWith) => respondWith.string(() => Promise.reject('See docs to implement AI Assistant')),
+    ai_request: (request, respondWith) =>
+      respondWith.string(() =>
+        Promise.reject('See docs to implement AI Assistant')
+      ),
   });
 }
+
 
 
 function previewProfilePicture(event) {

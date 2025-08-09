@@ -774,7 +774,7 @@ if ($delivery_format === 'video') {
 
             $fileName = handleFileUpload($tmpFileKey, $fileuploadDir); // using your function
             if ($fileName && strpos($fileName, 'Failed') === false && strpos($fileName, 'error') === false) {
-                $filePath = $fileuploadDir . $fileName;
+                $filePath =  $fileName;
             }
         }
 
@@ -812,7 +812,7 @@ elseif ($delivery_format === 'text') {
 
             $fileName = handleFileUpload($tmpFileKey, $fileuploadDir);
             if ($fileName && strpos($fileName, 'Failed') === false && strpos($fileName, 'error') === false) {
-                $filePath = $fileuploadDir . $fileName;
+                $filePath = $fileName;
             }
         }
 
