@@ -2278,13 +2278,10 @@ document.getElementById('addTicketBtn').addEventListener('click', function () {
 function addVideoModule() {
   const container = document.getElementById('videoModules');
   const firstModule = container.querySelector('.video-module');
-  const newModule = firstModule.cloneNode(true);
+  const newModule = firstModule.cloneNode(true); // deep clone
 
   const moduleCount = container.querySelectorAll('.video-module').length + 1;
   newModule.querySelector('.module-number').textContent = moduleCount;
-
-  // Clean cloned TinyMCE
-  newModule.querySelectorAll('.tox').forEach(el => el.remove());
 
   // Reset fields
   newModule.querySelectorAll('input, textarea').forEach(el => {
@@ -2293,16 +2290,66 @@ function addVideoModule() {
     } else {
       el.value = '';
     }
+  });
 
-    if (el.classList.contains('editor')) {
-      el.removeAttribute('aria-hidden');
-      el.style.display = '';
-      el.id = `video_editor_${moduleCount}`;
+  // Update checkbox names
+  newModule.querySelectorAll('input[type="checkbox"]').forEach(el => {
+    if (el.name.startsWith('video_quality')) {
+      el.name = `video_quality[${moduleCount - 1}][]`;
+    }
+    if (el.name.startsWith('video_subtitles')) {
+      el.name = `video_subtitles[${moduleCount - 1}]`;
     }
   });
 
+  // Give textareas unique IDs for TinyMCE
+  newModule.querySelectorAll('.editor').forEach((textarea, index) => {
+    textarea.id = `video_editor_${moduleCount}_${index}`;
+  });
+
+  // Add remove button
+  const removeBtn = document.createElement('button');
+  removeBtn.type = 'button';
+  removeBtn.className = 'btn btn-danger btn-sm mt-2';
+  removeBtn.textContent = 'Remove Module';
+  removeBtn.onclick = function () {
+    // Remove TinyMCE editors in this module
+    newModule.querySelectorAll('.editor').forEach(ed => {
+      if (tinymce.get(ed.id)) {
+        tinymce.remove(`#${ed.id}`);
+      }
+    });
+    newModule.remove();
+    renumberVideoModules();
+  };
+  newModule.appendChild(removeBtn);
+
   container.appendChild(newModule);
-  initTinyMCE(`#video_editor_${moduleCount}`);
+  reinitTinyMCE();
+}
+
+function renumberVideoModules() {
+  const modules = document.querySelectorAll('#videoModules .video-module');
+  modules.forEach((mod, i) => {
+    mod.querySelector('.module-number').textContent = i + 1;
+
+    // Update checkbox names after removal
+    mod.querySelectorAll('input[type="checkbox"]').forEach(el => {
+      if (el.name.startsWith('video_quality')) {
+        el.name = `video_quality[${i}][]`;
+      }
+      if (el.name.startsWith('video_subtitles')) {
+        el.name = `video_subtitles[${i}]`;
+      }
+    });
+
+    // Update TinyMCE textarea IDs
+    mod.querySelectorAll('.editor').forEach((textarea, index) => {
+      textarea.id = `video_editor_${i + 1}_${index}`;
+    });
+  });
+
+  reinitTinyMCE();
 }
 
 function addTextModule() {
@@ -2313,37 +2360,60 @@ function addTextModule() {
   const moduleCount = container.querySelectorAll('.text-module').length + 1;
   newModule.querySelector('.module-number').textContent = moduleCount;
 
-  // Clean cloned TinyMCE
-  newModule.querySelectorAll('.tox').forEach(el => el.remove());
-
-  // Reset fields
   newModule.querySelectorAll('input, textarea').forEach(el => {
     if (el.type === 'checkbox' || el.type === 'radio') {
       el.checked = false;
     } else {
       el.value = '';
     }
-
-    if (el.classList.contains('editor')) {
-      el.removeAttribute('aria-hidden');
-      el.style.display = '';
-      el.id = `text_editor_${moduleCount}`;
-    }
   });
 
+  newModule.querySelectorAll('.editor').forEach((textarea, index) => {
+    textarea.id = `text_editor_${moduleCount}_${index}`;
+  });
+
+  // Add remove button for text module
+  const removeBtn = document.createElement('button');
+  removeBtn.type = 'button';
+  removeBtn.className = 'btn btn-danger btn-sm mt-2';
+  removeBtn.textContent = 'Remove Module';
+  removeBtn.onclick = function () {
+    newModule.querySelectorAll('.editor').forEach(ed => {
+      if (tinymce.get(ed.id)) {
+        tinymce.remove(`#${ed.id}`);
+      }
+    });
+    newModule.remove();
+    renumberTextModules();
+  };
+  newModule.appendChild(removeBtn);
+
   container.appendChild(newModule);
-  initTinyMCE(`#text_editor_${moduleCount}`);
+  reinitTinyMCE();
 }
 
-function initTinyMCE(selector) {
+function renumberTextModules() {
+  const modules = document.querySelectorAll('#textModules .text-module');
+  modules.forEach((mod, i) => {
+    mod.querySelector('.module-number').textContent = i + 1;
+    mod.querySelectorAll('.editor').forEach((textarea, index) => {
+      textarea.id = `text_editor_${i + 1}_${index}`;
+    });
+  });
+
+  reinitTinyMCE();
+}
+
+function reinitTinyMCE() {
+  tinymce.remove('.editor');
   tinymce.init({
-    selector: selector,
+    selector: '.editor',
     toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
     tinycomments_mode: 'embedded',
     tinycomments_author: 'Author name',
     mergetags_list: [
       { value: 'First.Name', title: 'First Name' },
-      { value: 'Email', title: 'Email' }
+      { value: 'Email', title: 'Email' },
     ],
     ai_request: (request, respondWith) => respondWith.string(() => Promise.reject('See docs to implement AI Assistant')),
   });
