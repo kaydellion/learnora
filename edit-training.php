@@ -2,7 +2,11 @@
 
 <?php
 include "header.php";
-
+ checkActiveLog($active_log);
+ if ($trainer != 1) {
+  header("Location: index.php");
+  exit;
+}
 if (isset($_GET['training'])) {
     $training_id = $_GET['training'];
 }
@@ -412,7 +416,7 @@ $selected_subcategories = explode(',', $subcategory_id);
  <?php
     // Fetch instructors from the database
     $instructors = [];
-    $instructorQuery = mysqli_query($con, "SELECT s, name, photo FROM {$siteprefix}instructors WHERE user = '$user_id' ORDER BY name ASC");
+    $instructorQuery = mysqli_query($con, "SELECT s, name, photo FROM {$siteprefix}instructors WHERE user='$user_id'");
     while ($row = mysqli_fetch_assoc($instructorQuery)) {
         $instructors[] = $row;
     }
