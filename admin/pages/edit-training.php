@@ -668,7 +668,7 @@ while ($row = mysqli_fetch_assoc($eventTypeQuery)) {
   <?php foreach ($instructors as $inst): ?>
     <option value="<?php echo htmlspecialchars($inst['s']); ?>"
       data-name="<?php echo htmlspecialchars($inst['name']); ?>"
-      data-photo="<?php echo $adminimagePath.$inst['photo']; ?>"
+      data-photo="<?php echo $siteurl.$inst['photo']; ?>"
       <?php echo ($selected_instructor_id === $inst['s']) ? 'selected' : ''; ?>>
       <?php echo htmlspecialchars($inst['name']); ?>
     </option>
