@@ -242,6 +242,8 @@ if (!$training_data_set) {
     <option value="physical" <?= $format == 'physical' ? 'selected' : '' ?>>Physical (In-person)</option>
     <option value="online" <?= $format == 'online' ? 'selected' : '' ?>>Online (Webinar/Virtual)</option>
     <option value="hybrid" <?= $format == 'hybrid' ? 'selected' : '' ?>>Hybrid (Physical & Online)</option>
+    <option value="video" <?= $format == 'video' ? 'selected' : '' ?>>Video</option>
+    <option value="text" <?= $format == 'text' ? 'selected' : '' ?>>Text</option>
   </select>
 </div>
 
