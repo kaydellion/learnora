@@ -98,7 +98,7 @@ foreach ($fields as $col => $label) {
                 }
 
                 echo "<h5>Video Lessons</h5>";
-                $lessons = mysqli_query($con, "SELECT file_path, video_url FROM {$siteprefix}training_Video_Lessons WHERE training_id = '$id'");
+                $lessons = mysqli_query($con, "SELECT file_path, video_url FROM {$siteprefix}training_video_lessons WHERE training_id = '$id'");
                 while ($l = mysqli_fetch_assoc($lessons)) {
                     $filePath = htmlspecialchars($l['file_path']);
                     $videoUrl = htmlspecialchars($l['video_url']);
