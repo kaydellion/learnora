@@ -51,7 +51,7 @@
                         </div>
             <div class="mb-3">
               <label class="form-label">Cover Image</label>
-              <input type="file" class="form-control" name="cover_images" accept="image/*"  required>
+          <input type="file" class="form-control" id="imageInput" name="images[]" multiple accept="image/*">
             </div>
             <div class="mb-3">
               <label class="form-label">Description</label>
@@ -99,14 +99,16 @@
               </select>
             </div>
 
-            <h6>Delivery Format</h6>
             <div class="mb-3">
+                          <label>Delivery Format </label>
               <select class="form-control" name="delivery_format" id="deliveryFormat" onchange="toggleDeliveryFields()" required>
                 <option value="">Select Format</option>
                 <option value="physical">Physical (In-person)</option>
                 <option value="online">Online (Webinar/Virtual)</option>
                 <option value="hybrid">Hybrid (Physical & Online)</option>
-              
+                   <option value="video">Video</option>
+                <option value="text">Text</option>
+                
               </select>
             </div> 
             <!-- Physical Address Fields -->
@@ -119,9 +121,15 @@
               </select>
               <div id="nigeriaPhysicalFields" style="display:none;">
                 <label class="form-label mt-2">Nigerian Address</label>
-                <input type="text" class="form-control mb-2" name="nigeria_address">
-                <input type="text" class="form-control mb-2" name="state" placeholder="State">
-                <input type="text" class="form-control mb-2" name="lga" placeholder="LGA">
+                <select id="state" name="state" class="form-control" >
+              <option value="">-Select State-</option>
+            </select>
+                <select class="form-control" id="lga"  name="lga">
+            <option value="">-Select LGA-</option>
+          </select>
+                <input type="text" class="form-control mb-2" name="nigeria_address" placeholder="Address">
+               
+  
                 <input type="text" class="form-control mb-2" name="country" value="Nigeria" readonly>
               </div>
               <div id="foreignPhysicalFields" style="display:none;">
@@ -147,14 +155,82 @@
                 <option value="foreign">Foreign</option>
               </select>
               <div id="nigeriaHybridFields" style="display:none;">
-                <input type="text" class="form-control mb-2" name="hybrid_state" placeholder="State">
-                <input type="text" class="form-control mb-2" name="hybrid_lga" placeholder="LGA">
+                    <select id="hybrid_state"  name="hybrid_state" class="form-control">
+              <option value="">-Select State-</option>
+            </select>
+                <select class="form-control" id="hybrid_lga" name="hybrid_lga">
+            <option value="">-Select LGA-</option>
+          </select>
                 <input type="text" class="form-control mb-2" name="hybrid_country" value="Nigeria" readonly>
               </div>
               <div id="foreignHybridFields" style="display:none;">
                 <input type="text" class="form-control mb-2" name="hybrid_foreign_address" placeholder="Foreign Address">
               </div>
             </div>
+
+            <!-- Video Fields -->
+<div id="videoFields" style="display:none;">
+  <label>Total Number of Videos:</label>
+  <input type="number" class="form-control" name="total_videos" min="1">
+
+  <div id="videoModules">
+    <!-- Template -->
+    <div class="video-module mb-3">
+      <h5>Module <span class="module-number">1</span></h5>
+      <label>Lesson / Module Title:</label>
+      <input type="text" class="form-control" name="video_module_title[]">
+
+      <label>Description/Notes:</label>
+      <textarea class="form-control editor" name="video_module_desc[]"></textarea>
+
+      <label>Total Duration:</label>
+      <input type="text" class="form-control" name="video_duration[]">
+
+      <label>Upload/Link Video Files:</label>
+      <input type="file" name="video_file[]" class="form-control mb-2" accept="video/*">
+      <input type="url" class="form-control mt-2" placeholder="Or paste link" name="video_link[]">
+
+      <label>Video Quality</label><br>
+      <label><input type="checkbox" name="video_quality[0][]" value="720p"> 720p</label>
+      <label><input type="checkbox" name="video_quality[0][]" value="1080p"> 1080p</label>
+      <label><input type="checkbox" name="video_quality[0][]" value="4K"> 4K</label>
+
+      <br>
+      <label>Include Subtitles?</label><br>
+      <label><input type="checkbox" name="video_subtitles[0]" value="Yes"> Yes</label>
+      <label><input type="checkbox" name="video_subtitles[0]" value="No"> No</label>
+    </div>
+  </div>
+
+  <button type="button" class="btn btn-secondary mt-3" onclick="addVideoModule()">ADD MORE</button>
+</div>
+
+<!-- Text Fields -->
+<div id="textFields" style="display:none;">
+  <label>Number of Lessons/Modules:</label>
+  <input type="number" class="form-control" name="total_lessons" min="1">
+
+  <div id="textModules">
+    <!-- Template -->
+    <div class="text-module mb-3">
+      <h5>Module <span class="module-number">1</span></h5>
+      <label>Lesson / Module Title:</label>
+      <input type="text" class="form-control" name="text_module_title[]">
+
+      <label>Description/Notes:</label>
+      <textarea class="form-control editor" name="text_module_desc[]"></textarea>
+
+      <label>Estimated Reading Time:</label>
+      <input type="text" class="form-control" name="text_reading_time[]">
+
+      <label>Upload Text Content (PDF/Text):</label>
+      <input type="file" name="text_file[]">
+    </div>
+  </div>
+
+  <button type="button" class="btn btn-secondary mt-3" onclick="addTextModule()">ADD MORE</button>
+</div>
+
 
             <h6>Course Content Details</h6>
             <div class="mb-3">

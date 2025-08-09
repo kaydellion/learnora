@@ -363,6 +363,49 @@ while ($row = mysqli_fetch_assoc($eventTypeQuery)) {
             
               <input type="hidden" class="form-control" name="who_should_attend" placeholder="E.g. Beginners, Entrepreneurs, etc." value="<?php echo $attendee; ?>">
             
+ <?php
+    // Fetch instructors from the database
+    $instructors = [];
+    $instructorQuery = mysqli_query($con, "SELECT s, name, photo FROM {$siteprefix}instructors");
+    while ($row = mysqli_fetch_assoc($instructorQuery)) {
+        $instructors[] = $row;
+    }
+    ?>
+            <h6>Instructor Information</h6>
+    <div class="mb-3">
+      <label class="form-label">Select Instructor</label>
+
+           <select class="form-control" name="instructor"id="instructorSelect" onchange="displayInstructorInfo()" required>
+  <option value="">-- Select Instructor --</option>
+  <?php foreach ($instructors as $inst): ?>
+    <option value="<?php echo htmlspecialchars($inst['s']); ?>"
+      data-name="<?php echo htmlspecialchars($inst['name']); ?>"
+      data-photo="<?php echo $siteurl . 'uploads/' .$inst['photo']; ?>"
+      <?php echo ($selected_instructor_id === $inst['s']) ? 'selected' : ''; ?>>
+      <?php echo htmlspecialchars($inst['name']); ?>
+    </option>
+  <?php endforeach; ?>
+  <option value="add_new">+ Add New Instructor</option>
+</select>
+  </div>
+         
+<!-- Display selected instructor info -->
+<div class="mb-3" id="instructorInfo" style="display:none;">
+  <img id="instructorPhoto" src="" alt="Instructor Photo" style="width:50px;height:50px;border-radius:50%;object-fit:cover;">
+  <span id="instructorName" style="margin-left:10px;font-weight:bold;"></span>
+</div>
+<!-- Add New Instructor Fields (hidden by default) -->
+<div class="mb-3" id="addInstructorFields" style="display:none;">
+  <label class="form-label">Instructor Name</label>
+  <input type="text" class="form-control mb-2" name="new_instructor_name" placeholder="Enter instructor name">
+ <!---  <label class="form-label">Instructor Email</label> --->
+  <input type="hidden" class="form-control mb-2" name="new_instructor_email" placeholder="Enter instructor email">
+  <label class="form-label">Instructor Bio</label>
+  <textarea class="form-control mb-2 editor" name="new_instructor_bio" placeholder="Enter instructor bio"></textarea>
+  <label class="form-label">Instructor Photo</label>
+  <input type="file" class="form-control" name="new_instructor_photo" accept="image/*">
+      <input type="hidden" name="user_id" value="<?php echo $user_id; ?>">
+</div>
            
              <h6>Delivery Format</h6>
 <div class="mb-3">
@@ -671,49 +714,6 @@ if ($textQuery && mysqli_num_rows($textQuery) > 0): ?>
             </div>
        
 
- <?php
-    // Fetch instructors from the database
-    $instructors = [];
-    $instructorQuery = mysqli_query($con, "SELECT s, name, photo FROM {$siteprefix}instructors");
-    while ($row = mysqli_fetch_assoc($instructorQuery)) {
-        $instructors[] = $row;
-    }
-    ?>
-            <h6>Instructor Information</h6>
-    <div class="mb-3">
-      <label class="form-label">Select Instructor</label>
-
-           <select class="form-control" name="instructor"id="instructorSelect" onchange="displayInstructorInfo()" required>
-  <option value="">-- Select Instructor --</option>
-  <?php foreach ($instructors as $inst): ?>
-    <option value="<?php echo htmlspecialchars($inst['s']); ?>"
-      data-name="<?php echo htmlspecialchars($inst['name']); ?>"
-      data-photo="<?php echo $siteurl . 'uploads/' .$inst['photo']; ?>"
-      <?php echo ($selected_instructor_id === $inst['s']) ? 'selected' : ''; ?>>
-      <?php echo htmlspecialchars($inst['name']); ?>
-    </option>
-  <?php endforeach; ?>
-  <option value="add_new">+ Add New Instructor</option>
-</select>
-  </div>
-         
-<!-- Display selected instructor info -->
-<div class="mb-3" id="instructorInfo" style="display:none;">
-  <img id="instructorPhoto" src="" alt="Instructor Photo" style="width:50px;height:50px;border-radius:50%;object-fit:cover;">
-  <span id="instructorName" style="margin-left:10px;font-weight:bold;"></span>
-</div>
-<!-- Add New Instructor Fields (hidden by default) -->
-<div class="mb-3" id="addInstructorFields" style="display:none;">
-  <label class="form-label">Instructor Name</label>
-  <input type="text" class="form-control mb-2" name="new_instructor_name" placeholder="Enter instructor name">
- <!---  <label class="form-label">Instructor Email</label> --->
-  <input type="hidden" class="form-control mb-2" name="new_instructor_email" placeholder="Enter instructor email">
-  <label class="form-label">Instructor Bio</label>
-  <textarea class="form-control mb-2 editor" name="new_instructor_bio" placeholder="Enter instructor bio"></textarea>
-  <label class="form-label">Instructor Photo</label>
-  <input type="file" class="form-control" name="new_instructor_photo" accept="image/*">
-      <input type="hidden" name="user_id" value="<?php echo $user_id; ?>">
-</div>
 
 <div class="mb-3">
   <label class="form-label">Additional Instructions or Notes</label>

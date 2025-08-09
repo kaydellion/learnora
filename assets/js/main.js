@@ -2140,15 +2140,151 @@ function displayInstructorInfo() {
 
 function toggleDeliveryFields() {
   const format = document.getElementById('deliveryFormat').value;
-  document.getElementById('physicalFields').style.display = (format === 'physical') ? 'block' : 'none';
-  document.getElementById('onlineFields').style.display = (format === 'online') ? 'block' : 'none';
-  document.getElementById('hybridFields').style.display = (format === 'hybrid') ? 'block' : 'none';
+
+  // List of all section IDs
+  const sections = [
+    'physicalFields',
+    'onlineFields',
+    'hybridFields',
+    'videoFields',
+    'textFields'
+  ];
+
+  // Hide all first
+  sections.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+
+  // Show only the selected one
+  if (format === 'physical') {
+    document.getElementById('physicalFields').style.display = 'block';
+  } 
+  else if (format === 'online') {
+    document.getElementById('onlineFields').style.display = 'block';
+  } 
+  else if (format === 'hybrid') {
+    document.getElementById('hybridFields').style.display = 'block';
+    toggleHybridLocationFields(); // Still call this if needed
+  } 
+  else if (format === 'video') {
+    document.getElementById('videoFields').style.display = 'block';
+  } 
+  else if (format === 'text') {
+    document.getElementById('textFields').style.display = 'block';
+  }
 }
 
 function togglePhysicalLocationFields() {
   const type = document.getElementById('physicalLocationType').value;
   document.getElementById('nigeriaPhysicalFields').style.display = (type === 'nigeria') ? 'block' : 'none';
   document.getElementById('foreignPhysicalFields').style.display = (type === 'foreign') ? 'block' : 'none';
+}
+
+
+function addVideoModule() {
+  const container = document.getElementById('videoModules');
+  const firstModule = container.querySelector('.video-module');
+  const newModule = firstModule.cloneNode(true);
+
+  const moduleCount = container.querySelectorAll('.video-module').length + 1;
+  newModule.querySelector('.module-number').textContent = moduleCount;
+
+  // Clean cloned TinyMCE UI
+  newModule.querySelectorAll('.tox').forEach(el => el.remove());
+
+  // Reset fields
+  newModule.querySelectorAll('input, textarea').forEach(el => {
+    if (el.type === 'checkbox' || el.type === 'radio') {
+      el.checked = false;
+    } else {
+      el.value = '';
+    }
+
+    if (el.classList.contains('editor')) {
+      el.removeAttribute('aria-hidden');
+      el.style.display = '';
+      el.id = `video_editor_${moduleCount}`;
+    }
+  });
+
+  // Add Remove button (only for cloned modules)
+  const removeBtn = document.createElement('button');
+  removeBtn.type = 'button';
+  removeBtn.className = 'remove-module';
+  removeBtn.innerHTML = '❌ Remove';
+  removeBtn.onclick = function () {
+    newModule.remove();
+    updateModuleNumbers(container, '.video-module');
+  };
+  newModule.appendChild(removeBtn);
+
+  container.appendChild(newModule);
+
+  initTinyMCE(`#video_editor_${moduleCount}`);
+}
+
+function addTextModule() {
+  const container = document.getElementById('textModules');
+  const firstModule = container.querySelector('.text-module');
+  const newModule = firstModule.cloneNode(true);
+
+  const moduleCount = container.querySelectorAll('.text-module').length + 1;
+  newModule.querySelector('.module-number').textContent = moduleCount;
+
+  // Clean cloned TinyMCE UI
+  newModule.querySelectorAll('.tox').forEach(el => el.remove());
+
+  // Reset fields
+  newModule.querySelectorAll('input, textarea').forEach(el => {
+    if (el.type === 'checkbox' || el.type === 'radio') {
+      el.checked = false;
+    } else {
+      el.value = '';
+    }
+
+    if (el.classList.contains('editor')) {
+      el.removeAttribute('aria-hidden');
+      el.style.display = '';
+      el.id = `text_editor_${moduleCount}`;
+    }
+  });
+
+  // Add Remove button (only for cloned modules)
+  const removeBtn = document.createElement('button');
+  removeBtn.type = 'button';
+  removeBtn.className = 'remove-module';
+  removeBtn.innerHTML = '❌ Remove';
+  removeBtn.onclick = function () {
+    newModule.remove();
+    updateModuleNumbers(container, '.text-module');
+  };
+  newModule.appendChild(removeBtn);
+
+  container.appendChild(newModule);
+
+  initTinyMCE(`#text_editor_${moduleCount}`);
+}
+
+// Re-number modules after removal
+function updateModuleNumbers(container, selector) {
+  container.querySelectorAll(selector).forEach((module, index) => {
+    module.querySelector('.module-number').textContent = index + 1;
+  });
+}
+
+function initTinyMCE(selector) {
+  tinymce.init({
+    selector: selector,
+    toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
+    tinycomments_mode: 'embedded',
+    tinycomments_author: 'Author name',
+    mergetags_list: [
+      { value: 'First.Name', title: 'First Name' },
+      { value: 'Email', title: 'Email' }
+    ],
+    ai_request: (request, respondWith) => respondWith.string(() => Promise.reject('See docs to implement AI Assistant')),
+  });
 }
 
 

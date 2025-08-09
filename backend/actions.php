@@ -775,6 +775,89 @@ $stmt->close();
     }
 }
 
+
+
+if ($delivery_format === 'video') {
+    foreach ($_POST['video_module_title'] as $index => $title) {
+        $desc        = $_POST['video_module_desc'][$index] ?? '';
+        $duration    = $_POST['video_duration'][$index] ?? '';
+        $videoLink   = $_POST['video_link'][$index] ?? '';
+        $qualities   = isset($_POST['video_quality'][$index]) ? implode(',', $_POST['video_quality'][$index]) : '';
+        $subtitles   = $_POST['video_subtitles'][$index] ?? '';
+
+        // Prepare file path
+        $filePath = '';
+        if (!empty($_FILES['video_file']['name'][$index])) {
+            // Temporarily restructure the file array for this index
+            $tmpFileKey = 'single_video_upload';
+            $_FILES[$tmpFileKey] = [
+                'name'     => $_FILES['video_file']['name'][$index],
+                'type'     => $_FILES['video_file']['type'][$index],
+                'tmp_name' => $_FILES['video_file']['tmp_name'][$index],
+                'error'    => $_FILES['video_file']['error'][$index],
+                'size'     => $_FILES['video_file']['size'][$index]
+            ];
+
+            $fileName = handleFileUpload($tmpFileKey, $fileuploadDir); // using your function
+            if ($fileName && strpos($fileName, 'Failed') === false && strpos($fileName, 'error') === false) {
+                $filePath =  $fileName;
+            }
+        }
+
+        // Insert into DB
+        $stmt = $con->prepare("
+            INSERT INTO {$siteprefix}training_video_modules
+            (training_id, module_number, title, description, duration, file_path, video_link, video_quality, subtitles, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())
+        ");
+        $module_number = $index + 1;
+        $stmt->bind_param("sisssssss", $training_id, $module_number, $title, $desc, $duration, $filePath, $videoLink, $qualities, $subtitles);
+        $stmt->execute();
+        $stmt->close();
+    }
+}
+
+elseif ($delivery_format === 'text') {
+    // Loop through all text modules
+    foreach ($_POST['text_module_title'] as $index => $title) {
+        $desc         = $_POST['text_module_desc'][$index] ?? '';
+        $readingTime  = $_POST['text_reading_time'][$index] ?? '';
+
+        // Handle file upload for this index using your function
+        $filePath = '';
+        if (!empty($_FILES['text_file']['name'][$index])) {
+            // Create a temporary single-file array for this index
+            $tmpFileKey = 'single_text_upload';
+            $_FILES[$tmpFileKey] = [
+                'name'     => $_FILES['text_file']['name'][$index],
+                'type'     => $_FILES['text_file']['type'][$index],
+                'tmp_name' => $_FILES['text_file']['tmp_name'][$index],
+                'error'    => $_FILES['text_file']['error'][$index],
+                'size'     => $_FILES['text_file']['size'][$index]
+            ];
+
+            $fileName = handleFileUpload($tmpFileKey, $fileuploadDir);
+            if ($fileName && strpos($fileName, 'Failed') === false && strpos($fileName, 'error') === false) {
+                $filePath = $fileName;
+            }
+        }
+
+        // Insert into text table
+        $stmt = $con->prepare("
+            INSERT INTO {$siteprefix}training_texts_modules
+            (training_id, module_number, title, description, reading_time, file_path, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())
+        ");
+        $module_number = $index + 1;
+        $stmt->bind_param("sissss", $training_id, $module_number, $title, $desc, $readingTime, $filePath);
+
+        if (!$stmt->execute()) {
+            echo "Error inserting text module {$module_number}: " . $stmt->error . "<br>";
+        }
+        $stmt->close();
+    }
+}
+
         if ($_POST['pricing'] === 'paid') {
             $ticket_names = $_POST['ticket_name'];
 $ticket_benefits = $_POST['ticket_benefits'];
@@ -864,30 +947,32 @@ if ($instructor_id === 'add_new') {
     }
 
  
-    $fileKey = 'cover_images';
-    // Handle image uploads
-    if (empty($_FILES[$fileKey]['name'])) {
+    
+  $fileKeys = 'images';
+  // Handle image uploads
+    if (empty($_FILES[$fileKeys]['name'][0])) {
         // Use default images if no images are uploaded
         $defaultImages = ['default1.jpg', 'default2.jpg', 'default3.jpg', 'default4.jpg', 'default5.jpg'];
         $randomImage = $defaultImages[array_rand($defaultImages)];
         $reportImages = [$randomImage];
     }else{
-        $reportImage =$_FILES[$fileKey]['name'];
+
     // Insert images into the database
-    $fileName = uniqid() . '_' . basename($reportImage);
-    $reportImages = handleFileUpload($fileKey, $uploadDir,$fileName);
+    $reportImages = handleMultipleFileUpload($fileKeys, $uploadDir);
     }
 
- 
-  
+    $uploadedFiles = [];
+    foreach ($reportImages as $image) {
         $stmt = $con->prepare("INSERT INTO " . $siteprefix . "training_images (training_id, picture, updated_at) VALUES (?, ?, current_timestamp())");
-        $stmt->bind_param("ss", $training_id, $reportImages);
+        $stmt->bind_param("ss", $training_id, $image);
         if ($stmt->execute()) {
-            $uploadedFiles[] = $reportImages;
+            $uploadedFiles[] = $image;
         } else {
             $message .= "Error inserting image: " . $stmt->error . "<br>";
         }
         $stmt->close();
+    }
+
    
 
     $insertTraining = mysqli_query($con, "INSERT INTO {$siteprefix}training (
