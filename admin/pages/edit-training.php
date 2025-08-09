@@ -134,7 +134,7 @@ if (!$training_data_set) {
                          while ($image_row = mysqli_fetch_array($sql4)) {
                                echo '<div class="image-preview">';
                                echo '<img class="preview-image" src="'.$siteurl.'uploads/' .$image_row['picture'] . '" alt="Report Image">';
-                               echo '<button type="button" class="delete-btn delete-image" data-image-id="' .$image_row['id'] . '">X</button>';
+                               echo '<button type="button" class="delete-btn delete-image" data-image-id="' .$image_row['s'] . '">X</button>';
                                echo '</div>';
                            }
                        
