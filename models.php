@@ -1,7 +1,7 @@
 <?php include "header.php"; 
 
  checkActiveLog($active_log);
- if ($seller != 1) {
+ if ($trainer != 1) {
   header("Location: index.php");
   exit;
 }
