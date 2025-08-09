@@ -54,7 +54,7 @@ table th {
     LEFT JOIN ".$siteprefix."users lu ON t.user = lu.s
     LEFT JOIN ".$siteprefix."categories sc ON t.subcategory = sc.id 
     LEFT JOIN ".$siteprefix."training_tickets tt ON t.training_id= tt.training_id
-   Where t.status='approved' AND t.user = '$user_id' GROUP BY t.training_id";
+WHERE t.user = '$user_id' GROUP BY t.training_id";
                 $result = mysqli_query($con, $query);
                 if (!$result) {
                     die('Query Failed: ' . mysqli_error($con));
@@ -67,6 +67,7 @@ table th {
                 while($row = mysqli_fetch_assoc($result)) {
                 $training_id = $row['training_id'];
         $title = $row['title'];
+        $report_row = $row['s'];
         $alt_title = $row['alt_title'];
         $description = $row['description'];
         $category = $row['category'];

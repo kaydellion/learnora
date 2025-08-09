@@ -1950,7 +1950,20 @@ if (isset($_POST['send_dispute_message'])) {
     }
 
 
+if (isset($_GET['action']) && $_GET['action'] == 'delete') {
+    $table = $_GET['table'];
+    $item = $_GET['item'];
+    $page = $_GET['page'];
+    
+    if (deleteRecord($table, $item)) {
+        $message="Record deleted successfully.";
+    } else {
+         $message="Failed to delete the record.";
+    }
 
+    showToast($message);
+    header("refresh:2; url=$page");
+}
 // Insert into table and send mail
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_request'])) {
     $seminar_title = mysqli_real_escape_string($con, $_POST['seminar_title']);
