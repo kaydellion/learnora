@@ -175,6 +175,20 @@ $user_review = $existing_review_result->fetch_assoc();
             </div>
           
 
+            <?php
+// Fetch images for this training
+$images = [];
+$sql = "SELECT picture FROM {$siteprefix}training_images WHERE training_id = ?";
+$stmt = $con->prepare($sql);
+$stmt->bind_param("s", $id);
+$stmt->execute();
+$result = $stmt->get_result();
+while ($row = $result->fetch_assoc()) {
+$images[] = $siteurl . $imagePath . $row['picture']; // store full image URL
+
+}
+$stmt->close();
+?>
           
 <div class="product-gallery mb-3">
     <!-- Vertical Thumbnails -->
