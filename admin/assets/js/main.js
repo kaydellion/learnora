@@ -2283,7 +2283,7 @@ function addVideoModule() {
   const moduleCount = container.querySelectorAll('.video-module').length + 1;
   newModule.querySelector('.module-number').textContent = moduleCount;
 
-  // Reset fields
+  // Reset all fields
   newModule.querySelectorAll('input, textarea').forEach(el => {
     if (el.type === 'checkbox' || el.type === 'radio') {
       el.checked = false;
@@ -2292,7 +2292,7 @@ function addVideoModule() {
     }
   });
 
-  // Update checkbox names
+  // Update checkbox name attributes to use correct index
   newModule.querySelectorAll('input[type="checkbox"]').forEach(el => {
     if (el.name.startsWith('video_quality')) {
       el.name = `video_quality[${moduleCount - 1}][]`;
@@ -2302,18 +2302,13 @@ function addVideoModule() {
     }
   });
 
-  // Give textareas unique IDs for TinyMCE
-  newModule.querySelectorAll('.editor').forEach((textarea, index) => {
-    textarea.id = `video_editor_${moduleCount}_${index}`;
-  });
-
   // Add remove button
   const removeBtn = document.createElement('button');
   removeBtn.type = 'button';
   removeBtn.className = 'btn btn-danger btn-sm mt-2';
   removeBtn.textContent = 'Remove Module';
   removeBtn.onclick = function () {
-    // Remove TinyMCE editors in this module
+    // Destroy TinyMCE instances inside this module
     newModule.querySelectorAll('.editor').forEach(ed => {
       if (tinymce.get(ed.id)) {
         tinymce.remove(`#${ed.id}`);
@@ -2332,8 +2327,6 @@ function renumberVideoModules() {
   const modules = document.querySelectorAll('#videoModules .video-module');
   modules.forEach((mod, i) => {
     mod.querySelector('.module-number').textContent = i + 1;
-
-    // Update checkbox names after removal
     mod.querySelectorAll('input[type="checkbox"]').forEach(el => {
       if (el.name.startsWith('video_quality')) {
         el.name = `video_quality[${i}][]`;
@@ -2342,24 +2335,18 @@ function renumberVideoModules() {
         el.name = `video_subtitles[${i}]`;
       }
     });
-
-    // Update TinyMCE textarea IDs
-    mod.querySelectorAll('.editor').forEach((textarea, index) => {
-      textarea.id = `video_editor_${i + 1}_${index}`;
-    });
   });
-
-  reinitTinyMCE();
 }
 
 function addTextModule() {
   const container = document.getElementById('textModules');
   const firstModule = container.querySelector('.text-module');
-  const newModule = firstModule.cloneNode(true);
+  const newModule = firstModule.cloneNode(true); // deep clone
 
   const moduleCount = container.querySelectorAll('.text-module').length + 1;
   newModule.querySelector('.module-number').textContent = moduleCount;
 
+  // Reset all fields
   newModule.querySelectorAll('input, textarea').forEach(el => {
     if (el.type === 'checkbox' || el.type === 'radio') {
       el.checked = false;
@@ -2368,11 +2355,7 @@ function addTextModule() {
     }
   });
 
-  newModule.querySelectorAll('.editor').forEach((textarea, index) => {
-    textarea.id = `text_editor_${moduleCount}_${index}`;
-  });
-
-  // Add remove button for text module
+  // Add remove button
   const removeBtn = document.createElement('button');
   removeBtn.type = 'button';
   removeBtn.className = 'btn btn-danger btn-sm mt-2';
@@ -2396,12 +2379,7 @@ function renumberTextModules() {
   const modules = document.querySelectorAll('#textModules .text-module');
   modules.forEach((mod, i) => {
     mod.querySelector('.module-number').textContent = i + 1;
-    mod.querySelectorAll('.editor').forEach((textarea, index) => {
-      textarea.id = `text_editor_${i + 1}_${index}`;
-    });
   });
-
-  reinitTinyMCE();
 }
 
 function reinitTinyMCE() {
