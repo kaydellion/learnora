@@ -126,10 +126,20 @@ if (!$training_data_set) {
             </div>
             
                             <input type="hidden" id="training-id" name="training-id" class="form-control" value="<?php echo $training_id; ?>" readonly required>
-                <div class="image-preview">
-                          <img class="preview-image" src="<?php echo $siteurl . $image_paths ?>" alt="Training Image">
-                           <button type="button" class="delete-btn delete-image" data-image-id="<?php echo $image_id; ?>">X</button>
-                            </div>
+                 <div id="preview1" class="preview-container">
+                         <?php
+                         $sql3 = "SELECT * FROM ".$siteprefix."training_images WHERE training_id = '$training_id'";   
+                         $sql4 = mysqli_query($con, $sql3);
+                         if (!$sql4) {die("Query failed: " . mysqli_error($con)); }
+                         while ($image_row = mysqli_fetch_array($sql4)) {
+                               echo '<div class="image-preview">';
+                               echo '<img class="preview-image" src="'.$siteurl.'uploads/' .$image_row['picture'] . '" alt="Report Image">';
+                               echo '<button type="button" class="delete-btn delete-image" data-image-id="' .$image_row['id'] . '">X</button>';
+                               echo '</div>';
+                           }
+                       
+                        ?>
+                        </div>
             <div class="mb-3">
               <label class="form-label">Cover Image</label>
               <input type="file" class="form-control" id="imageInput" name="images[]" multiple accept="image/*">
