@@ -13,9 +13,9 @@ $videoCounter = 1;
 
 // Fetch training and event data
 $query = "SELECT t.*, u.name AS display_name, tv.video_path, et.name AS event_types, tt.price, tt.ticket_name, tt.benefits, tt.seats,
-                 u.photo AS profile_picture, l.category_name AS category, 
-                 sc.category_name AS subcategory, ti.picture AS event_image, ti.s AS image_id,
-                 tem.event_date, tem.start_time, tem.end_time, tem.s,tvl.file_path, tvl.video_url,tvl.s as video_id
+                 u.photo AS profile_picture, l.category_name AS categoryname, 
+                 sc.category_name AS subcategoryname, ti.picture AS event_image, ti.s AS image_id,
+                 tem.event_date, tem.start_time, tem.end_time, tem.s AS event_id, tvl.file_path, tvl.video_url, tvl.s AS video_id
           FROM {$siteprefix}training t 
           LEFT JOIN {$siteprefix}categories l ON t.category = l.id 
           LEFT JOIN {$siteprefix}instructors u ON t.instructors = u.s
@@ -44,12 +44,13 @@ while ($row = mysqli_fetch_assoc($result)) {
         $alt_title = $row['alt_title'];
         $description = $row['description'];
         $learning_objectives = $row['learning_objectives'];
-        $category_id = $row['category'];
+     $category = $row['categoryname'];
+    $subcategory = $row['subcategoryname'];
+    $category_id = $row['category'];
     $subcategory_id = $row['subcategory'];
     $selected_categories = explode(',', $category_id); // result: [1, 3]
     $selected_subcategories = explode(',', $subcategory_id); // result: [5, 6]
         $image_id = $row['image_id'];
-       
         $loyalty = $row['loyalty'];
         $pricing = $row['pricing'];
         $attendee = $row['attendee'];
@@ -89,12 +90,13 @@ while ($row = mysqli_fetch_assoc($result)) {
     }
 
     // Add event dates
+    // Always collect event dates from every row
     if (!empty($row['event_date']) && !empty($row['start_time']) && !empty($row['end_time'])) {
         $event_dates[] = [
             'event_date' => $row['event_date'],
             'start_time' => $row['start_time'],
             'end_time' => $row['end_time'],
-            's' => $row['s']
+            'event_id' => $row['event_id']
         ];
     }
 
@@ -169,7 +171,7 @@ if (!$training_data_set) {
  <div id="dateTimeRepeater">
   <?php foreach ($event_dates as $ev) { ?>
     <div class="row mb-2 dateTimeRow">
-      <input type="hidden" name="event_ids[]" value="<?= $ev['s'] ?>">
+      <input type="hidden" name="event_ids[]" value="<?= $ev['event_id'] ?>">
       <div class="col">
         <input type="date" class="form-control" name="event_dates[]" value="<?= $ev['event_date'] ?>" required>
       </div>
@@ -339,7 +341,7 @@ while ($row = $textResult->fetch_assoc()):
     <?php if (!empty($row['file_path'])): ?>
       <ul class="list-group mt-2">
         <li class="list-group-item d-flex justify-content-between align-items-center" id="textlesson_<?php echo $row['id']; ?>">
-          📄 <a href="<?php echo $admindocumentPath . $row['file_path']; ?>" target="_blank">View Uploaded File</a>
+          📄 <a href="<?php echo $siteurl . $row['file_path']; ?>" target="_blank">View Uploaded File</a>
         </li>
       </ul>
     <?php endif; ?>
@@ -376,7 +378,7 @@ while ($row = $textResult->fetch_assoc()):
     <?php if (!empty($row['file_path'])): ?>
       <ul class="list-group mt-2">
         <li class="list-group-item d-flex justify-content-between align-items-center" id="lesson_<?php echo $row['id']; ?>">
-          📁 <a href="<?php echo $admindocumentPath . $row['file_path']; ?>" target="_blank">View Uploaded Video</a>
+          📁 <a href="<?php echo $siteurl . $row['file_path']; ?>" target="_blank">View Uploaded Video</a>
         
         </li>
       </ul>
@@ -425,7 +427,7 @@ $embedValue = ''; // to store the embed url for pre-filling
       <li class="list-group-item d-flex justify-content-between align-items-center" id="lesson_<?php echo $lessonId; ?>">
         <div>
           <?php if (!empty($filePath)): ?>
-            📁 <a href="<?php echo $admindocumentPath . $filePath; ?>" target="_blank">View Uploaded Video</a>
+            📁 <a href="<?php echo $siteurl . $filePath; ?>" target="_blank">View Uploaded Video</a>
           <?php elseif (!empty($embedUrl)): ?>
             🔗 <a href="<?php echo $embedUrl; ?>" target="_blank">View Embedded URL</a>
           <?php endif; ?>
@@ -458,7 +460,7 @@ if ($textQuery && mysqli_num_rows($textQuery) > 0): ?>
         $textPath = $text['file_path'];
       ?>
         <li class="list-group-item d-flex justify-content-between align-items-center" id="text_<?php echo $textId; ?>">
-          <a href="<?php echo $admindocumentPath . $textPath; ?>" target="_blank">📄 <?php echo basename($textPath); ?></a>
+          <a href="<?php echo $siteurl . $textPath; ?>" target="_blank">📄 <?php echo basename($textPath); ?></a>
           <button type="button" class="btn btn-sm btn-danger delete-text-module" data-id="<?php echo $textId; ?>">Delete</button>
         </li>
       <?php endwhile; ?>
