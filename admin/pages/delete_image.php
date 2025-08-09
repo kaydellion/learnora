@@ -39,7 +39,7 @@ if($action == 'deleteimage'){
 // Check if the correct action is provided
 if (isset($_GET['action']) && $_GET['action'] === 'deletevideo' && isset($_GET['video_id'])) {
     $video_id = intval($_GET['video_id']);
-    $query = "DELETE FROM {$siteprefix}training_Video_Lessons WHERE s = ?";
+    $query = "DELETE FROM {$siteprefix}training_video_lessons WHERE s = ?";
     $stmt = $con->prepare($query);
 
     if ($stmt) {

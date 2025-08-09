@@ -38,7 +38,6 @@ table th {
                   <th>Category</th>
                   <th>Subcategory</th>
                   <th>Pricing</th>
-                  <th>Price</th>
                   <th>Tags</th>
                   <th>Created Date</th>
                   <th>Status</th>
@@ -83,6 +82,7 @@ WHERE t.user = '$user_id' GROUP BY t.training_id";
                 ?>
                   <tr>
                   <td><strong><?php echo $i; ?></strong></td>
+                   <td><strong><?php echo $title; ?></strong></td>
                   <td><?php echo $category; ?></td>
                   <td><?php echo $subcategory; ?></td>
                   <td><?php echo $pricing; ?></td>
