@@ -2701,6 +2701,15 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 
+
+document.querySelectorAll('a.delete').forEach(link => {
+    link.addEventListener('click', function(e) {
+        if (!confirm('Are you sure you want to delete this item?')) {
+            e.preventDefault();
+        }
+    });
+});
+
 function togglePasswordVisibility(fieldId) {
   const passwordField = document.getElementById(fieldId);
   const parent = passwordField.parentElement; // input-group
