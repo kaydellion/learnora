@@ -166,26 +166,51 @@ if (!$training_data_set) {
               <label class="form-label">Who Should Attend</label>
               <input type="text" class="form-control" name="who_should_attend" placeholder="E.g. Beginners, Entrepreneurs, etc." value="<?php echo $attendee; ?>">
             </div>
+            <?php
+$event_datess = [];
+
+// Get all event dates for this training
+$sql = "SELECT s AS event_id, event_date, start_time, end_time
+        FROM {$siteprefix}training_event_dates
+        WHERE training_id = '$training_id'
+        ORDER BY event_date ASC";
+
+$result = mysqli_query($con, $sql);
+if (!$result) {
+    die('Query Failed: ' . mysqli_error($con));
+}
+
+while ($row = mysqli_fetch_assoc($result)) {
+    $event_datess[] = [
+        'event_id'   => $row['event_id'],
+        'event_date' => $row['event_date'],
+        'start_time' => $row['start_time'],
+        'end_time'   => $row['end_time']
+    ];
+}
+?>
           <div class="mb-3">
   <label class="form-label">Event Dates & Times</label>
  <div id="dateTimeRepeater">
-  <?php foreach ($event_dates as $ev) { ?>
-    <div class="row mb-2 dateTimeRow">
-      <input type="hidden" name="event_ids[]" value="<?= $ev['event_id'] ?>">
-      <div class="col">
-        <input type="date" class="form-control" name="event_dates[]" value="<?= $ev['event_date'] ?>" required>
-      </div>
-      <div class="col">
-        <input type="time" class="form-control" name="event_start_times[]" value="<?= $ev['start_time'] ?>" required>
-      </div>
-      <div class="col">
-        <input type="time" class="form-control" name="event_end_times[]" value="<?= $ev['end_time'] ?>" required>
-      </div>
-      <div class="col-auto">
-        <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('.dateTimeRow').remove()">-</button>
-      </div>
-    </div>
-  <?php } ?>
+     <?php if (!empty($event_datess)) { ?>
+      <?php foreach ($event_datess as $ev) { ?>
+        <div class="row mb-2 dateTimeRow">
+          <input type="hidden" name="event_ids[]" value="<?= $ev['event_id'] ?>">
+          <div class="col">
+            <input type="date" class="form-control" name="event_dates[]" value="<?= $ev['event_date'] ?>" required>
+          </div>
+          <div class="col">
+            <input type="time" class="form-control" name="event_start_times[]" value="<?= $ev['start_time'] ?>" required>
+          </div>
+          <div class="col">
+            <input type="time" class="form-control" name="event_end_times[]" value="<?= $ev['end_time'] ?>" required>
+          </div>
+          <div class="col-auto">
+            <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('.dateTimeRow').remove()">-</button>
+          </div>
+        </div>
+      <?php } }  ?>
+   
 </div>
 
 <button type="button" class="btn btn-success btn-sm mt-2" onclick="addDateTimeRow()">
