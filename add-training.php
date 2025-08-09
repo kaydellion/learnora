@@ -99,7 +99,216 @@
               </select>
             </div>
 
+          <?php
+          // Fetch event types from the database
+          $eventTypes = [];
+          $eventTypeQuery = mysqli_query($con, "SELECT s, name FROM {$siteprefix}event_types");
+          while ($row = mysqli_fetch_assoc($eventTypeQuery)) {
+              $eventTypes[] = $row;
+          }
+          ?>
+          <!-- ...existing code... -->
+
+          <div class="mb-3">
+            <label class="form-label">Type of Training & Events</label>
+            <select class="form-control" name="event_type" required>
+              <option value="">Select Type</option>
+              <?php foreach ($eventTypes as $type): ?>
+                <option value="<?php echo htmlspecialchars($type['s']); ?>">
+                  <?php echo htmlspecialchars($type['name']); ?>
+                </option>
+              <?php endforeach; ?>
+            </select>
+          </div>
+
+          <div class="mb-3">
+  <label class="form-label">Pricing</label>
+  <select class="form-control" name="pricing" id="pricingSelect" onchange="togglePricingFields()" required>
+    <option value="">Select Pricing</option>
+    <option value="donation">Donation</option>
+    <option value="free">Free</option>
+    <option value="paid">Paid</option>
+  </select>
+</div>
+
+<!-- Donation Info -->
+<div class="mb-3" id="donationFields" style="display:none;">
+  <p>This event allows attendees to pay any amount they choose as a donation.</p>
+</div>
+
+<!-- Free Info -->
+<div class="mb-3" id="freeFields" style="display:none;">
+  <p>This event is free for all attendees.</p>
+</div>
+
+
+<!-- Paid Ticket Fields -->
+<div class="mb-3" id="paidFields" style="display:none;">
+  <label class="form-label">Ticket Name</label>
+  <input type="text" class="form-control mb-2" name="ticket_name[]" placeholder="e.g. General Admission">
+  <label class="form-label">Benefits</label>
+  <input type="text" class="form-control mb-2" name="ticket_benefits[]" placeholder="e.g. Certificate, Lunch, Materials">
+  <label class="form-label">Price</label>
+  <input type="number" class="form-control mb-2" name="ticket_price[]" min="0" step="0.01" placeholder="e.g. 5000">
+  <label class="form-label">Number of Seats Available</label>
+  <input type="number" class="form-control" name="ticket_seats[]" min="1" placeholder="e.g. 100">
+
+    <div class="mb-3" id="ticketWrapper">
+
+              </div>
+  <!-- Add Another Ticket Button -->
+<button type="button" id="addTicketBtn" class="btn btn-secondary">Add Another Ticket</button>
+</div>
+
+       <div class="mb-3">
+                          <label>Category</label>
+                      <div class="custom-select-wrapper" id="category-wrapper">
+  <div class="custom-select-display" onclick="toggleDropdown('category')">
+    <div class="custom-select-tags" id="category-tags"></div>
+  </div>
+  <div class="custom-select-dropdown" id="category-dropdown">
+    <input type="search" class="form-control" placeholder="Search categories..." onkeyup="filterOptions(this, 'category-options')">
+    <div id="category-options">
+      <?php
+        $sql = "SELECT * FROM " . $siteprefix . "categories WHERE parent_id IS NULL";
+        $res = mysqli_query($con, $sql);
+        while ($row = mysqli_fetch_assoc($res)) {
+          echo '<div class="custom-option">
+                  <label>
+                    <input type="checkbox" name="category[]" value="' . $row['id'] . '" onchange="updateTags(this, \'category\')">
+                    ' . htmlspecialchars($row['category_name']) . '
+                  </label>
+                </div>';
+        }
+      ?>
+    </div>
+  </div>
+</div>
+
+<label>Subcategory</label>
+<div class="custom-select-wrapper" id="subcategory-wrapper" style="margin-top: 20px; display: none;">
+  <div class="custom-select-display" onclick="toggleDropdown('subcategory')">
+    <div class="custom-select-tags" id="subcategory-tags"></div>
+  </div>
+  <div class="custom-select-dropdown" id="subcategory-dropdown">
+    <input class="form-control" type="search" placeholder="Search subcategories..." onkeyup="filterOptions(this, 'subcategory-options')">
+    <div id="subcategory-options">
+      <!-- Subcategory checkboxes inserted dynamically -->
+    </div>
+  </div>
+</div>
+                        </div>
+            
+
+
+            <h6>Course Content Details</h6>
             <div class="mb-3">
+              <label class="form-label">Course Description</label>
+              <textarea class="form-control editor" name="course_description" rows="4"></textarea>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Learning Objectives / Outcomes</label>
+              <textarea class="form-control editor" name="learning_objectives" rows="3" placeholder="List what the learner will be able to do after completing the course."></textarea>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Target Audience</label>
+              <input type="text" class="form-control" name="target_audience" placeholder='E.g. "Beginners in Python", "Entrepreneurs", etc.'>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Course Requirements / Prerequisites</label>
+              <textarea class="form-control editor" name="prerequisites" rows="2" placeholder="Any knowledge, tools, or skills needed before starting."></textarea>
+            </div>
+
+            <h6>Course Content Uploads</h6>
+            <div class="mb-3">
+              <label class="form-label">Video Lessons (Upload or Embed URL)</label>
+              <input type="file" class="form-control mb-2" name="video_lessons[]" multiple accept="video/*">
+              <input type="url" class="form-control" name="video_embed_url" placeholder="Or paste video URL">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Text Modules / PDFs / Readings (Upload)</label>
+              <input type="file" class="form-control" name="text_modules[]" multiple accept=".pdf,.txt,.doc,.docx">
+            </div>
+            <div class="mb-3">
+              <div>
+              <label class="form-label">Quizzes & Assignments</label>
+          </div>
+         <label>Choose how to provide quiz/assignment content:</label>
+          <select onchange="toggleQuizOption(this.value)" name="quiz_method" class="form-control mb-3">
+            <option value="">-- Select Option --</option>
+            <option value="text">Text Entry</option>
+            <option value="upload">Upload Files</option>
+            <option value="form">Use Form Builder</option>
+          </select>
+
+        <!-- Option 1: Text Entry -->
+        <div id="quizText" style="display:none;">
+          <label>Text Entry:</label>
+          <textarea name="quiz_text[]" placeholder="e.g., Write a short essay on the impact of AI on job markets..." class="form-control editor"></textarea>
+        </div>
+
+        <!-- Option 2: File Upload -->
+      <div id="quizUpload" style="display:none;">
+        <label>Upload Quiz or Assignment Files:</label>
+        <input type="file" name="quiz_files[]" multiple  class="form-control">
+        <small>You can upload multiple files (PDF, Word, Text).</small>
+      </div>
+<div id="quizFormButton" style="display:none;">
+  <label>Use the Form Builder to Add Structured Questions:</label><br>
+  <button type="button" onclick="openQuizModal()" class="btn btn-success"><i class="bx bx-plus me-1"></i>Add Quiz/Assignment Questions</button>
+</div>
+
+      <div id="quizModal" class="modal" style="display:none;">
+  <div class="modal-content">
+    <span class="close" onclick="closeQuizModal()">&times;</span>
+    <h3>🧠 Add Quiz Questions</h3>
+    
+<div id="quizBuilderModal">
+  <div class="mb-3">
+    <label>Instructions:</label>
+    <textarea name="quiz_instructions" placeholder="Quiz Instructions" class="form-control mb-2 editor"></textarea>
+  </div>
+
+  <!-- Template to clone -->
+  <div class="question-block">
+    <div class="mb-3">
+      <label>Question:</label>
+      <textarea name="questions[]" class="form-control mb-2 editor" placeholder="Question"></textarea>
+    </div>
+    <div class="mb-3">
+      <input type="text" name="option_a[]" placeholder="Option A">
+      <input type="text" name="option_b[]" placeholder="Option B">
+      <input type="text" name="option_c[]" placeholder="Option C">
+      <input type="text" name="option_d[]" placeholder="Option D">
+    </div>
+    <div class="mb-3">
+      <label>Correct Answer:</label>
+      <select name="correct_answer[]" class="form-select mb-3">
+        <option value="a">A</option>
+        <option value="b">B</option>
+        <option value="c">C</option>
+        <option value="d">D</option>
+      </select>
+    </div>
+    
+    <hr>
+  </div>
+</div>
+
+    <button type="button" onclick="addQuizQuestionModal()" class="btn btn-secondary"><i class="bx bx-plus me-1"></i>Add Another Question</button>
+    <br><br>
+    <button type="button" onclick="closeQuizModal()" class="btn btn-primary">✅ Done</button>
+  </div>
+</div>
+
+
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Course Trailer/Intro Video (Optional)</label>
+              <input type="file" class="form-control" name="trailer_video" accept="video/*">
+            </div>
+
+                      <div class="mb-3">
                           <label>Delivery Format </label>
               <select class="form-control" name="delivery_format" id="deliveryFormat" onchange="toggleDeliveryFields()" required>
                 <option value="">Select Format</option>
@@ -230,215 +439,7 @@
 
   <button type="button" class="btn btn-secondary mt-3" onclick="addTextModule()">ADD MORE</button>
 </div>
-
-
-            <h6>Course Content Details</h6>
-            <div class="mb-3">
-              <label class="form-label">Course Description</label>
-              <textarea class="form-control editor" name="course_description" rows="4"></textarea>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Learning Objectives / Outcomes</label>
-              <textarea class="form-control editor" name="learning_objectives" rows="3" placeholder="List what the learner will be able to do after completing the course."></textarea>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Target Audience</label>
-              <input type="text" class="form-control" name="target_audience" placeholder='E.g. "Beginners in Python", "Entrepreneurs", etc.'>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Course Requirements / Prerequisites</label>
-              <textarea class="form-control editor" name="prerequisites" rows="2" placeholder="Any knowledge, tools, or skills needed before starting."></textarea>
-            </div>
-
-            <h6>Course Content Uploads</h6>
-            <div class="mb-3">
-              <label class="form-label">Video Lessons (Upload or Embed URL)</label>
-              <input type="file" class="form-control mb-2" name="video_lessons[]" multiple accept="video/*">
-              <input type="url" class="form-control" name="video_embed_url" placeholder="Or paste video URL">
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Text Modules / PDFs / Readings (Upload)</label>
-              <input type="file" class="form-control" name="text_modules[]" multiple accept=".pdf,.txt,.doc,.docx">
-            </div>
-            <div class="mb-3">
-              <div>
-              <label class="form-label">Quizzes & Assignments</label>
-          </div>
-         <label>Choose how to provide quiz/assignment content:</label>
-          <select onchange="toggleQuizOption(this.value)" name="quiz_method" class="form-control mb-3">
-            <option value="">-- Select Option --</option>
-            <option value="text">Text Entry</option>
-            <option value="upload">Upload Files</option>
-            <option value="form">Use Form Builder</option>
-          </select>
-
-        <!-- Option 1: Text Entry -->
-        <div id="quizText" style="display:none;">
-          <label>Text Entry:</label>
-          <textarea name="quiz_text[]" placeholder="e.g., Write a short essay on the impact of AI on job markets..." class="form-control editor"></textarea>
-        </div>
-
-        <!-- Option 2: File Upload -->
-      <div id="quizUpload" style="display:none;">
-        <label>Upload Quiz or Assignment Files:</label>
-        <input type="file" name="quiz_files[]" multiple  class="form-control">
-        <small>You can upload multiple files (PDF, Word, Text).</small>
-      </div>
-<div id="quizFormButton" style="display:none;">
-  <label>Use the Form Builder to Add Structured Questions:</label><br>
-  <button type="button" onclick="openQuizModal()" class="btn btn-success"><i class="bx bx-plus me-1"></i>Add Quiz/Assignment Questions</button>
-</div>
-
-      <div id="quizModal" class="modal" style="display:none;">
-  <div class="modal-content">
-    <span class="close" onclick="closeQuizModal()">&times;</span>
-    <h3>🧠 Add Quiz Questions</h3>
-    
-<div id="quizBuilderModal">
-  <div class="mb-3">
-    <label>Instructions:</label>
-    <textarea name="quiz_instructions" placeholder="Quiz Instructions" class="form-control mb-2 editor"></textarea>
-  </div>
-
-  <!-- Template to clone -->
-  <div class="question-block">
-    <div class="mb-3">
-      <label>Question:</label>
-      <textarea name="questions[]" class="form-control mb-2 editor" placeholder="Question"></textarea>
-    </div>
-    <div class="mb-3">
-      <input type="text" name="option_a[]" placeholder="Option A">
-      <input type="text" name="option_b[]" placeholder="Option B">
-      <input type="text" name="option_c[]" placeholder="Option C">
-      <input type="text" name="option_d[]" placeholder="Option D">
-    </div>
-    <div class="mb-3">
-      <label>Correct Answer:</label>
-      <select name="correct_answer[]" class="form-select mb-3">
-        <option value="a">A</option>
-        <option value="b">B</option>
-        <option value="c">C</option>
-        <option value="d">D</option>
-      </select>
-    </div>
-    
-    <hr>
-  </div>
-</div>
-
-    <button type="button" onclick="addQuizQuestionModal()" class="btn btn-secondary"><i class="bx bx-plus me-1"></i>Add Another Question</button>
-    <br><br>
-    <button type="button" onclick="closeQuizModal()" class="btn btn-primary">✅ Done</button>
-  </div>
-</div>
-
-
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Course Trailer/Intro Video (Optional)</label>
-              <input type="file" class="form-control" name="trailer_video" accept="video/*">
-            </div>
-
-          <?php
-          // Fetch event types from the database
-          $eventTypes = [];
-          $eventTypeQuery = mysqli_query($con, "SELECT s, name FROM {$siteprefix}event_types");
-          while ($row = mysqli_fetch_assoc($eventTypeQuery)) {
-              $eventTypes[] = $row;
-          }
-          ?>
-          <!-- ...existing code... -->
-
-          <div class="mb-3">
-            <label class="form-label">Type of Training & Events</label>
-            <select class="form-control" name="event_type" required>
-              <option value="">Select Type</option>
-              <?php foreach ($eventTypes as $type): ?>
-                <option value="<?php echo htmlspecialchars($type['s']); ?>">
-                  <?php echo htmlspecialchars($type['name']); ?>
-                </option>
-              <?php endforeach; ?>
-            </select>
-          </div>
-
-          <div class="mb-3">
-  <label class="form-label">Pricing</label>
-  <select class="form-control" name="pricing" id="pricingSelect" onchange="togglePricingFields()" required>
-    <option value="">Select Pricing</option>
-    <option value="donation">Donation</option>
-    <option value="free">Free</option>
-    <option value="paid">Paid</option>
-  </select>
-</div>
-
-<!-- Donation Info -->
-<div class="mb-3" id="donationFields" style="display:none;">
-  <p>This event allows attendees to pay any amount they choose as a donation.</p>
-</div>
-
-<!-- Free Info -->
-<div class="mb-3" id="freeFields" style="display:none;">
-  <p>This event is free for all attendees.</p>
-</div>
-
-
-<!-- Paid Ticket Fields -->
-<div class="mb-3" id="paidFields" style="display:none;">
-  <label class="form-label">Ticket Name</label>
-  <input type="text" class="form-control mb-2" name="ticket_name[]" placeholder="e.g. General Admission">
-  <label class="form-label">Benefits</label>
-  <input type="text" class="form-control mb-2" name="ticket_benefits[]" placeholder="e.g. Certificate, Lunch, Materials">
-  <label class="form-label">Price</label>
-  <input type="number" class="form-control mb-2" name="ticket_price[]" min="0" step="0.01" placeholder="e.g. 5000">
-  <label class="form-label">Number of Seats Available</label>
-  <input type="number" class="form-control" name="ticket_seats[]" min="1" placeholder="e.g. 100">
-
-    <div class="mb-3" id="ticketWrapper">
-
-              </div>
-  <!-- Add Another Ticket Button -->
-<button type="button" id="addTicketBtn" class="btn btn-secondary">Add Another Ticket</button>
-</div>
-
-                      
-                         <div class="mb-3">
-                          <label>Category</label>
-                      <div class="custom-select-wrapper" id="category-wrapper">
-  <div class="custom-select-display" onclick="toggleDropdown('category')">
-    <div class="custom-select-tags" id="category-tags"></div>
-  </div>
-  <div class="custom-select-dropdown" id="category-dropdown">
-    <input type="search" class="form-control" placeholder="Search categories..." onkeyup="filterOptions(this, 'category-options')">
-    <div id="category-options">
-      <?php
-        $sql = "SELECT * FROM " . $siteprefix . "categories WHERE parent_id IS NULL";
-        $res = mysqli_query($con, $sql);
-        while ($row = mysqli_fetch_assoc($res)) {
-          echo '<div class="custom-option">
-                  <label>
-                    <input type="checkbox" name="category[]" value="' . $row['id'] . '" onchange="updateTags(this, \'category\')">
-                    ' . htmlspecialchars($row['category_name']) . '
-                  </label>
-                </div>';
-        }
-      ?>
-    </div>
-  </div>
-</div>
-
-<label>Subcategory</label>
-<div class="custom-select-wrapper" id="subcategory-wrapper" style="margin-top: 20px; display: none;">
-  <div class="custom-select-display" onclick="toggleDropdown('subcategory')">
-    <div class="custom-select-tags" id="subcategory-tags"></div>
-  </div>
-  <div class="custom-select-dropdown" id="subcategory-dropdown">
-    <input class="form-control" type="search" placeholder="Search subcategories..." onkeyup="filterOptions(this, 'subcategory-options')">
-    <div id="subcategory-options">
-      <!-- Subcategory checkboxes inserted dynamically -->
-    </div>
-  </div>
-</div>
-                        </div>
+                  
 
                             <?php
     // Fetch instructors from the database
