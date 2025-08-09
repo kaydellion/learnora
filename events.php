@@ -6,16 +6,23 @@ include "event-details.php";
 //get and decode affliate_id if it exists
 $affliate_id = isset($_GET['affiliate']) ? base64_decode($_GET['affiliate']) : 0;
 $event_passed = false;
+
 if (!empty($event_dates)) {
     $now = date('Y-m-d H:i:s');
     $all_past = true;
+
     foreach ($event_dates as $ed) {
-        $event_end = $ed['event_date'] . ' ' . $ed['end_time'];
-        if ($event_end >= $now) {
-            $all_past = false;
-            break;
+        // Ensure both date and time are valid before checking
+        if (!empty($ed['event_date']) && !empty($ed['end_time'])) {
+            $event_end = $ed['event_date'] . ' ' . $ed['end_time'];
+
+            if ($event_end >= $now) {
+                $all_past = false; // Found an upcoming or ongoing event
+                break;
+            }
         }
     }
+
     $event_passed = $all_past;
 }
 
@@ -520,31 +527,48 @@ if ($wordCount > 30) {
         </tr>
         <tr>
             <td><i class="bi bi-people"></i> Target Audience:</td>
-            <td><?php echo htmlspecialchars($target_audience); ?></td>
+            <td><?php echo $target_audience; ?></td>
         </tr>
 
         <!-- ✅ Insert Delivery Format Location Info -->
         <?php echo $delivery_details; ?>
 
-        <!-- ✅ Event Dates -->
-        <?php if (!empty($event_dates)): ?>
-            <?php foreach ($event_dates as $ed): ?>
-                <tr>
-                    <td><i class="bi bi-calendar-event"></i> Date & Time:</td>
-                    <td>
-                        <?php
-                        echo date('D, M j, Y', strtotime($ed['event_date'])) . ' — ';
-                        echo date('g:ia', strtotime($ed['start_time'])) . ' to ' . date('g:ia', strtotime($ed['end_time']));
-                        ?>
-                    </td>
-                </tr>
-            <?php endforeach; ?>
-        <?php else: ?>
-            <tr>
-                <td><i class="bi bi-calendar-event"></i> Date & Time:</td>
-                <td>No scheduled dates yet.</td>
-            </tr>
-        <?php endif; ?>
+     <?php
+
+// ✅ Fetch all event dates for this training
+$event_dates = [];
+$dates_sql = "SELECT event_date, start_time, end_time
+              FROM {$siteprefix}training_event_dates
+              WHERE training_id = '$id'
+              ORDER BY event_date ASC, start_time ASC";
+$dates_result = mysqli_query($con, $dates_sql);
+
+while ($d = mysqli_fetch_assoc($dates_result)) {
+    $event_dates[] = $d;
+}
+
+
+?>
+           <!-- ✅ Event Dates -->
+<?php if (!empty($event_dates)): ?>
+    <?php foreach ($event_dates as $ed): ?>
+        <tr>
+            <td><i class="bi bi-calendar-event"></i> Date & Time:</td>
+            <td>
+                <?php
+                echo date('D, M j, Y', strtotime($ed['event_date'])) . ' — ';
+                echo date('g:ia', strtotime($ed['start_time'])) . ' to ' . date('g:ia', strtotime($ed['end_time']));
+                ?>
+            </td>
+        </tr>
+    <?php endforeach; ?>
+<?php else: ?>
+    <tr>
+        <td><i class="bi bi-calendar-event"></i> Date & Time:</td>
+        <td>No scheduled dates yet.</td>
+    </tr>
+<?php endif; ?>
+
     </tbody>
 </table>
 
@@ -599,7 +623,7 @@ if ($wordCount > 30) {
       
 	  
 	      <div class="product-description mb-1">
-      <?php if (!empty($course_description)): ?>
+      <?php if (!empty($description)): ?>
     <div class="accordion mb-3" id="benefitAccordion">
         <div class="accordion-item">
             <h2 class="accordion-header" id="headingBenefit">
@@ -613,7 +637,7 @@ if ($wordCount > 30) {
                  <div class="product-short-description mb-1">
 <?php
 // Fetch from DB (already contains TinyMCE HTML)
-$description_html = $course_description;
+$description_html = $description;
 
 // Count words in plain text
 $plainText = strip_tags($description_html);
