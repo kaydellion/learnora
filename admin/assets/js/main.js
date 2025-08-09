@@ -304,6 +304,7 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 });
 
+
 document.querySelectorAll('.delete-image').forEach(button => {
   button.addEventListener('click', function() {
       if (confirm('Are you sure you want to delete this image?')) {
@@ -326,6 +327,7 @@ document.querySelectorAll('.delete-image').forEach(button => {
       }
   });
 });
+
 
 document.addEventListener('DOMContentLoaded', function () {
   document.querySelectorAll('.delete-video-lesson').forEach(function (button) {

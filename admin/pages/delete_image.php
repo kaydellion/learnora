@@ -17,7 +17,7 @@ if($action == 'deleteimage'){
 
     if ($image) {
         // Delete the image file from the server
-        $file_path = '../../uploads/' . $image['picture'];
+        $file_path = 'uploads/' . $image['picture'];
         if (file_exists($file_path)) {
             unlink($file_path);
         }
