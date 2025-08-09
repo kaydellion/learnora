@@ -151,7 +151,7 @@ foreach ($fields as $col => $label) {
             echo "<p>{$description}</p>";
         }
         if (!empty($filePath)) {
-            echo "<p><a href='documents/{$filePath}' target='_blank'>Download: {$fileName}</a></p>";
+            echo "<p><a href='documents/{$filePath}' target='_blank'>Download</a></p>";
         }
         echo "</div>";
     }
