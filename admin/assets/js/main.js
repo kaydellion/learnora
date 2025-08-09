@@ -2294,7 +2294,7 @@ function addVideoModule() {
   });
 
   container.appendChild(newModule);
-  reinitTinyMCE();
+ 
 }
 
 function addTextModule() {
@@ -2314,7 +2314,7 @@ function addTextModule() {
   });
 
   container.appendChild(newModule);
-  reinitTinyMCE();
+ 
 }
 
 function reinitTinyMCE() {
