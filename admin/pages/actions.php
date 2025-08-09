@@ -241,46 +241,6 @@ if (!empty($_POST['text_module_title_existing'])) {
 
 
 
-if (empty($_FILES[$fileKey]['name'])) {
-    // Use default images if no images are uploaded
-    $defaultImages = ['default1.jpg', 'default2.jpg', 'default3.jpg', 'default4.jpg', 'default5.jpg'];
-    $reportImages = $defaultImages[array_rand($defaultImages)];
-} else {
-    $reportImage = $_FILES[$fileKey]['name'];
-    $fileName = uniqid() . '_' . basename($reportImage);
-    $reportImages = handleFileUpload($fileKey, $uploadDir, $fileName);
-}
-
-// ✅ Check if image already exists for this training_id
-$checkStmt = $con->prepare("SELECT COUNT(*) AS count FROM {$siteprefix}training_images WHERE training_id = ?");
-$checkStmt->bind_param("s", $training_id);
-$checkStmt->execute();
-$checkResult = $checkStmt->get_result();
-$row = $checkResult->fetch_assoc();
-$checkStmt->close();
-
-if ($row['count'] > 0) {
-    // ✅ Update existing image
-    $updateStmt = $con->prepare("UPDATE {$siteprefix}training_images SET picture = ?, updated_at = NOW() WHERE training_id = ?");
-    $updateStmt->bind_param("ss", $reportImages, $training_id);
-    if ($updateStmt->execute()) {
-        $uploadedFiles[] = $reportImages;
-    } else {
-        $message .= "Error updating image: " . $updateStmt->error . "<br>";
-    }
-    $updateStmt->close();
-} else {
-    // ✅ Insert new image
-    $insertStmt = $con->prepare("INSERT INTO {$siteprefix}training_images (training_id, picture, updated_at) VALUES (?, ?, NOW())");
-    $insertStmt->bind_param("ss", $training_id, $reportImages);
-    if ($insertStmt->execute()) {
-        $uploadedFiles[] = $reportImages;
-    } else {
-        $message .= "Error inserting image: " . $insertStmt->error . "<br>";
-    }
-    $insertStmt->close();
-}
-
 $submitted_ids = [];
 
 if (!empty($_POST['event_dates'])) {
