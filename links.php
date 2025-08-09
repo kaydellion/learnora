@@ -15,9 +15,8 @@ function generateLink($page, $icon, $text, $current_page) {
 
 // Only show "Add Training" if the user is a trainer
 if (isset($trainer) && $trainer == 1) {
-    generateLink('add-training.php', 'ti-plus', 'Add Training', $current_page);
-    generateLink('saved-training.php', 'ti-edit', 'Draft', $current_page);
-    generateLink('wallet.php', 'ti-wallet', 'Wallet', $current_page);
+    generateLink('add-training.php', 'bi-plus', 'Add Training', $current_page);
+    generateLink('wallet.php', 'bi-wallet', 'Wallet', $current_page);
 }
 
 generateLink('dashboard.php', 'bi-anchor', 'Dashboard', $current_page);
