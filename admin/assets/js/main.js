@@ -194,7 +194,7 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 document.addEventListener('DOMContentLoaded', function () {
-  document.querySelectorAll('.delete-text-module').forEach(function (button) {
+  document.querySelectorAll('.delete-texts-module').forEach(function (button) {
     button.addEventListener('click', function () {
       const moduleId = this.getAttribute('data-module-id');
 

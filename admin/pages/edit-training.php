@@ -322,7 +322,7 @@ while ($row = $textResult->fetch_assoc()):
   <div class="text-module mb-3 border p-3" data-module-id="<?php echo $row['id']; ?>">
     <div class="d-flex justify-content-between align-items-center">
       <h5>Module <span class="module-number"><?php echo $row['module_number']; ?></span></h5>
-      <button type="button" class="btn btn-sm btn-danger delete-text-module" data-module-id="<?php echo $row['id']; ?>">
+      <button type="button" class="btn btn-sm btn-danger delete-texts-module" data-module-id="<?php echo $row['id']; ?>">
         Delete Module
       </button>
     </div>
