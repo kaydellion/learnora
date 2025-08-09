@@ -56,7 +56,7 @@
         $user_picture = $imagePath.$row['profile_picture'];
         $created_date = $row['created_at'];
         $status = $row['status'];
-        $image_path = $imagePath.$row['picture'];
+      
         $slug = $alt_title;
         $event_type = $row['event_type'] ?? '';
          $loyalty = $row['loyalty'];
