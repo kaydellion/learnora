@@ -2383,8 +2383,7 @@ if ($instructor_id === 'add_new') {
             subcategory = '$subcategory',
             instructors = '$instructor_id',
             additional_notes = '$additional_notes',
-            tags = '$tags',
-         
+            tags = '$tags'
         WHERE training_id = '$training_id'");
 if ($updateTraining) {
     $statusAction = "Success!";
