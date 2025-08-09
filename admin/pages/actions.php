@@ -106,6 +106,149 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['edit_event'])) {
     $pricing = mysqli_real_escape_string($con, $_POST['pricing']);
 
     
+    // Check the current status of the report in the database
+    $currentStatusQuery = "SELECT status FROM ".$siteprefix."training WHERE training_id = '$training_Id'";
+    $currentStatusResult = mysqli_query($con, $currentStatusQuery);
+    $currentStatusRow = mysqli_fetch_assoc($currentStatusResult);
+    $currentStatus = $currentStatusRow['status'];
+
+    // Only proceed if the current status is not 'approved' and the new status is 'approved'
+    if ($currentStatus !== 'approved' && $status === 'approved' ) {
+
+        // Fetch seller_id from the users table
+$sellerQuery = "SELECT * FROM ".$siteprefix."users WHERE s = '$user_id'";
+$sellerResult = mysqli_query($con, $sellerQuery);
+
+if ($sellerResult && mysqli_num_rows($sellerResult) > 0) {
+    $sellerRow = mysqli_fetch_assoc($sellerResult);
+    $seller_id = $sellerRow['trainer'];
+
+    // Check if the seller_id is 1
+    if ($seller_id > 0) {
+        // Proceed with the rest of the logic
+        $sellerEmail = $sellerRow['email_address'];
+        $sellerName = $sellerRow['display_name'];
+
+        // Prepare the email
+$emailSubject = "🎉 Your event Is Now Live on Learnora!";
+
+$emailMessage = "
+    <p>Dear Contributor,</p>
+
+    <p>We’re thrilled to inform you that your event titled <strong>\"$title\"</strong> has been successfully reviewed and is now live on the <strong>Financial Models Store</strong> marketplace!</p>
+
+   <p>You can view your document here:  <a href='{$siteurl}trainer-store.php?seller_id=$user_id' target='_blank'>$title</a></p>
+
+    <p>To maximize visibility and boost your initial sales, we recommend promoting your events across the following platforms:</p>
+
+    <ul>
+        <li><strong>LinkedIn:</strong> Create a LinkedIn Pulse article (not just a post) to introduce your event. Tag friends, peers, and communities in the comments to drive engagement and reach.</li>
+        <li><strong>Product Hunt:</strong> Launch your event as a product. Tag <em>Learnora</em> as a collaborator to amplify exposure.</li>
+        <li><strong>Reddit, Nairaland, Quora, and Medium:</strong> Engage with niche communities by sharing your event and participating in discussions around financial modeling and academic resources.</li>
+    </ul>
+
+    <p>Promoting your model through these channels can significantly enhance your event’s reach, improve SEO, and drive sustainable long-term traction.</p>
+
+    <p>Thank you for being a valued member of the Learnora community!</p>
+
+    <p>Warm regards,<br>
+    The Learnora Team</p>
+";
+
+
+        // Send the email
+        sendEmail($sellerEmail, $sellerName, $siteName, $siteMail, $emailMessage, $emailSubject);
+    }
+}
+        // Check if the user_id matches the seller_id in the followers table
+        $followersQuery = "SELECT user_id FROM ".$siteprefix."followers WHERE seller_id = '$user_id'";
+        $followersResult = mysqli_query($con, $followersQuery);
+
+        if (mysqli_num_rows($followersResult) > 0) {
+            // Fetch the seller's name
+            $sellerQuery = "SELECT display_name FROM ".$siteprefix."users WHERE s = '$user_id'";
+            $sellerResult = mysqli_query($con, $sellerQuery);
+            $sellerRow = mysqli_fetch_assoc($sellerResult);
+            $sellerName = $sellerRow['display_name'];
+
+            // Notify all followers
+            while ($follower = mysqli_fetch_assoc($followersResult)) {
+                $followerId = $follower['user_id'];
+
+                // Fetch follower details
+                $followerDetailsQuery = "SELECT email_address, display_name FROM ".$siteprefix."users WHERE s = '$followerId'";
+                $followerDetailsResult = mysqli_query($con, $followerDetailsQuery);
+                $followerDetails = mysqli_fetch_assoc($followerDetailsResult);
+
+                $followerEmail = $followerDetails['email_address'];
+                $followerName = $followerDetails['display_name'];
+
+                // Prepare the email
+                $emailSubject = "New event Posted by $sellerName";
+                $emailMessage = "
+                    <p>We are excited to inform you that $sellerName has just posted a new event titled <strong>$title</strong>.</p>
+                        <p>You can check it out here: 
+    <a href=\"{$siteurl}trainer-store.php?seller_id={$user_id}\">{$sellerName}</a>
+    </p>
+                    <p>Thank you for following $sellerName!</p>";
+
+                // Send the email
+                sendEmail($followerEmail, $followerName, $siteName, $siteMail, $emailMessage, $emailSubject);
+
+                // Notify user
+                insertAlert($con, $followerId, "New event titled $title has been posted by $sellerName", $currentdatetime, 0);
+            }
+        }
+
+  
+
+// Query to get users following the category
+$categories = explode(',', $category); // Convert comma-separated string back to array
+
+foreach ($categories as $catId) {
+    $catId = trim($catId);
+
+    // Query to get users following this category
+    $categoryFollowersQuery = "SELECT user_id FROM " . $siteprefix . "followers WHERE category_id = '$catId'";
+    $categoryFollowersResult = mysqli_query($con, $categoryFollowersQuery);
+
+    if ($categoryFollowersResult && mysqli_num_rows($categoryFollowersResult) > 0) {
+        // Fetch category name for the email
+        $categoryQuery = "SELECT * FROM " . $siteprefix . "categories WHERE id = '$catId'";
+        $categoryResult = mysqli_query($con, $categoryQuery);
+        $categoryRow = mysqli_fetch_assoc($categoryResult);
+        $categoryName = $categoryRow['category_name'];
+        $slugs = $categoryRow['slug'];
+
+        // Notify all users following this category
+        while ($follower = mysqli_fetch_assoc($categoryFollowersResult)) {
+            $followerId = $follower['user_id'];
+
+            // Fetch follower details
+            $followerDetailsQuery = "SELECT email_address, display_name FROM " . $siteprefix . "users WHERE s = '$followerId'";
+            $followerDetailsResult = mysqli_query($con, $followerDetailsQuery);
+            $followerDetails = mysqli_fetch_assoc($followerDetailsResult);
+
+            $followerEmail = $followerDetails['email_address'];
+            $followerName = $followerDetails['display_name'];
+
+            // Prepare the email
+            $emailSubject = "New event in $categoryName";
+        $emailMessage = "
+    <p>We are excited to inform you that a new eventl titled <strong>{$title}</strong> has been added to the <strong>{$categoryName}</strong> category.</p>
+    <p>You can check it out here: <a href=\"{$siteurl}category/{$slugs}\" target=\"_blank\">{$categoryName}</a></p>
+    <p>Thank you for following the <strong>{$categoryName}</strong> category!</p>
+";
+
+
+            // Send the email
+            sendEmail($followerEmail, $followerName, $siteName, $siteMail, $emailMessage, $emailSubject);
+
+            // Notify user
+            insertAlert($con, $followerId, "New event titled $title under category $categoryName has been posted", $currentdatetime, 0);
+        }
+    }
+    }
 
 
     if ($delivery_format === 'video' && !empty($_POST['video_module_title_existing'])) {
