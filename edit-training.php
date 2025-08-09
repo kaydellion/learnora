@@ -772,22 +772,6 @@ if ($textQuery && mysqli_num_rows($textQuery) > 0): ?>
   <input type="text" class="form-control" name="tags" placeholder="E.g. finance, business, marketing" value="<?php echo $tags; ?>">
 </div>
 
-    <?php if ($user_type === 'admin'): ?>
-                    <div class="mb-3">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="loyalty" name="loyalty" <?php echo ($loyalty) ? 'checked' : ''; ?>>
-                            <label class="form-check-label" for="loyalty">List under our Loyalty Program</label>
-                        </div>
-                    </div>
-                    <?php endif; ?>
-                    <div class="mb-3">
-                          <label class="form-label" for="status-type">Approval Status</label>
-                          <select id="status-type" name="status" class="form-control" required <?= getReadonlyAttribute() ?>>
-                            <option value="pending" <?php echo ($status == 'pending') ? 'selected' : ''; ?>>Pending</option>
-                            <option value="approved" <?php echo ($status == 'approved') ? 'selected' : ''; ?>>Approved</option>
-                          </select>
-                        </div>
-                        
             <div class="mb-3">
               <button type="submit" name="edit_event" class="btn btn-primary">Edit Event / Course</button>
             </div>

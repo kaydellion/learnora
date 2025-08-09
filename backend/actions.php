@@ -1964,6 +1964,451 @@ if (isset($_GET['action']) && $_GET['action'] == 'delete') {
     showToast($message);
     header("refresh:2; url=$page");
 }
+
+
+
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['edit_event'])) {
+
+        // Directories for uploads
+    $uploadDir = 'uploads/';
+    $fileuploadDir = 'documents/';
+  
+    $message = "";
+    $physical_address = $physical_state = $physical_lga = $physical_country = $foreign_address = '';
+    $web_address = '';
+    $hybrid_physical_address = $hybrid_web_address = $hybrid_state = $hybrid_lga = $hybrid_country = $hybrid_foreign_address = '';
+
+    $title = mysqli_real_escape_string($con, $_POST['title']);
+    $description = mysqli_real_escape_string($con, $_POST['description']);
+    $category = implode(',', $_POST['category']);
+    $subcategory = implode(',', $_POST['subcategory']);
+    $event_type = mysqli_real_escape_string($con, $_POST['event_type']);
+    $attendee = mysqli_real_escape_string($con, $_POST['who_should_attend']);
+    $user = mysqli_real_escape_string($con, $_POST['user']);
+    $training_id = mysqli_real_escape_string($con, $_POST['training-id']);
+    $language = mysqli_real_escape_string($con, $_POST['language']);
+    $certification = mysqli_real_escape_string($con, $_POST['certification']);
+    $course_description = mysqli_real_escape_string($con, $_POST['course_description']);
+    $level = mysqli_real_escape_string($con, $_POST['level']);
+     $tags = mysqli_real_escape_string($con, $_POST['tags']);
+    $learning_objectives = mysqli_real_escape_string($con, $_POST['learning_objectives']);
+    $target_audience = mysqli_real_escape_string($con, $_POST['target_audience']);
+    $prerequisites = mysqli_real_escape_string($con, $_POST['prerequisites']);
+    $additional_notes = mysqli_real_escape_string($con, $_POST['additional_notes']);
+    $delivery_format = mysqli_real_escape_string($con, $_POST['delivery_format']);
+    $video_embed_url = mysqli_real_escape_string($con, $_POST['video_embed_url']);
+    $pricing = mysqli_real_escape_string($con, $_POST['pricing']);
+
+    
+    // Check the current status of the report in the database
+    $currentStatusQuery = "SELECT status FROM ".$siteprefix."training WHERE training_id = '$training_Id'";
+    $currentStatusResult = mysqli_query($con, $currentStatusQuery);
+    $currentStatusRow = mysqli_fetch_assoc($currentStatusResult);
+    $currentStatus = $currentStatusRow['status'];
+
+    if ($delivery_format === 'video' && !empty($_POST['video_module_title_existing'])) {
+    foreach ($_POST['video_module_title_existing'] as $moduleId => $title) {
+        $desc      = $_POST['video_module_desc_existing'][$moduleId] ?? '';
+        $duration  = $_POST['video_duration_existing'][$moduleId] ?? '';
+        $videoLink = $_POST['video_link_existing'][$moduleId] ?? '';
+        $qualities = isset($_POST['video_quality_existing'][$moduleId]) ? implode(',', $_POST['video_quality_existing'][$moduleId]) : '';
+        $subtitles = $_POST['video_subtitles_existing'][$moduleId] ?? '';
+
+        $filePath = '';
+
+        // Check if a new file was uploaded
+        if (!empty($_FILES['video_file_existing']['name'][$moduleId])) {
+            // Restructure file array for handleFileUpload()
+            $tmpFileKey = 'single_video_update';
+            $_FILES[$tmpFileKey] = [
+                'name'     => $_FILES['video_file_existing']['name'][$moduleId],
+                'type'     => $_FILES['video_file_existing']['type'][$moduleId],
+                'tmp_name' => $_FILES['video_file_existing']['tmp_name'][$moduleId],
+                'error'    => $_FILES['video_file_existing']['error'][$moduleId],
+                'size'     => $_FILES['video_file_existing']['size'][$moduleId]
+            ];
+
+            // Upload file
+            $fileName = handleFileUpload($tmpFileKey, $fileuploadDir);
+            if ($fileName && strpos($fileName, 'Failed') === false && strpos($fileName, 'error') === false) {
+                $filePath = $fileuploadDir . $fileName;
+
+                // Remove old file
+                $oldFileQuery = $con->prepare("SELECT file_path FROM {$siteprefix}training_video_modules WHERE id = ?");
+                $oldFileQuery->bind_param("i", $moduleId);
+                $oldFileQuery->execute();
+                $oldFileResult = $oldFileQuery->get_result()->fetch_assoc();
+                if (!empty($oldFileResult['file_path']) && file_exists($oldFileResult['file_path'])) {
+                    unlink($oldFileResult['file_path']);
+                }
+                $oldFileQuery->close();
+            }
+        }
+
+        // Build update query dynamically
+        if ($filePath) {
+            $stmt = $con->prepare("
+                UPDATE {$siteprefix}training_video_modules 
+                SET title = ?, description = ?, duration = ?, file_path = ?, video_link = ?, video_quality = ?, subtitles = ?, updated_at = NOW()
+                WHERE id = ?
+            ");
+            $stmt->bind_param("sssssssi", $title, $desc, $duration, $filePath, $videoLink, $qualities, $subtitles, $moduleId);
+        } else {
+            $stmt = $con->prepare("
+                UPDATE {$siteprefix}training_video_modules 
+                SET title = ?, description = ?, duration = ?, video_link = ?, video_quality = ?, subtitles = ?, updated_at = NOW()
+                WHERE id = ?
+            ");
+            $stmt->bind_param("ssssssi", $title, $desc, $duration, $videoLink, $qualities, $subtitles, $moduleId);
+        }
+
+        $stmt->execute();
+        $stmt->close();
+    }
+}
+
+if (!empty($_POST['text_module_title_existing'])) {
+    foreach ($_POST['text_module_title_existing'] as $moduleId => $title) {
+        $desc       = $_POST['text_module_desc_existing'][$moduleId] ?? '';
+        $reading    = $_POST['text_reading_time_existing'][$moduleId] ?? '';
+        $filePath   = '';
+
+        if (!empty($_FILES['text_file_existing']['name'][$moduleId])) {
+            $tmpFileKey = 'single_text_upload';
+            $_FILES[$tmpFileKey] = [
+                'name'     => $_FILES['text_file_existing']['name'][$moduleId],
+                'type'     => $_FILES['text_file_existing']['type'][$moduleId],
+                'tmp_name' => $_FILES['text_file_existing']['tmp_name'][$moduleId],
+                'error'    => $_FILES['text_file_existing']['error'][$moduleId],
+                'size'     => $_FILES['text_file_existing']['size'][$moduleId]
+            ];
+
+            $fileName = handleFileUpload($tmpFileKey, $fileuploadDir);
+            if ($fileName && strpos($fileName, 'Failed') === false) {
+                $filePath = $fileuploadDir . $fileName;
+            }
+        }
+
+        if (!empty($filePath)) {
+            $stmt = $con->prepare("
+                UPDATE {$siteprefix}training_texts_modules
+                SET title=?, description=?, reading_time=?, file_path=?, updated_at=NOW()
+                WHERE id=?
+            ");
+            $stmt->bind_param("ssssi", $title, $desc, $reading, $filePath, $moduleId);
+        } else {
+            $stmt = $con->prepare("
+                UPDATE {$siteprefix}training_texts_modules
+                SET title=?, description=?, reading_time=?, updated_at=NOW()
+                WHERE id=?
+            ");
+            $stmt->bind_param("sssi", $title, $desc, $reading, $moduleId);
+        }
+        $stmt->execute();
+        $stmt->close();
+    }
+}
+
+
+// Handle image uploads
+
+    $fileKeys = 'images';
+    if (empty($_FILES[$fileKeys]['name'][0])) {
+       // Array of default images
+     //  $defaultImages = ['default1.jpg', 'default2.jpg', 'default3.jpg', 'default4.jpg', 'default5.jpg'];
+        // Pick a random default image
+     //  $randomImage = $defaultImages[array_rand($defaultImages)];
+     //   $reportImages = [$randomImage];
+        $reportImages = [];
+    }else{
+    $reportImages = handleMultipleFileUpload($fileKeys, $uploadDir);
+     }
+
+     $uploadedFiles = [];
+    foreach ($reportImages as $image) {
+        $stmt = $con->prepare("INSERT INTO  ".$siteprefix."training_images (training_id, picture, updated_at) VALUES (?, ?, current_timestamp())");
+        $stmt->bind_param("ss", $training_id, $image);
+        if ($stmt->execute()) {
+            $uploadedFiles[] = $image;
+        } else {
+            $message.="Error: " . $stmt->error;
+            $hasError = true;
+        }
+        $stmt->close();
+    }
+
+
+
+$submitted_ids = [];
+
+if (!empty($_POST['event_dates'])) {
+    foreach ($_POST['event_dates'] as $i => $date) {
+        $event_date = mysqli_real_escape_string($con, $_POST['event_dates'][$i]);
+        $start_time = mysqli_real_escape_string($con, $_POST['event_start_times'][$i]);
+        $end_time = mysqli_real_escape_string($con, $_POST['event_end_times'][$i]);
+
+        $event_id = isset($_POST['event_ids'][$i]) ? intval($_POST['event_ids'][$i]) : 0;
+
+        if ($event_id > 0) {
+            // Update existing record
+            mysqli_query(
+                $con,
+                "UPDATE {$siteprefix}training_event_dates 
+                 SET event_date = '$event_date', start_time = '$start_time', end_time = '$end_time'
+                 WHERE s = '$event_id' AND training_id = '$training_id'"
+            );
+            $submitted_ids[] = $event_id;
+        } else {
+            // Insert new record
+            mysqli_query(
+                $con,
+                "INSERT INTO {$siteprefix}training_event_dates (training_id, event_date, start_time, end_time)
+                 VALUES ('$training_id', '$event_date', '$start_time', '$end_time')"
+            );
+            $submitted_ids[] = mysqli_insert_id($con); // Optional if you need it later
+        }
+    }
+
+    // Delete records not included in the form
+    if (!empty($submitted_ids)) {
+        $ids_to_keep = implode(',', array_map('intval', $submitted_ids));
+        mysqli_query(
+            $con,
+            "DELETE FROM {$siteprefix}training_event_dates 
+             WHERE training_id = '$training_id' AND s NOT IN ($ids_to_keep)"
+        );
+    } else {
+        // No submitted IDs at all? Delete all for this training
+        mysqli_query(
+            $con,
+            "DELETE FROM {$siteprefix}training_event_dates 
+             WHERE training_id = '$training_id'"
+        );
+    }
+}
+if (isset($_POST['video_embed_url']) && !empty($_POST['video_embed_url'])) {
+    $trailer_video_path = mysqli_real_escape_string($con, $_POST['video_embed_url']);
+  
+
+    $update_sql = "
+        UPDATE {$siteprefix}training_video_lessons 
+        SET file_path = '', 
+            video_url = '$trailer_video_path', 
+            updated_at = NOW() 
+        WHERE training_id = '$training_id'
+    ";
+
+    mysqli_query($con, $update_sql) or die("Update failed: " . mysqli_error($con));
+}
+
+
+    if (!empty($_FILES['video_lessons']['name'])) {
+        $fileKey = 'video_lessons';
+        $videoFiles = handleMultipleFileUpload($fileKey, $fileuploadDir);
+
+    foreach ($videoFiles as $file) {
+        $stmt = $con->prepare(
+            "INSERT INTO {$siteprefix}training_video_lessons (training_id, file_path, video_url, updated_at) VALUES (?, ?, '', NOW())"
+        );
+        $stmt->bind_param("ss", $training_id, $file);
+        if (!$stmt->execute()) {
+            $message .= "Error inserting file: " . $stmt->error . "<br>";
+        }
+        $stmt->close();
+    }
+    }
+
+    if (!empty($_FILES['text_modules']['name'][0])) {
+    $fileKey = 'text_modules';
+    $textFiles = handleMultipleFileUpload($fileKey, $fileuploadDir);
+
+    foreach ($textFiles as $file) {
+        $stmt = $con->prepare(
+            "INSERT INTO {$siteprefix}training_text_modules (training_id, file_path, updated_at) VALUES (?, ?, NOW())"
+        );
+        $stmt->bind_param("ss", $training_id, $file);
+        if (!$stmt->execute()) {
+            $message .= "Error inserting text module: " . $stmt->error . "<br>";
+        }
+        $stmt->close();
+    }
+}
+
+if ($_POST['pricing'] === 'paid') {
+    $ticket_ids = $_POST['ticket_ids'];
+    $ticket_names = $_POST['ticket_name'];
+    $ticket_benefits = $_POST['ticket_benefits'];
+    $ticket_prices = $_POST['ticket_price'];
+    $ticket_seats = $_POST['ticket_seats'];
+
+    foreach ($ticket_names as $index => $name) {
+        $ticket_id = intval($ticket_ids[$index]); // This will be 0 if empty
+        $name = mysqli_real_escape_string($con, $name);
+        $benefits = mysqli_real_escape_string($con, $ticket_benefits[$index]);
+        $price = floatval($ticket_prices[$index]);
+        $seats = intval($ticket_seats[$index]);
+
+        if ($ticket_id > 0) {
+            // Update existing ticket
+            mysqli_query($con, "UPDATE {$siteprefix}training_tickets 
+                SET ticket_name = '$name', benefits = '$benefits', price = '$price', seats = '$seats', seatremain = '$seats'
+                WHERE s = '$ticket_id' AND training_id = '$training_id'");
+        } else {
+            // Insert new ticket
+            mysqli_query($con, "INSERT INTO {$siteprefix}training_tickets 
+                (training_id, ticket_name, benefits, price, seats, seatremain) 
+                VALUES ('$training_id', '$name', '$benefits', '$price', '$seats', '$seats')");
+        }
+    }
+}
+
+
+// Handle Promo Video
+$promo_video = $_FILES['promo_video']['name'];
+if (!empty($promo_video)) {
+    $fileKey = 'promo_video';
+    $fileName = uniqid() . '_' . basename($promo_video);
+    $logopromo_video = handleFileUpload($fileKey, $uploadDir, $fileName);
+
+    // Check if promo video exists for this training_id
+    $checkPromo = mysqli_query($con, "SELECT s FROM {$siteprefix}training_videos WHERE training_id = '$training_id' AND video_type = 'promo'");
+    
+    if (mysqli_num_rows($checkPromo) > 0) {
+        // Update existing promo
+        mysqli_query($con, "UPDATE {$siteprefix}training_videos SET video_path = '$logopromo_video', updated_at = NOW() WHERE training_id = '$training_id' AND video_type = 'promo'");
+    } else {
+        // Insert new promo
+        mysqli_query($con, "INSERT INTO {$siteprefix}training_videos (training_id, video_type, video_path, updated_at) VALUES ('$training_id', 'promo', '$logopromo_video', NOW())");
+    }
+}
+
+// Handle Trailer Video
+$trailer_video = $_FILES['trailer_video']['name'];
+if (!empty($trailer_video)) {
+    $fileKey = 'trailer_video';
+    $fileName = uniqid() . '_' . basename($trailer_video);
+    $logotrailer_video = handleFileUpload($fileKey, $fileuploadDir, $fileName);
+
+    // Check if trailer video exists for this training_id
+    $checkTrailer = mysqli_query($con, "SELECT s FROM {$siteprefix}training_videos WHERE training_id = '$training_id' AND video_type = 'trailer'");
+    
+    if (mysqli_num_rows($checkTrailer) > 0) {
+        // Update existing trailer
+        mysqli_query($con, "UPDATE {$siteprefix}training_videos SET video_path = '$logotrailer_video', updated_at = NOW() WHERE training_id = '$training_id' AND video_type = 'trailer'");
+    } else {
+        // Insert new trailer
+        mysqli_query($con, "INSERT INTO {$siteprefix}training_videos (training_id, video_type, video_path, updated_at) VALUES ('$training_id', 'trailer', '$logotrailer_video', NOW())");
+    }
+}
+
+  // Handle Instructor
+$instructor_id = $_POST['instructor'];
+
+if ($instructor_id === 'add_new') {
+    $new_name = mysqli_real_escape_string($con, $_POST['new_instructor_name']);
+    $new_bio = mysqli_real_escape_string($con, $_POST['new_instructor_bio']);
+    $new_email = mysqli_real_escape_string($con, $_POST['new_instructor_email']);
+    $adduser = mysqli_real_escape_string($con, $_POST['user_id']);
+    $instructor_photo = ''; // initialize photo filename
+    $photo_path = '';       // full path for saving file
+
+    if (!empty($_FILES['new_instructor_photo']['name'])) {
+        $originalName = basename($_FILES['new_instructor_photo']['name']);
+        $uniqueFileName = uniqid() . '_' . $originalName;
+        $photo_path = $uploadDir . $uniqueFileName;
+
+        if (move_uploaded_file($_FILES['new_instructor_photo']['tmp_name'], $photo_path)) {
+            $instructor_photo = $uniqueFileName;
+        }
+    }
+
+    mysqli_query($con, "INSERT INTO {$siteprefix}instructors (name, email_address, bio, photo, user) 
+                        VALUES ('$new_name', '$new_email', '$new_bio', '$instructor_photo','$adduser')");
+
+    $instructor_id = mysqli_insert_id($con);
+}
+
+  
+//delivery format handling
+    if ($delivery_format === 'physical') {
+    if ($_POST['physicalLocationType'] === 'nigeria') {
+        $physical_address = mysqli_real_escape_string($con, $_POST['nigeria_address']);
+        $physical_state = mysqli_real_escape_string($con, $_POST['state']);
+        $physical_lga = mysqli_real_escape_string($con, $_POST['lga']);
+        $physical_country = 'Nigeria';
+    } elseif ($_POST['physicalLocationType'] === 'foreign') {
+        $foreign_address = mysqli_real_escape_string($con, $_POST['foreign_address']);
+    }
+
+    } elseif ($delivery_format === 'online') {
+    $web_address = mysqli_real_escape_string($con, $_POST['web_address']);
+} elseif ($delivery_format === 'hybrid') {
+    $hybrid_physical_address = mysqli_real_escape_string($con, $_POST['hybrid_physical_address']);
+    $hybrid_web_address = mysqli_real_escape_string($con, $_POST['hybrid_web_address']);
+    if ($_POST['hybridLocationType'] === 'nigeria') {
+        $hybrid_state = mysqli_real_escape_string($con, $_POST['hybrid_state']);
+        $hybrid_lga = mysqli_real_escape_string($con, $_POST['hybrid_lga']);
+        $hybrid_country = 'Nigeria';
+    } elseif ($_POST['hybridLocationType'] === 'foreign') {
+        $hybrid_foreign_address = mysqli_real_escape_string($con, $_POST['hybrid_foreign_address']);
+    }
+}
+
+
+// UPDATE existing training
+    $updateTraining = mysqli_query($con, "
+        UPDATE {$siteprefix}training SET
+            title = '$title',
+            description = '$description',
+            attendee = '$attendee',
+            Language = '$language',
+            certification = '$certification',
+            level = '$level',
+            delivery_format = '$delivery_format',
+            physical_address = '$physical_address',
+            physical_state = '$physical_state',
+            physical_lga = '$physical_lga',
+            physical_country = '$physical_country',
+            foreign_address = '$foreign_address',
+            web_address = '$web_address',
+            hybrid_physical_address = '$hybrid_physical_address',
+            hybrid_web_address = '$hybrid_web_address',
+            hybrid_state = '$hybrid_state',
+            hybrid_lga = '$hybrid_lga',
+            hybrid_country = '$hybrid_country',
+            hybrid_foreign_address = '$hybrid_foreign_address',
+            course_description = '$course_description',
+            learning_objectives = '$learning_objectives',
+            target_audience = '$target_audience',
+            course_requirrement = '$prerequisites',
+            event_type = '$event_type',
+            pricing = '$pricing',
+            category = '$category',
+            subcategory = '$subcategory',
+            instructors = '$instructor_id',
+            additional_notes = '$additional_notes',
+            tags = '$tags',
+         
+        WHERE training_id = '$training_id'");
+if ($updateTraining) {
+    $statusAction = "Success!";
+    $statusMessage = "Training updated successfully.";
+    showSuccessModal2($statusAction, $statusMessage);
+
+    header("refresh:2; url=models.php"); // ✅ Change to the desired redirect page
+
+} else {
+    $statusAction = "Error!";
+    $statusMessage = "Failed to update training. Please try again.";
+    showErrorModal2($statusAction, $statusMessage);
+
+    header("refresh:2; url=models.php"); // ✅ Optional: change this to a retry page
+  
+}
+
+}
+
 // Insert into table and send mail
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_request'])) {
     $seminar_title = mysqli_real_escape_string($con, $_POST['seminar_title']);
