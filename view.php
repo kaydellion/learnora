@@ -112,17 +112,56 @@ foreach ($fields as $col => $label) {
             </div>
 
             <!-- Text Modules Tab -->
-            <div class="tab-pane fade" id="text">
-                <h5>Downloadable PDFs / Docs</h5>
-                <?php
-                $texts = mysqli_query($con, "SELECT file_path FROM {$siteprefix}training_text_modules WHERE training_id = '$id'");
-                while ($t = mysqli_fetch_assoc($texts)) {
-                    $fileName = htmlspecialchars(basename($t['file_path']));
-                    $filePath = htmlspecialchars($t['file_path']);
-                    echo "<p><a href='documents/{$filePath}' target='_blank'>📄 {$fileName}</a></p>";
-                }
-                ?>
-            </div>
+       <div class="tab-pane fade" id="text">
+    <h5>Downloadable PDFs / Docs</h5>
+    <?php
+    // 1️⃣ Fetch from training_text_modules
+    $texts1 = mysqli_query($con, "SELECT file_path FROM {$siteprefix}training_text_modules WHERE training_id = '$id'");
+    while ($t = mysqli_fetch_assoc($texts1)) {
+        $fileName = htmlspecialchars(basename($t['file_path']));
+        $filePath = htmlspecialchars($t['file_path']);
+        echo "<p><a href='documents/{$filePath}' target='_blank'>📄 {$fileName}</a></p>";
+    }
+
+    // 2️⃣ Fetch from training_texts_modules (with title, description, reading time)
+    $stmt = $con->prepare("
+        SELECT title, description, reading_time, file_path 
+        FROM {$siteprefix}training_texts_modules 
+        WHERE training_id = ?
+    ");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    while ($t = $result->fetch_assoc()) {
+        $title       = htmlspecialchars($t['title']);
+        $description = $t['description'];
+        $readingTime = $t['reading_time'];
+        $fileName    = $t['file_path'];
+        $filePath    = $t['file_path'];
+
+        echo "<div class='mb-3'>";
+        if (!empty($title)) {
+            echo "<h6>📄 {$title}</h6>";
+        }
+        if ($readingTime > 0) {
+            echo "<p><strong>Reading time:</strong> {$readingTime} mins</p>";
+        }
+        if (!empty($description)) {
+            echo "<p>{$description}</p>";
+        }
+        if (!empty($filePath)) {
+            echo "<p><a href='documents/{$filePath}' target='_blank'>Download: {$fileName}</a></p>";
+        }
+        echo "</div>";
+    }
+
+    if (mysqli_num_rows($texts1) === 0 && $result->num_rows === 0) {
+        echo "<p>No downloadable files available.</p>";
+    }
+    ?>
+</div>
+
 
             <!-- Format Tab -->
             <div class="tab-pane fade" id="format">
