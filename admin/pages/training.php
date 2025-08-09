@@ -33,7 +33,7 @@
     LEFT JOIN ".$siteprefix."users lu ON t.user = lu.s
     LEFT JOIN ".$siteprefix."categories sc ON t.subcategory = sc.id 
     LEFT JOIN ".$siteprefix."training_tickets tt ON t.training_id= tt.training_id
-    LEFT JOIN ".$siteprefix."training_images ti ON t.training_id = ti.training_id 
+
    Where t.status='approved'";
       $result = mysqli_query($con, $query);
                 if (!$result) {
