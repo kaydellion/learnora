@@ -105,8 +105,8 @@ if (in_array($current_page, $excluded_pages)) {
   <meta name="keywords" content="">
 
   <!-- Favicons -->
-  <link href="<?php echo $siteurl; ?>assets/img/<?php echo $siteimg; ?>" rel="icon">
-  <link href="<?php echo $siteurl; ?>assets/img/<?php echo $siteimg; ?>" rel="apple-touch-icon">
+  <link href="<?php echo $siteurl; ?>uploads/<?php echo $siteimg; ?>" rel="icon">
+  <link href="<?php echo $siteurl; ?>uploads/<?php echo $siteimg; ?>" rel="apple-touch-icon">
 
   <!-- Fonts -->
   <link href="https://fonts.googleapis.com" rel="preconnect">
