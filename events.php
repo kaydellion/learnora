@@ -1528,7 +1528,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     if (data.success) {
                         document.getElementById("instructorPhoto").src = data.photo;
                         document.getElementById("instructorName").textContent = data.name;
-                       document.getElementById("instructorBio").innerHTML = data.bio;
+                        document.getElementById("instructorBio").textContent = data.bio;
                         let instructorModal = new bootstrap.Modal(document.getElementById("instructorModal"));
                         instructorModal.show();
                     } else {
