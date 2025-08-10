@@ -9,7 +9,7 @@
       <a href="<?php echo $siteurl; ?>event-type/<?php echo $slugs; ?>" class="btn-shop">Shop Now</a>
     </div>
     <div class="promo-image">
-      <img src="<?php echo $images; ?>" alt="<?php echo $category_name; ?>" class="img-fluid">
+      <img src="<?php echo $imagespro; ?>" alt="<?php echo $category_name; ?>" class="img-fluid">
     </div>
   </div>
 </div>
