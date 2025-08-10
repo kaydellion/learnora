@@ -221,6 +221,7 @@ $rating_data = calculateRating($training_id, $con, $siteprefix);
                         $category_name = $row['name'];
                         $alt_names = $row['slug'];
                         $slugs = $alt_names;
+                        $images = $siteurl . $imagePath . $row['images'];
 
                         include "type-card.php"; // Include the promo card template
 
