@@ -92,7 +92,7 @@ $user_review = $existing_review_result->fetch_assoc();
         <div class="row gx-2 gy-1">
 		
           <!-- Product Images Column -->
-          <div class="col-lg-6 mb-5 mb-lg-0" data-aos="fade-right" data-aos-delay="200">
+          <div class="col-lg-6 mb-2 mb-lg-0" data-aos="fade-right" data-aos-delay="200">
 		  <div class="row">
 		  <div class="col-12">
 		  		  <div class="product-data">
