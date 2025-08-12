@@ -1155,7 +1155,7 @@ CREATE TABLE `ln_site_settings` (
   `account_number` int(11) NOT NULL,
   `site_bank` varchar(600) NOT NULL,
   `google_map` varchar(200) NOT NULL DEFAULT 'AIzaSyBAz868BQ8JaQBr_a-osQLCgeNL6e7AZjs',
-  `brevo_key` varchar(500) NOT NULL DEFAULT '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',
+  `brevo_key` varchar(500) NOT NULL DEFAULT '',
   `payment_url` varchar(450) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
