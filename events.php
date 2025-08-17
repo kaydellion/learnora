@@ -302,76 +302,38 @@ Participants attending training sessions abroad will need to obtain a visa indep
             <div class="product-info-wrapper" id="product-info-sticky">
               <!-- Product Meta -->
               <div class="product-meta">
-                <div class="product-short-description mb-1">
-                  <?php
-                  // Fetch from DB (already contains TinyMCE HTML)
-                  $description_html = $description;
-
-                  // Count words in plain text
-                  $plainText = strip_tags($description_html);
-                  $wordCount = str_word_count($plainText);
-
-                  if ($wordCount > 30) {
-                    // Split words
-                    $words = explode(' ', $plainText);
-
-                    // Get first 30 words
-                    $first30 = implode(' ', array_slice($words, 0, 30));
-
-                    // Build preview HTML with TinyMCE styles
-                  ?>
-                    <div>
-                      <div class="preview" style="display:inline;">
-                        <?php
-                        // We use full HTML, but CSS will hide anything after 30 words
-                        echo '<span class="preview-text">' . $first30 . '...</span>';
-                        ?>
-                      </div>
-                      <div class="more-text" style="display:none;">
-                        <?php echo $description_html; ?>
-                      </div>
-                      <a href="javascript:void(0);" class="toggle-btn">Read More</a>
-                    </div>
-                  <?php
-                  } else {
-                    // If 30 words or fewer, just display the HTML directly
-                    echo "<div>$description_html</div>";
-                  }
-                  ?>
-                </div>
-
-                <!-- Product Price -->
-                <div class="product-price-container">
-                  <div class="price-wrapper">
-                    <span class="current-price">
-                      <?php
-                      if ($pricing === 'paid') {
-                        echo '<span id="paidPrice"></span>'; // Empty placeholder for JS
-                      } elseif ($pricing === 'free') {
-                        echo 'Free';
-                      } elseif ($pricing === 'donation') {
-                        echo 'Donate';
-                      }
-                      ?>
-                    </span>
-                  </div>
-
-                  <div class="mb-1">
-                    <!-- Loyalty Display -->
-                    <?php if ($loyalty == 1): ?>
-                      <span class="badge text-light bg-danger mb-1">Loyalty Material</span>
-                    <?php endif; ?>
-                    <?php foreach ($ticket_list as $ticket): ?>
-                      <?php
-                      $ticket_price = floatval($ticket['price']); // Get ticket price safely
-                      ?>
-                    <?php endforeach; ?>
-                    <?php if ($loyalty_id < 1): ?>
-                      <h6>Buy for Less – <a href="<?php echo $siteurl; ?>loyalty-program.php">Sign up</a> as a loyalty member today!</h6>
-                      <div class="product-loyalty-container mb-3" style="display:none;">
-                        <?php
-                        $loyalty_query = "SELECT name, discount FROM {$siteprefix}subscription_plans WHERE status = 'active'";
-                        $loyalty_result = mysqli_query($con, $loyalty_query);
+              <!-- Product Price -->
+              <div class="product-price-container">
+                <div class="price-wrapper">
+                  <span class="current-price">
+            <?php
+                if ($pricing === 'paid') {
+                  echo '<span id="paidPrice"></span>'; // Empty placeholder for JS
+                } elseif ($pricing === 'free') {
+                echo 'Free';
+                } elseif ($pricing === 'donation') {
+                echo 'Donate';
+                }
+            ?>
+            </span>
+              </div>
+           
+  <div class="mb-1">
+    <!-- Loyalty Display -->
+    <?php if ($loyalty == 1): ?>
+      <span class="badge text-light bg-danger mb-1">Loyalty Material</span>
+    <?php endif; ?>
+<?php foreach ($ticket_list as $ticket): ?>
+    <?php 
+      $ticket_price = floatval($ticket['price']); // Get ticket price safely
+    ?>
+<?php endforeach; ?>
+    <?php if ($loyalty_id < 1): ?>
+  <h6>Buy for Less – <a href="<?php echo $siteurl; ?>loyalty-program.php">Sign up</a> as a loyalty member today!</h6>
+  <div class="product-loyalty-container mb-3" style="display:none;">
+    <?php
+      $loyalty_query = "SELECT name, discount FROM {$siteprefix}subscription_plans WHERE status = 'active'";
+      $loyalty_result = mysqli_query($con, $loyalty_query);
 
                         if ($loyalty_result && mysqli_num_rows($loyalty_result) > 0) {
                           while ($row = mysqli_fetch_assoc($loyalty_result)) {
@@ -585,31 +547,29 @@ Participants attending training sessions abroad will need to obtain a visa indep
               ORDER BY event_date ASC, start_time ASC";
                   $dates_result = mysqli_query($con, $dates_sql);
 
-                  while ($d = mysqli_fetch_assoc($dates_result)) {
-                    $event_dates[] = $d;
-                  }
-
-
-                  ?>
-                  <!-- ✅ Event Dates -->
-                  <?php if (!empty($event_dates)): ?>
-                    <?php foreach ($event_dates as $ed): ?>
-                      <tr>
-                        <td><i class="bi bi-calendar-event"></i> Date & Time:</td>
-                        <td>
-                          <?php
-                          echo date('D, M j, Y', strtotime($ed['event_date'])) . ' — ';
-                          echo date('g:ia', strtotime($ed['start_time'])) . ' to ' . date('g:ia', strtotime($ed['end_time']));
-                          ?>
-                        </td>
-                      </tr>
-                    <?php endforeach; ?>
-                  <?php else: ?>
-                    <tr>
-                      <td><i class="bi bi-calendar-event"></i> Date & Time:</td>
-                      <td>No scheduled dates yet.</td>
-                    </tr>
-                  <?php endif; ?>
+while ($d = mysqli_fetch_assoc($dates_result)) {
+    $event_dates[] = $d;
+}
+?>
+           <!-- ✅ Event Dates -->
+<?php if (!empty($event_dates)): ?>
+    <?php foreach ($event_dates as $ed): ?>
+        <tr>
+            <td><i class="bi bi-calendar-event"></i> Date & Time:</td>
+            <td>
+                <?php
+                echo date('D, M j, Y', strtotime($ed['event_date'])) . ' — ';
+                echo date('g:ia', strtotime($ed['start_time'])) . ' to ' . date('g:ia', strtotime($ed['end_time']));
+                ?>
+            </td>
+        </tr>
+    <?php endforeach; ?>
+<?php else: ?>
+    <tr>
+        <td><i class="bi bi-calendar-event"></i> Date & Time:</td>
+        <td>No scheduled dates yet.</td>
+    </tr>
+<?php endif; ?>
 
                 </tbody>
               </table>

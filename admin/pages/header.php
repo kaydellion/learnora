@@ -221,13 +221,9 @@ redirectToDashboardIfSubAdmin();
                   </a>
                 </li>
 
-               
+              
                 <li class="menu-item">
-                  <a href="drafts.php" class="menu-link">
-                    <div data-i18n="Without navbar">Drafts</div>
-                  </a>
-                <li class="menu-item">
-                  <a href="admin-report.php" class="menu-link">
+                  <a href="admin-event.php" class="menu-link">
                     <div data-i18n="Without navbar">Admin Events</div>
                   </a>
                 </li>
@@ -239,6 +235,11 @@ redirectToDashboardIfSubAdmin();
                 <li class="menu-item">
                   <a href="event_reports.php" class="menu-link">
                     <div data-i18n="Container">Event Reports</div>
+                  </a>
+                </li>
+                   <li class="menu-item">
+                  <a href="inhouse-proposal.php" class="menu-link">
+                    <div data-i18n="Container">In-house Proposal</div>
                   </a>
                 </li>
               </ul>

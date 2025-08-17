@@ -1369,7 +1369,7 @@ if (isset($_POST['submit_manual_payment'])) {
                     $statusAction = "Success!";
                     $statusMessage = "Your payment proof has been submitted successfully. Your order is now pending verification.";
                     showSuccessModal($statusAction, $statusMessage);
-                    header("refresh:2; url=checkout.php");
+                    header("refresh:2; url=dashboard.php");
                 
                 } else {
                     $statusAction = "Error!";

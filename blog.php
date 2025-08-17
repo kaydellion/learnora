@@ -31,7 +31,7 @@
  <?php
 
 // Pagination setup
-$postsPerPage = 3; // Number of posts per page
+$postsPerPage = 12; // Number of posts per page
 $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
 $offset = ($page - 1) * $postsPerPage;
 

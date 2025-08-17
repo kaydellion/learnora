@@ -2241,6 +2241,82 @@ document.addEventListener('DOMContentLoaded', function () {
       });
     });
 
+document.addEventListener('DOMContentLoaded', function () {
+  const today = new Date().toISOString().split('T')[0];
+
+  document.querySelectorAll('input[name="event_dates[]"]').forEach(function (dateInput) {
+    dateInput.setAttribute('min', today);
+
+    const row = dateInput.closest('.dateTimeRow');
+    if (row) {
+      const startTimeInput = row.querySelector('input[name="event_start_times[]"]');
+      const endTimeInput = row.querySelector('input[name="event_end_times[]"]');
+
+      // Helper to check and reset invalid time
+      function validateTime(input) {
+        if (dateInput.value === today && input.value) {
+          const now = new Date();
+          const [h, m] = input.value.split(':');
+          const selected = new Date();
+          selected.setHours(h, m, 0, 0);
+          if (selected < now) {
+            input.value = '';
+            input.setCustomValidity('Please select a future time.');
+            input.reportValidity();
+          } else {
+            input.setCustomValidity('');
+          }
+        } else {
+          input.setCustomValidity('');
+        }
+      }
+
+      // Initial check if value is already today
+      if (dateInput.value === today) {
+        const now = new Date();
+        const minTime = now.toTimeString().slice(0, 5);
+        if (startTimeInput) startTimeInput.min = minTime;
+        if (endTimeInput) endTimeInput.min = minTime;
+        validateTime(startTimeInput);
+        validateTime(endTimeInput);
+      }
+
+      dateInput.addEventListener('change', function () {
+        if (dateInput.value === today) {
+          const now = new Date();
+          const minTime = now.toTimeString().slice(0, 5);
+          if (startTimeInput) startTimeInput.min = minTime;
+          if (endTimeInput) endTimeInput.min = minTime;
+          validateTime(startTimeInput);
+          validateTime(endTimeInput);
+        } else {
+          if (startTimeInput) {
+            startTimeInput.removeAttribute('min');
+            startTimeInput.setCustomValidity('');
+          }
+          if (endTimeInput) {
+            endTimeInput.removeAttribute('min');
+            endTimeInput.setCustomValidity('');
+          }
+        }
+      });
+
+      if (startTimeInput) {
+        startTimeInput.addEventListener('input', function () {
+          validateTime(startTimeInput);
+        });
+      }
+      if (endTimeInput) {
+        endTimeInput.addEventListener('input', function () {
+          validateTime(endTimeInput);
+        });
+      }
+    }
+  });
+});
+
+
+
 document.getElementById('addTicketBtn').addEventListener('click', function () {
   const wrapper = document.getElementById('ticketWrapper');
   const ticketHTML = `
@@ -2515,6 +2591,54 @@ function addDateTimeRow() {
     </div>
   `;
   container.appendChild(row);
+
+    const today = new Date().toISOString().split('T')[0];
+  const dateInput = row.querySelector('input[name="event_dates[]"]');
+  const startTimeInput = row.querySelector('input[name="event_start_times[]"]');
+  const endTimeInput = row.querySelector('input[name="event_end_times[]"]');
+  dateInput.setAttribute('min', today);
+
+  // Helper to check and reset invalid time
+  function validateTime(input) {
+    if (dateInput.value === today && input.value) {
+      const now = new Date();
+      const [h, m] = input.value.split(':');
+      const selected = new Date();
+      selected.setHours(h, m, 0, 0);
+      if (selected < now) {
+        input.value = '';
+        input.setCustomValidity('Please select a future time.');
+        input.reportValidity();
+      } else {
+        input.setCustomValidity('');
+      }
+    } else {
+      input.setCustomValidity('');
+    }
+  }
+
+  dateInput.addEventListener('change', function() {
+    if (dateInput.value === today) {
+      const now = new Date();
+      const minTime = now.toTimeString().slice(0,5);
+      startTimeInput.min = minTime;
+      endTimeInput.min = minTime;
+      validateTime(startTimeInput);
+      validateTime(endTimeInput);
+    } else {
+      startTimeInput.removeAttribute('min');
+      endTimeInput.removeAttribute('min');
+      startTimeInput.setCustomValidity('');
+      endTimeInput.setCustomValidity('');
+    }
+  });
+
+  startTimeInput.addEventListener('input', function() {
+    validateTime(startTimeInput);
+  });
+  endTimeInput.addEventListener('input', function() {
+    validateTime(endTimeInput);
+  });
 }
 
 function toggleQuizOption(option) {
