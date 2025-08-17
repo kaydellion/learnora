@@ -117,7 +117,7 @@ if (!$training_data_set) {
 <div class="container-xxl flex-grow-1 container-p-y">
   <div class="row">
     <div class="col-xl">
-      <div class="card mb-4">
+      <div class="card mb-4 mt-4">
         <div class="card-header d-flex justify-content-between align-items-center">
           <h4 class="mb-0">Add New Training Listings</h4>
         </div>
@@ -129,8 +129,14 @@ if (!$training_data_set) {
               <label class="form-label">Title</label>
               <input type="text" class="form-control" name="title" value="<?php echo $title; ?>" >
             </div>
+
             
-                            <input type="hidden" id="training-id" name="training-id" class="form-control" value="<?php echo $training_id; ?>" readonly required>
+               <div class="mb-3">
+                        <label class="form-label" for="course-id">Training ID</label>
+                        <input type="text" id="course-id" name="id" class="form-control" value="<?php echo $training_id; ?>" readonly required>
+                    </div>
+            
+<input type="hidden" id="training-id" name="training-id" class="form-control" value="<?php echo $training_id; ?>" readonly required>
                  <div id="preview1" class="preview-container">
                          <?php
                          $sql3 = "SELECT * FROM ".$siteprefix."training_images WHERE training_id = '$training_id'";   
@@ -149,21 +155,13 @@ if (!$training_data_set) {
               <label class="form-label">Cover Images</label>
               <input type="file" class="form-control" id="imageInput" name="images[]" multiple accept="image/*">
             </div>
-
-               <div class="mb-3">
-                        <label class="form-label" for="course-id">Training ID</label>
-                        <input type="text" id="course-id" name="id" class="form-control" value="<?php echo $training_id; ?>" readonly required>
-                    </div>
-                       <h6>Course Content Details</h6>
-           
-              <textarea hidden class="form-control editor" name="course_description" rows="4"><?php echo $course_description; ?></textarea>
-         
-            <div class="mb-3">
+         <div class="mb-3">
               <label class="form-label">Description</label>
               <textarea class="form-control editor"  name="description" ><?php echo $description; ?></textarea>
             </div>
 
-             <?php
+
+                           <?php
 $event_datess = [];
 
 // Get all event dates for this training
@@ -216,6 +214,8 @@ while ($row = mysqli_fetch_assoc($result)) {
 
 </div>
 
+
+                    
 <div class="mb-3">
               <label class="form-label">Language</label>
               <input type="text" class="form-control" name="language" value="<?php echo $language; ?>" required>
@@ -227,9 +227,9 @@ while ($row = mysqli_fetch_assoc($result)) {
                 <option value="no" <?php echo ($certification == 'no') ? 'selected' : ''; ?>>No</option>
               </select>
             </div>
-                 <input type="hidden" name="user" value="<?php echo $user_id; ?>">
-            <div class="mb-3">
-              <label class="form-label">Level</label>
+
+               <div class="mb-3">
+              <label class="form-label">Course Level</label>
               <select class="form-control" name="level" required>
                 <option value="">Select Level</option>
                 <option value="beginner" <?php echo ($level == 'beginner') ? 'selected' : ''; ?>>Beginner</option>
@@ -238,15 +238,7 @@ while ($row = mysqli_fetch_assoc($result)) {
               </select>
             </div>
 
-             <?php
-// Fetch event types from the database
-$eventTypes = [];
-$eventTypeQuery = mysqli_query($con, "SELECT s, name FROM {$siteprefix}event_types");
-while ($row = mysqli_fetch_assoc($eventTypeQuery)) {
-    $eventTypes[] = $row;
-}
-?>
-
+            
 <div class="mb-3">
   <label class="form-label">Type of Training & Events</label>
   <select class="form-control" name="event_type" required>
@@ -330,6 +322,18 @@ while ($row = mysqli_fetch_assoc($eventTypeQuery)) {
 
 
 
+             <?php
+// Fetch event types from the database
+$eventTypes = [];
+$eventTypeQuery = mysqli_query($con, "SELECT s, name FROM {$siteprefix}event_types");
+while ($row = mysqli_fetch_assoc($eventTypeQuery)) {
+    $eventTypes[] = $row;
+}
+?>
+
+
+
+
 
      <?php
 $selected_categories = explode(',', $category_id);
@@ -397,67 +401,29 @@ $selected_subcategories = explode(',', $subcategory_id);
 </div>
 
 
+                <h6 class="mb-3">Course Content Details</h6>
+
+              <textarea  hidden name="course_description" rows="4"><?php echo $course_description; ?></textarea>
+         
+             <div class="mb-3">
+              <label class="form-label">Who Should Attend & Target Audience</label>
+              <textarea class="form-control editor" name="target_audience" placeholder='E.g. "Beginners in Python", "Entrepreneurs", etc.'><?php echo $target_audience; ?></textarea>
+            </div>
+
+                 <input type="hidden" name="user" value="<?php echo $user_id; ?>">
+         
             <div class="mb-3">
               <label class="form-label">Learning Objectives / Outcomes</label>
               <textarea class="form-control editor" name="learning_objectives" rows="3" placeholder="List what the learner will be able to do after completing the course."><?php echo $learning_objectives; ?></textarea>
             </div>
-            <div class="mb-3">
-              <label class="form-label">Who Should Attend & Target Audience</label>
-              <textarea class="form-control editor" name="target_audience" placeholder='E.g. "Beginners in Python", "Entrepreneurs", etc.'><?php echo $target_audience; ?></textarea>
-            </div>
+          
             <div class="mb-3">
               <label class="form-label">Course Requirements / Prerequisites</label>
               <textarea class="form-control editor" name="prerequisites" rows="2" placeholder="Any knowledge, tools, or skills needed before starting."><?php echo $course_requirrement; ?></textarea>
             </div>
 
-            
-              <input type="hidden" class="form-control" name="who_should_attend" placeholder="E.g. Beginners, Entrepreneurs, etc." value="<?php echo $attendee; ?>">
-            
- <?php
-    // Fetch instructors from the database
-    $instructors = [];
-    $instructorQuery = mysqli_query($con, "SELECT s, name, photo FROM {$siteprefix}instructors WHERE user='$user_id'");
-    while ($row = mysqli_fetch_assoc($instructorQuery)) {
-        $instructors[] = $row;
-    }
-    ?>
-            <h6>Instructor Information</h6>
-    <div class="mb-3">
-      <label class="form-label">Select Instructor</label>
 
-           <select class="form-control" name="instructor"id="instructorSelect" onchange="displayInstructorInfo()" required>
-  <option value="">-- Select Instructor --</option>
-  <?php foreach ($instructors as $inst): ?>
-    <option value="<?php echo htmlspecialchars($inst['s']); ?>"
-      data-name="<?php echo htmlspecialchars($inst['name']); ?>"
-      data-photo="<?php echo $siteurl . 'uploads/' .$inst['photo']; ?>"
-      <?php echo ($selected_instructor_id === $inst['s']) ? 'selected' : ''; ?>>
-      <?php echo htmlspecialchars($inst['name']); ?>
-    </option>
-  <?php endforeach; ?>
-  <option value="add_new">+ Add New Instructor</option>
-</select>
-  </div>
-         
-<!-- Display selected instructor info -->
-<div class="mb-3" id="instructorInfo" style="display:none;">
-  <img id="instructorPhoto" src="" alt="Instructor Photo" style="width:50px;height:50px;border-radius:50%;object-fit:cover;">
-  <span id="instructorName" style="margin-left:10px;font-weight:bold;"></span>
-</div>
-<!-- Add New Instructor Fields (hidden by default) -->
-<div class="mb-3" id="addInstructorFields" style="display:none;">
-  <label class="form-label">Instructor Name</label>
-  <input type="text" class="form-control mb-2" name="new_instructor_name" placeholder="Enter instructor name">
- <!---  <label class="form-label">Instructor Email</label> --->
-  <input type="hidden" class="form-control mb-2" name="new_instructor_email" placeholder="Enter instructor email">
-  <label class="form-label">Instructor Bio</label>
-  <textarea class="form-control mb-2 editor" name="new_instructor_bio" placeholder="Enter instructor bio"></textarea>
-  <label class="form-label">Instructor Photo</label>
-  <input type="file" class="form-control" name="new_instructor_photo" accept="image/*">
-      <input type="hidden" name="user_id" value="<?php echo $user_id; ?>">
-</div>
-           
-             <h6>Delivery Format</h6>
+              <h6 class="mt-3">Delivery Format</h6>
 <div class="mb-3">
   <select class="form-control" name="delivery_format" id="deliveryFormat" onchange="toggleDeliveryFields()" required>
     <option value="">Select Format</option>
@@ -627,8 +593,54 @@ while ($row = $textResult->fetch_assoc()):
 <?php endwhile; ?>
 </div>
 </div>
+            
+              <input type="hidden" class="form-control" name="who_should_attend" placeholder="E.g. Beginners, Entrepreneurs, etc." value="<?php echo $attendee; ?>">
+            
+ <?php
+    // Fetch instructors from the database
+    $instructors = [];
+    $instructorQuery = mysqli_query($con, "SELECT s, name, photo FROM {$siteprefix}instructors WHERE user='$user_id'");
+    while ($row = mysqli_fetch_assoc($instructorQuery)) {
+        $instructors[] = $row;
+    }
+    ?>
+            <h6>Instructor Information</h6>
+    <div class="mb-3">
+      <label class="form-label">Select Instructor</label>
 
-
+           <select class="form-control" name="instructor"id="instructorSelect" onchange="displayInstructorInfo()" required>
+  <option value="">-- Select Instructor --</option>
+  <?php foreach ($instructors as $inst): ?>
+    <option value="<?php echo htmlspecialchars($inst['s']); ?>"
+      data-name="<?php echo htmlspecialchars($inst['name']); ?>"
+      data-photo="<?php echo $siteurl . 'uploads/' .$inst['photo']; ?>"
+      <?php echo ($selected_instructor_id === $inst['s']) ? 'selected' : ''; ?>>
+      <?php echo htmlspecialchars($inst['name']); ?>
+    </option>
+  <?php endforeach; ?>
+  <option value="add_new">+ Add New Instructor</option>
+</select>
+  </div>
+         
+<!-- Display selected instructor info -->
+<div class="mb-3" id="instructorInfo" style="display:none;">
+  <img id="instructorPhoto" src="" alt="Instructor Photo" style="width:50px;height:50px;border-radius:50%;object-fit:cover;">
+  <span id="instructorName" style="margin-left:10px;font-weight:bold;"></span>
+</div>
+<!-- Add New Instructor Fields (hidden by default) -->
+<div class="mb-3" id="addInstructorFields" style="display:none;">
+  <label class="form-label">Instructor Name</label>
+  <input type="text" class="form-control mb-2" name="new_instructor_name" placeholder="Enter instructor name">
+ <!---  <label class="form-label">Instructor Email</label> --->
+  <input type="hidden" class="form-control mb-2" name="new_instructor_email" placeholder="Enter instructor email">
+  <label class="form-label">Instructor Bio</label>
+  <textarea class="form-control mb-2 editor" name="new_instructor_bio" placeholder="Enter instructor bio"></textarea>
+  <label class="form-label">Instructor Photo</label>
+  <input type="file" class="form-control" name="new_instructor_photo" accept="image/*">
+      <input type="hidden" name="user_id" value="<?php echo $user_id; ?>">
+</div>
+           
+           
 
 
 
@@ -725,6 +737,7 @@ if ($textQuery && mysqli_num_rows($textQuery) > 0): ?>
   <?php } ?>
 </ul>
 
+<h6 class="mb-3">Marketing & Instructions</h6>
 
 <div class="mb-3">
   <label class="form-label">Promo Video (Optional)</label>

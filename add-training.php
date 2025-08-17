@@ -30,10 +30,10 @@
 </style>
 <section>
 <div class="d-flex justify-content-center">
-  <div class="container-xxl flex-grow-1 container-p-y" style="max-width: 800px;">
+  <div class="container-xxl flex-grow-1 container-p-y mt-3" style="max-width: 800px;">
     <div class="row">
       <div class="col-xl">
-        <div class="card mb-4">
+        <div class="card mb-4 mt-2">
           <div class="card-header d-flex justify-content-between align-items-center">
           <h4 class="mb-0">Add New Training Listings</h4>
         </div>
@@ -90,12 +90,13 @@
             </div>
                  <input type="hidden" name="user" value="<?php echo $user_id; ?>">
             <div class="mb-3">
-              <label class="form-label">Level</label>
+              <label class="form-label">Course Level</label>
               <select class="form-control" name="level" required>
                 <option value="">Select Level</option>
                 <option value="beginner">Beginner</option>
                 <option value="intermediate">Intermediate</option>
                 <option value="advanced">Advanced</option>
+                <option value="All Levels">All Levels</option>
               </select>
             </div>
 
@@ -202,22 +203,35 @@
 
 
             <h6>Course Content Details</h6>
-            <div class="mb-3">
-              <label class="form-label">Course Description</label>
-              <textarea class="form-control editor" name="course_description" rows="4"></textarea>
+           <div class="mb-3">
+              <label class="form-label">Who Should Attend & Target Audience</label>
+              <textarea class="form-control editor" name="target_audience" placeholder='E.g. "Beginners in Python", "Entrepreneurs", etc.'></textarea>
             </div>
+
+              <textarea  name="course_description" rows="4" hidden></textarea>
+          
             <div class="mb-3">
               <label class="form-label">Learning Objectives / Outcomes</label>
               <textarea class="form-control editor" name="learning_objectives" rows="3" placeholder="List what the learner will be able to do after completing the course."></textarea>
             </div>
-            <div class="mb-3">
-              <label class="form-label">Target Audience</label>
-              <input type="text" class="form-control" name="target_audience" placeholder='E.g. "Beginners in Python", "Entrepreneurs", etc.'>
-            </div>
+          
             <div class="mb-3">
               <label class="form-label">Course Requirements / Prerequisites</label>
               <textarea class="form-control editor" name="prerequisites" rows="2" placeholder="Any knowledge, tools, or skills needed before starting."></textarea>
             </div>
+          
+            <div class="mb-3">
+              <label>Delivery Format </label>
+              <select class="form-control" name="delivery_format" id="deliveryFormat" onchange="toggleDeliveryFields()" required>
+                <option value="">Select Format</option>
+                <option value="physical">Physical (In-person)</option>
+                <option value="online">Online (Webinar/Virtual)</option>
+                <option value="hybrid">Hybrid (Physical & Online)</option>
+                   <option value="video">Video</option>
+                <option value="text">Text</option>
+                
+              </select>
+            </div> 
 
             <h6>Course Content Uploads</h6>
             <div class="mb-3">
@@ -308,18 +322,6 @@
               <input type="file" class="form-control" name="trailer_video" accept="video/*">
             </div>
 
-                      <div class="mb-3">
-                          <label>Delivery Format </label>
-              <select class="form-control" name="delivery_format" id="deliveryFormat" onchange="toggleDeliveryFields()" required>
-                <option value="">Select Format</option>
-                <option value="physical">Physical (In-person)</option>
-                <option value="online">Online (Webinar/Virtual)</option>
-                <option value="hybrid">Hybrid (Physical & Online)</option>
-                   <option value="video">Video</option>
-                <option value="text">Text</option>
-                
-              </select>
-            </div> 
             <!-- Physical Address Fields -->
             <div class="mb-3" id="physicalFields" style="display:none;">
               <label class="form-label">Nigeria or Foreign</label>
@@ -385,59 +387,75 @@
   <div id="videoModules">
     <!-- Template -->
     <div class="video-module mb-3">
-      <h5>Module <span class="module-number">1</span></h5>
+      <h6 class="mt-2 mb-2">Module <span class="module-number">1</span></h6>
+      <div class="mb-3">
       <label>Lesson / Module Title:</label>
       <input type="text" class="form-control" name="video_module_title[]">
-
+      </div>
+      <div class="mb-3">
       <label>Description/Notes:</label>
       <textarea class="form-control editor" name="video_module_desc[]"></textarea>
-
+      </div>
+      <div class="mb-3">
       <label>Total Duration:</label>
       <input type="text" class="form-control" name="video_duration[]">
-
+      </div>
+      <div class="mb-3">
       <label>Upload/Link Video Files:</label>
       <input type="file" name="video_file[]" class="form-control mb-2" accept="video/*">
       <input type="url" class="form-control mt-2" placeholder="Or paste link" name="video_link[]">
-
-      <label>Video Quality</label><br>
+      </div>
+      <div class="mb-3">
+      <label>Video Quality</label>
       <label><input type="checkbox" name="video_quality[0][]" value="720p"> 720p</label>
       <label><input type="checkbox" name="video_quality[0][]" value="1080p"> 1080p</label>
       <label><input type="checkbox" name="video_quality[0][]" value="4K"> 4K</label>
-
-      <br>
+      </div>
+      <div class="mb-3">
       <label>Include Subtitles?</label><br>
       <label><input type="checkbox" name="video_subtitles[0]" value="Yes"> Yes</label>
       <label><input type="checkbox" name="video_subtitles[0]" value="No"> No</label>
+      </div>
     </div>
   </div>
 
-  <button type="button" class="btn btn-secondary mt-3" onclick="addVideoModule()">ADD MORE</button>
+  <button type="button" class="btn btn-secondary mb-3" onclick="addVideoModule()">ADD MORE</button>
 </div>
 
 <!-- Text Fields -->
 <div id="textFields" style="display:none;">
+  <h6 class="mt-2 mb-2">Text Modules</h6>
   <label>Number of Lessons/Modules:</label>
   <input type="number" class="form-control" name="total_lessons" min="1">
 
   <div id="textModules">
     <!-- Template -->
     <div class="text-module mb-3">
-      <h5>Module <span class="module-number">1</span></h5>
+      <h6 class="mt-2 mb-2">Module <span class="module-number">1</span></h6>
+
+      <div class="mb-3">
       <label>Lesson / Module Title:</label>
       <input type="text" class="form-control" name="text_module_title[]">
+      </div>
 
+      <div class="mb-3">
       <label>Description/Notes:</label>
       <textarea class="form-control editor" name="text_module_desc[]"></textarea>
+      </div>
 
+      <div class="mb-3">
       <label>Estimated Reading Time:</label>
       <input type="text" class="form-control" name="text_reading_time[]">
+      </div>
 
+      <div class="mb-3">
       <label>Upload Text Content (PDF/Text):</label>
       <input type="file" name="text_file[]">
     </div>
+     </div>
   </div>
 
-  <button type="button" class="btn btn-secondary mt-3" onclick="addTextModule()">ADD MORE</button>
+  <button type="button" class="btn btn-secondary mb-3" onclick="addTextModule()">ADD MORE</button>
 </div>
                   
 
@@ -486,7 +504,7 @@
   <input type="file" class="form-control" name="new_instructor_photo" accept="image/*">
   <input type="hidden" name="user_id" value="<?php echo $user_id; ?>">
 </div>
-
+<h6 class="mb-3">Marketing & Instructions</h6>
 <div class="mb-3">
   <label class="form-label">Promo Video (Optional)</label>
   <input type="file" class="form-control" name="promo_video" accept="video/*">

@@ -28,7 +28,7 @@
 
         <!-- Total Reports Card -->
         <div class="col-md-3">
-            <a href="reports.php">
+            <a href="training.php">
                 <div class="card text-white bg-dark mb-3">
                     <div class="card-body">
                         <h5 class="card-title text-white">Total Events</h5>
@@ -54,10 +54,10 @@
 
         <!-- Pending Reports Card -->
 <div class="col-md-3 ">
-    <a href="pending-reports.php">
+    <a href="pending-training.php">
         <div class="card text-white bg-dark mb-3">
             <div class="card-body">
-                <h5 class="card-title text-white">Pending Events</h5>
+                <h5 class="card-title text-white">Pending Training</h5>
                 <p class="card-text counter" data-target="<?php echo $pendingReportsCount; ?>">0</p>
             </div>
         </div>

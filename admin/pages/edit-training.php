@@ -224,7 +224,7 @@ while ($row = mysqli_fetch_assoc($result)) {
             </div>
                  <input type="hidden" name="user" value="<?php echo $user_id; ?>">
             <div class="mb-3">
-              <label class="form-label">Level</label>
+              <label class="form-label">Course Level</label>
               <select class="form-control" name="level" required>
                 <option value="">Select Level</option>
                 <option value="beginner" <?php echo ($level == 'beginner') ? 'selected' : ''; ?>>Beginner</option>

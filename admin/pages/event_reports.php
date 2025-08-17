@@ -3,7 +3,7 @@
 include "header.php"; // Include the header file
 
 // Fetch all product reports
-$query = "SELECT pr.product_id, pr.user_id, pr.reason, pr.report_date, 
+$query = "SELECT pr.product_id, pr.user_id, pr.reason, pr.main_reason, pr.report_date, 
                  u.display_name AS user_name, u.email_address AS user_email, 
                  r.title AS product_title 
           FROM " . $siteprefix . "product_reports pr

@@ -302,44 +302,6 @@ $cancel_words = explode(' ', strip_tags($cancel_text));
             <div class="product-info-wrapper" id="product-info-sticky">
               <!-- Product Meta -->
               <div class="product-meta">
-<div class="product-short-description mb-1">
-<?php
-// Fetch from DB (already contains TinyMCE HTML)
-$description_html = $description;
-
-// Count words in plain text
-$plainText = strip_tags($description_html);
-$wordCount = str_word_count($plainText);
-
-if ($wordCount > 30) {
-    // Split words
-    $words = explode(' ', $plainText);
-
-    // Get first 30 words
-    $first30 = implode(' ', array_slice($words, 0, 30));
-
-    // Build preview HTML with TinyMCE styles
-    ?>
-    <div>
-        <div class="preview" style="display:inline;">
-            <?php
-            // We use full HTML, but CSS will hide anything after 30 words
-            echo '<span class="preview-text">' . $first30 . '...</span>';
-            ?>
-        </div>
-        <div class="more-text" style="display:none;">
-            <?php echo $description_html; ?>
-        </div>
-        <a href="javascript:void(0);" class="toggle-btn">Read More</a>
-    </div>
-<?php
-} else {
-    // If 30 words or fewer, just display the HTML directly
-    echo "<div>$description_html</div>";
-}
-?>
-</div>
-
               <!-- Product Price -->
               <div class="product-price-container">
                 <div class="price-wrapper">
@@ -586,8 +548,6 @@ $dates_result = mysqli_query($con, $dates_sql);
 while ($d = mysqli_fetch_assoc($dates_result)) {
     $event_dates[] = $d;
 }
-
-
 ?>
            <!-- ✅ Event Dates -->
 <?php if (!empty($event_dates)): ?>

@@ -89,7 +89,7 @@
             </div>
                  <input type="hidden" name="user" value="<?php echo $user_id; ?>">
             <div class="mb-3">
-              <label class="form-label">Level</label>
+              <label class="form-label">Course Level</label>
               <select class="form-control" name="level" required>
                 <option value="">Select Level</option>
                 <option value="beginner">Beginner</option>
@@ -187,7 +187,7 @@
               <textarea class="form-control editor" name="target_audience" placeholder='E.g. "Beginners in Python", "Entrepreneurs", etc.'></textarea>
             </div>
         
-              <textarea hidden class="form-control" name="course_description" rows="4"></textarea>
+              <textarea hidden  name="course_description" rows="4"></textarea>
             
             <div class="mb-3">
               <label class="form-label">Learning Objectives / Outcomes</label>
@@ -276,33 +276,40 @@
   <div id="videoModules">
     <!-- Template -->
     <div class="video-module mb-3">
-      <h5>Module <span class="module-number">1</span></h5>
+      <h6 class="mb-2 mt-3">Module <span class="module-number">1</span></h6>
+      <div class="mb-3">
       <label>Lesson / Module Title:</label>
       <input type="text" class="form-control" name="video_module_title[]">
-
+      </div>
+      <div class="mb-3">
       <label>Description/Notes:</label>
       <textarea class="form-control editor" name="video_module_desc[]"></textarea>
-
+      </div>
+      <div class="mb-3">
       <label>Total Duration:</label>
       <input type="text" class="form-control" name="video_duration[]">
-
+        </div>
+        <div class="mb-3">
       <label>Upload/Link Video Files:</label>
       <input type="file" name="video_file[]" class="form-control mb-2" accept="video/*">
-      <input type="url" class="form-control mt-2" placeholder="Or paste link" name="video_link[]">
-
-      <label>Video Quality</label><br>
+      <input type="url" class="form-control" placeholder="Or paste link" name="video_link[]">
+                     </div>
+                     <div class="mb-2">
+      <label>Video Quality</label>
       <label><input type="checkbox" name="video_quality[0][]" value="720p"> 720p</label>
       <label><input type="checkbox" name="video_quality[0][]" value="1080p"> 1080p</label>
       <label><input type="checkbox" name="video_quality[0][]" value="4K"> 4K</label>
-
-      <br>
+                     </div>
+     
+      <div class="mb-2">
       <label>Include Subtitles?</label><br>
       <label><input type="checkbox" name="video_subtitles[0]" value="Yes"> Yes</label>
       <label><input type="checkbox" name="video_subtitles[0]" value="No"> No</label>
+      </div>
     </div>
   </div>
 
-  <button type="button" class="btn btn-secondary mt-3" onclick="addVideoModule()">ADD MORE</button>
+  <button type="button" class="btn btn-secondary mt-3 mb-2" onclick="addVideoModule()">ADD MORE</button>
 </div>
 
 <!-- Text Fields -->
@@ -313,22 +320,27 @@
   <div id="textModules">
     <!-- Template -->
     <div class="text-module mb-3">
-      <h5>Module <span class="module-number">1</span></h5>
+      <h6 class="mb-2 mt-3">Module <span class="module-number">1</span></h6>
+      <div class="mb-3">
       <label>Lesson / Module Title:</label>
       <input type="text" class="form-control" name="text_module_title[]">
-
+                     </div>
+                     <div class="mb-3">
       <label>Description/Notes:</label>
       <textarea class="form-control editor" name="text_module_desc[]"></textarea>
-
+                     </div>
+                     <div class="mb-3">
       <label>Estimated Reading Time:</label>
       <input type="text" class="form-control" name="text_reading_time[]">
-
+                     </div>
+                     <div class="mb-3">
       <label>Upload Text Content (PDF/Text):</label>
-      <input type="file" name="text_file[]">
+      <input type="file" name="text_file[]" class="form-control">
+                     </div>
     </div>
   </div>
 
-  <button type="button" class="btn btn-secondary mt-3" onclick="addTextModule()">ADD MORE</button>
+  <button type="button" class="btn btn-secondary mb-3" onclick="addTextModule()">ADD MORE</button>
 </div>
 
 
@@ -467,7 +479,7 @@
   <input type="file" class="form-control" name="new_instructor_photo" accept="image/*">
       <input type="hidden" name="user_id" value="<?php echo $user_id; ?>">
 </div>
-
+<h6 class="mb-3">Marketing & Instructions</h6>
 <div class="mb-3">
   <label class="form-label">Promo Video (Optional)</label>
   <input type="file" class="form-control" name="promo_video" accept="video/*">
