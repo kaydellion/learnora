@@ -605,7 +605,22 @@ function fetchSubcategories() {
               ${sub.title}
             </label>
           `;
-          subOptions.appendChild(div);
+          if (sub.children && sub.children.length > 0) {
+            const nestedDiv = document.createElement('div');
+            nestedDiv.style.marginLeft = '20px';
+            sub.children.forEach(child => {
+              const childDiv = document.createElement('div');
+              childDiv.className = 'custom-option';
+              childDiv.innerHTML = `
+                <label>
+                  <input type="checkbox" name="subcategory[]" value="${child.s}" onchange="updateTags(this, 'subcategory')">
+                  ${child.title}
+                </label>
+              `;
+              nestedDiv.appendChild(childDiv);
+            });
+            div.appendChild(nestedDiv);
+          }  subOptions.appendChild(div);
         });
       } else {
         subWrapper.style.display = 'none';

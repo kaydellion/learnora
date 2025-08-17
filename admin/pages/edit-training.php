@@ -761,7 +761,7 @@ if ($textQuery && mysqli_num_rows($textQuery) > 0): ?>
                     </script>
 
           
-                        <script>
+                         <script>
                         document.querySelector('select[name="category"]').addEventListener('change', function() {
                           let parentId = this.value;
                           let subSelect = document.getElementById('subcategory-container');
@@ -773,11 +773,17 @@ if ($textQuery && mysqli_num_rows($textQuery) > 0): ?>
                               console.log('Received data:', data);
                               if (data.length > 0) {
                                 subcategorySelect.innerHTML = '<option selected>- Select Subcategory -</option>';
-                                data.forEach(cat => {
-                                  console.log('Processing category:', cat);
-                                  subcategorySelect.innerHTML += `<option value="${cat.s}">${cat.title}</option>`;
-                                });
-                                subSelect.style.display = 'block';
+                                // Recursive rendering for nested subcategories
+                                function renderSubcategoryOptions(categories, parentId = null, level = 0) {
+                                  categories
+                                    .filter(cat => cat.parent_id == parentId)
+                                    .forEach(cat => {
+                                      subcategorySelect.innerHTML += `<option value="${cat.s}">${'— '.repeat(level)}${cat.title}</option>`;
+                                      renderSubcategoryOptions(categories, cat.s, level + 1);
+                                    });
+                                }
+
+                                renderSubcategoryOptions(data);  subSelect.style.display = 'block';
                               } else {
                                 console.log('No subcategories found');
                                 subSelect.style.display = 'none';
@@ -831,31 +837,40 @@ function fetchSubcategoriesForEdit(categoryIds) {
     return;
   }
 
-  Promise.all(categoryIds.map(id =>
-    fetch(`get_subcategories.php?parent_id=${id}`)
-      .then(res => res.json())
-      .catch(() => [])
-  )).then(allResults => {
-    let found = false;
+  // Fetch all nested subcategories in one request
+  fetch(`get_subcategories.php?parent_ids=${categoryIds.join(',')}`)
+    .then(res => res.json())
+    .then(data => {
+      if (data.length > 0) {
+        // Build a map for parent-child relationships
+        const byParent = {};
+        data.forEach(cat => {
+          if (!byParent[cat.parent_id]) byParent[cat.parent_id] = [];
+          byParent[cat.parent_id].push(cat);
+        });
 
-    allResults.flat().forEach(cat => {
-      if ($subSelect.find(`option[value="${cat.s}"]`).length === 0) {
-        const isSelected = selectedSubcategoryIds.includes(cat.s.toString()) ? 'selected' : '';
-        $subSelect.append(`<option value="${cat.s}" ${isSelected}>${cat.title}</option>`);
-        found = true;
-      }
-    });
+        // Recursive rendering for nested subcategories
+        function renderOptions(parentId = null, level = 0) {
+          (byParent[parentId] || []).forEach(cat => {
+            const isSelected = selectedSubcategoryIds.includes(cat.s.toString()) ? 'selected' : '';
+            $subSelect.append(`<option value="${cat.s}" ${isSelected}>${'— '.repeat(level)}${cat.title}</option>`);
+            renderOptions(cat.s, level + 1);
+          });
+        }
+        renderOptions();
 
-    if (found) {
-      $subContainer.show();
-      if ($subSelect.hasClass('select2-hidden-accessible')) {
-        $subSelect.select2('destroy');
+        $subContainer.show();
+        if ($subSelect.hasClass('select2-hidden-accessible')) {
+          $subSelect.select2('destroy');
+        }
+        $subSelect.select2();
+      } else {
+        $subContainer.hide();
       }
-      $subSelect.select2();
-    } else {
+    })
+    .catch(() => {
       $subContainer.hide();
-    }
-  });
+    });
 }
 
 $j(document).ready(function () {

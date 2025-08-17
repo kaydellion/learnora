@@ -543,42 +543,35 @@
       $subSelect.html('');
 
       if (selectedCategories.length === 0) {
-        $subContainer.hide();
-        return;
+      $subContainer.hide();
+      return;
       }
 
-      // Fetch subcategories for each selected category
-      Promise.all(
-        selectedCategories.map(categoryId =>
-          fetch(`get_subcategories.php?parent_id=${categoryId}`)
-            .then(response => response.json())
-            .catch(error => {
-              console.error('Error fetching subcategories for category', categoryId, error);
-              return [];
-            })
-        )
-      ).then(allResults => {
+      // Fetch all nested subcategories for selected categories
+      fetch(`get_subcategories.php?parent_ids=${selectedCategories.join(',')}`)
+      .then(response => response.json())
+      .then(allSubcats => {
         let found = false;
-
-        // Flatten all subcategories into one array
-        allResults.flat().forEach(cat => {
-          if ($subSelect.find(`option[value="${cat.s}"]`).length === 0) {
-            $subSelect.append(new Option(cat.title, cat.s));
-            found = true;
-          }
+        allSubcats.forEach(cat => {
+        if ($subSelect.find(`option[value="${cat.s}"]`).length === 0) {
+          $subSelect.append(new Option(cat.title, cat.s));
+          found = true;
+        }
         });
 
         if (found) {
-          $subContainer.show();
-
-          // Re-initialize select2 after modifying the options
-          if ($subSelect.hasClass('select2-hidden-accessible')) {
-            $subSelect.select2('destroy');
-          }
-          $subSelect.select2();
-        } else {
-          $subContainer.hide();
+        $subContainer.show();
+        if ($subSelect.hasClass('select2-hidden-accessible')) {
+          $subSelect.select2('destroy');
         }
+        $subSelect.select2();
+        } else {
+        $subContainer.hide();
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching subcategories', error);
+        $subContainer.hide();
       });
     });
   });
