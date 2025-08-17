@@ -182,7 +182,7 @@
     
 
             <h6>Course Content Details</h6>
-       <div class="mb-3">
+              <div class="mb-3">
               <label class="form-label">Who Should Attend & Target Audience</label>
               <textarea class="form-control editor" name="target_audience" placeholder='E.g. "Beginners in Python", "Entrepreneurs", etc.'></textarea>
             </div>

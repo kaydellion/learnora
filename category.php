@@ -1,6 +1,6 @@
 
 <?php 
-
+include "seo.php";
 include "header.php"; 
 
 if (isset($_GET['slugs'])) {

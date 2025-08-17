@@ -203,7 +203,7 @@
 
             <h6>Course Content Details</h6>
             <div class="mb-3">
-              <label class="form-label">Course Description</label>
+              <label class="form-label">Who Should Attend & Target Audience</label>
               <textarea class="form-control editor" name="course_description" rows="4"></textarea>
             </div>
             <div class="mb-3">

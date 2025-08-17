@@ -2390,14 +2390,14 @@ if ($updateTraining) {
     $statusMessage = "Training updated successfully.";
     showSuccessModal2($statusAction, $statusMessage);
 
-    header("refresh:2; url=models.php"); // ✅ Change to the desired redirect page
+    header("refresh:2; url=myevents.php"); // ✅ Change to the desired redirect page
 
 } else {
     $statusAction = "Error!";
     $statusMessage = "Failed to update training. Please try again.";
     showErrorModal2($statusAction, $statusMessage);
 
-    header("refresh:2; url=models.php"); // ✅ Optional: change this to a retry page
+    header("refresh:2; url=myevents.php"); // ✅ Optional: change this to a retry page
   
 }
 

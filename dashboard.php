@@ -102,10 +102,10 @@ $totalResources = mysqli_fetch_assoc($resourcesResult)['total_resources'];
 ?>
 <!-- Seller Statistics Section -->
 <div class="col-md-2">
-    <a href="models.php">
+    <a href="myevents.php">
     <div class="card text-white bg-primary mb-3">
         <div class="card-body">
-            <h5 class="card-title text-white"><a href="models.php" style="text-decoration: none; color:#fff;">Resources</a></h5>
+            <h5 class="card-title text-white"><a href="myevents.php" style="text-decoration: none; color:#fff;">Events</a></h5>
             <p class="card-text text-white"><?php echo $totalResources; ?></p>
         </div>
     </div>

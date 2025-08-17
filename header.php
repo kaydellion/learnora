@@ -1,24 +1,26 @@
-<?php 
-include "backend/connect.php";  
+<?php
+include "backend/connect.php";
 
 //previous page
 
 $_SESSION['previous_page'] = "https://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
-$previousPage=$_SESSION['previous_page'];
+$previousPage = $_SESSION['previous_page'];
 $current_page = urlencode(pathinfo($_SERVER['PHP_SELF'], PATHINFO_FILENAME) . '?' . $_SERVER['QUERY_STRING']);;
 
 $code = "";
-if (isset($_COOKIE['userID'])) {$code = $_COOKIE['userID'];}
-$check = "SELECT * FROM ".$siteprefix."users WHERE s = '" . $code . "'";
+if (isset($_COOKIE['userID'])) {
+  $code = $_COOKIE['userID'];
+}
+$check = "SELECT * FROM " . $siteprefix . "users WHERE s = '" . $code . "'";
 $query = mysqli_query($con, $check);
 if (mysqli_affected_rows($con) == 0) {
 
 
-    $active_log = 0;
+  $active_log = 0;
 } else {
-    $sql = "SELECT * FROM ".$siteprefix."users  WHERE s  = '".$code."'";
-    $sql2 = mysqli_query($con, $sql);
-    while ($row = mysqli_fetch_array($sql2)) {
+  $sql = "SELECT * FROM " . $siteprefix . "users  WHERE s  = '" . $code . "'";
+  $sql2 = mysqli_query($con, $sql);
+  while ($row = mysqli_fetch_array($sql2)) {
     $id = $row['s'];
     $title                = $row['title'];
     $display_name         = $row['display_name'];
@@ -60,34 +62,54 @@ if (mysqli_affected_rows($con) == 0) {
     $trainer              = $row['trainer'];
     $reset_token          = $row['reset_token'];
     $reset_token_expiry   = $row['reset_token_expiry'];
-// ...existing code... 
-        $_SESSION['user_role'] = $user_type;
-        $_SESSION['user_id'] = $id;
-        $_SESSION['user_trainer'] = $trainer;
+    // ...existing code... 
+    $_SESSION['user_role'] = $user_type;
+    $_SESSION['user_id'] = $id;
+    $_SESSION['user_trainer'] = $trainer;
 
-        $active_log = 1;
-        $user_id = $id;
-        $username = $display_name;
-        $user_reg_date = formatDateTime($created_date);
-        $user_lastseen=formatDateTime($last_login);
-
-
-}}
+    $active_log = 1;
+    $user_id = $id;
+    $username = $display_name;
+    $user_reg_date = formatDateTime($created_date);
+    $user_lastseen = formatDateTime($last_login);
+  }
+}
 
 include "backend/start_order.php";
-include "backend/actions.php"; 
+include "backend/actions.php";
 
 //exclude pages tht require user to be logged in
 $current_page = basename($_SERVER['PHP_SELF']);
-$excluded_pages = array('cart.php', 'pay_success.php',  'checkout.php', 'free_order_handler.php',
-'dashboard.php','loyalty-status.php','my_orders.php','manual_orders.php', 'wallet.php','contact.php',
-'notifications.php','sales.php','reviews.php','my_orders.php','order_details.php','settings.php','tickets.php',
-'change-password.php','create_ticket.php','saved-models.php','add-training.php','all-training.php',
-'withdrawhistory.php','my_wishlist.php');
+$excluded_pages = array(
+  'cart.php',
+  'pay_success.php',
+  'checkout.php',
+  'free_order_handler.php',
+  'dashboard.php',
+  'loyalty-status.php',
+  'my_orders.php',
+  'manual_orders.php',
+  'wallet.php',
+  'contact.php',
+  'notifications.php',
+  'sales.php',
+  'reviews.php',
+  'my_orders.php',
+  'order_details.php',
+  'settings.php',
+  'tickets.php',
+  'change-password.php',
+  'create_ticket.php',
+  'saved-models.php',
+  'add-training.php',
+  'all-training.php',
+  'withdrawhistory.php',
+  'my_wishlist.php'
+);
 if (in_array($current_page, $excluded_pages)) {
-    checkActiveLog($active_log); 
+  checkActiveLog($active_log);
 } else {
-    //ifLoggedin($active_log);
+  //ifLoggedin($active_log);
 }
 
 ?>
@@ -100,9 +122,17 @@ if (in_array($current_page, $excluded_pages)) {
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
-  <title>Learnora</title>
-  <meta name="description" content="">
-  <meta name="keywords" content="">
+  <title><?= isset($page_title) ? htmlspecialchars($page_title) : $sitename ?></title>
+  <meta name="description" content="<?= isset($sitedescription) ? htmlspecialchars($sitedescription) : $sitename ?>">
+  <meta name="keywords" content="<?= isset($sitekeywords) ? htmlspecialchars($sitekeywords) : $sitename ?>">
+  <meta name="author" content="<?= isset($sitename) ? htmlspecialchars($sitename) : $sitename ?>">
+  <meta property="og:title" content="<?= isset($page_title) ? htmlspecialchars($page_title) : $sitename ?>" />
+  <meta property="og:description" content="<?= isset($sitedescription) ? htmlspecialchars($sitedescription) : $sitename ?>" />
+  <meta property="og:image" content="<?= isset($siteurl) ? htmlspecialchars($siteurl) : $sitename ?>img/<?= isset($siteimg) ? htmlspecialchars($siteimg) : $sitename ?>" />
+  <meta property="og:url" content="<?= isset($siteurl) ? htmlspecialchars($siteurl) : $sitename ?>" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="<?= isset($sitename) ? htmlspecialchars($sitename) : $sitename ?>" />
+  <meta property="og:locale" content="en_US" />
 
   <!-- Favicons -->
   <link href="<?php echo $siteurl; ?>uploads/<?php echo $siteimg; ?>" rel="icon">
@@ -121,18 +151,18 @@ if (in_array($current_page, $excluded_pages)) {
   <link href="<?php echo $siteurl; ?>assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
   <link href="<?php echo $siteurl; ?>assets/vendor/drift-zoom/drift-basic.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-<script src="<?php echo $paymenturl; ?>"></script>
+  <script src="<?php echo $paymenturl; ?>"></script>
 
   <!-- Main CSS File -->
   <link href="<?php echo $siteurl; ?>assets/css/main.css" rel="stylesheet">
-<?php include 'backend/tinymce.php'; ?>
+  <?php include 'backend/tinymce.php'; ?>
 </head>
 
 <body class="index-page">
 
   <header id="header" class="header position-relative">
     <!-- Top Bar -->
-  <!-- Top Bar -->
+    <!-- Top Bar -->
     <div class="top-bar py-2 d-none d-lg-block">
       <div class="container-fluid container-xl">
         <div class="row align-items-center">
@@ -166,14 +196,14 @@ if (in_array($current_page, $excluded_pages)) {
           <!-- Logo -->
           <a href="index" class="logo d-flex align-items-center">
             <!-- Uncomment the line below if you also wish to use an image logo -->
-       <img src="<?php echo $siteurl . $imagePath . $siteimg; ?>" alt=""> 
-        
+            <img src="<?php echo $siteurl . $imagePath . $siteimg; ?>" alt="">
+
           </a>
 
           <!-- Search -->
-          <form class="search-form desktop-search-form" action="<?php echo $siteurl;?>search.php" method="get">
+          <form class="search-form desktop-search-form" action="<?php echo $siteurl; ?>search.php" method="get">
             <div class="input-group">
-              <input type="text" class="form-control" placeholder="Search for events..." name="searchterm"  id="search_input">
+              <input type="text" class="form-control" placeholder="Search for events..." name="searchterm" id="search_input">
               <button class="btn search-btn" type="submit">
                 <i class="bi bi-search"></i>
               </button>
@@ -189,80 +219,80 @@ if (in_array($current_page, $excluded_pages)) {
             </button>
 
             <!-- Account -->
-                     <!-- Account -->
+            <!-- Account -->
             <div class="dropdown account-dropdown">
               <button class="header-action-btn" data-bs-toggle="dropdown">
                 <i class="bi bi-person"></i>
-                   <span class="action-text d-none d-md-inline-block">Account</span>
+                <span class="action-text d-none d-md-inline-block">Account</span>
               </button>
-            <div class="dropdown-menu">
-  <div class="dropdown-header">
-    <h6>Welcome to <span class="sitename"><?php echo $sitename; ?></span></h6>
-    <?php if($active_log==0){ ?>
-      <p class="mb-0">Access account &amp; manage orders</p>
-  </div>
-  <div class="dropdown-footer">
-    <a href="<?php echo $siteurl; ?>login" class="btn btn-primary w-100 mb-2">Sign In</a>
-    <a href="<?php echo $siteurl; ?>register" class="btn btn-outline-primary w-100">Register</a>
-  </div>
-    <?php } else { ?>
-      </div>
-      <div class="dropdown-body">
-        <a class="dropdown-item d-flex align-items-center" href="<?php echo $siteurl; ?>dashboard">
-          <i class="bi bi-person-circle me-2"></i>
-          <span>My Profile</span>
-        </a>
-        <a class="dropdown-item d-flex align-items-center" href="<?php echo $siteurl; ?>my_orders">
-          <i class="bi bi-bag-check me-2"></i>
-          <span>My Orders</span>
-        </a>
-        <a class="dropdown-item d-flex align-items-center" href="<?php echo $siteurl; ?>my_wishlist">
-          <i class="bi bi-heart me-2"></i>
-          <span>My Wishlist</span>
-        </a>
-        <a class="dropdown-item d-flex align-items-center" href="<?php echo $siteurl; ?>settings">
-          <i class="bi bi-gear me-2"></i>
-          <span>Settings</span>
-        </a>
-      </div>
-      <div class="dropdown-footer">
-        <a href="<?php echo $siteurl; ?>logout.php" class="btn btn-primary w-100 mb-2">Log Out</a>
-      </div>
-    <?php } ?>
-</div>
+              <div class="dropdown-menu">
+                <div class="dropdown-header">
+                  <h6>Welcome to <span class="sitename"><?php echo $sitename; ?></span></h6>
+                  <?php if ($active_log == 0) { ?>
+                    <p class="mb-0">Access account &amp; manage orders</p>
+                </div>
+                <div class="dropdown-footer">
+                  <a href="<?php echo $siteurl; ?>login" class="btn btn-primary w-100 mb-2">Sign In</a>
+                  <a href="<?php echo $siteurl; ?>register" class="btn btn-outline-primary w-100">Register</a>
+                </div>
+              <?php } else { ?>
+              </div>
+              <div class="dropdown-body">
+                <a class="dropdown-item d-flex align-items-center" href="<?php echo $siteurl; ?>dashboard">
+                  <i class="bi bi-person-circle me-2"></i>
+                  <span>My Profile</span>
+                </a>
+                <a class="dropdown-item d-flex align-items-center" href="<?php echo $siteurl; ?>my_orders">
+                  <i class="bi bi-bag-check me-2"></i>
+                  <span>My Orders</span>
+                </a>
+                <a class="dropdown-item d-flex align-items-center" href="<?php echo $siteurl; ?>my_wishlist">
+                  <i class="bi bi-heart me-2"></i>
+                  <span>My Wishlist</span>
+                </a>
+                <a class="dropdown-item d-flex align-items-center" href="<?php echo $siteurl; ?>settings">
+                  <i class="bi bi-gear me-2"></i>
+                  <span>Settings</span>
+                </a>
+              </div>
+              <div class="dropdown-footer">
+                <a href="<?php echo $siteurl; ?>logout.php" class="btn btn-primary w-100 mb-2">Log Out</a>
+              </div>
+            <?php } ?>
             </div>
- <!-- Wishlist -->
-             <?php
-$wishlist_count = 0;
-if (isset($user_id) && !empty($user_id)) {
-    $wishlist_count = getWishlistCountByUser($con, $user_id);
-    if ($wishlist_count === null) $wishlist_count = 0;
-}
-?>
-          <a href="<?php echo $siteurl; ?>my_wishlist" class="header-action-btn d-none d-md-block">
-  <i class="bi bi-heart"></i>
-  <span class="action-text d-none d-md-inline-block">Wishlist</span>
-  <span class="badge wishlist-count"><?php echo $wishlist_count; ?></span>
-</a>
-
-            <!-- Cart -->
-            <a href="<?php echo $siteurl; ?>cart.php" class="header-action-btn">
-               <?php
-                $cart_count = getCartCount($con, $siteprefix, $order_id);
-                     ?>
-              <i class="bi bi-cart3"></i>
-              <span class="action-text d-none d-md-inline-block">Cart</span>
-               <?php if($cart_count >= 0): ?>
-              <span class="badge cart-count"><?php echo $cart_count; ?></span>
-              <?php endif; ?>
-            </a>
-
-            <!-- Mobile Navigation Toggle -->
-            <i class="mobile-nav-toggle d-xl-none bi bi-list me-0"></i>
-
           </div>
+          <!-- Wishlist -->
+          <?php
+          $wishlist_count = 0;
+          if (isset($user_id) && !empty($user_id)) {
+            $wishlist_count = getWishlistCountByUser($con, $user_id);
+            if ($wishlist_count === null) $wishlist_count = 0;
+          }
+          ?>
+          <a href="<?php echo $siteurl; ?>my_wishlist" class="header-action-btn d-none d-md-block">
+            <i class="bi bi-heart"></i>
+            <span class="action-text d-none d-md-inline-block">Wishlist</span>
+            <span class="badge wishlist-count"><?php echo $wishlist_count; ?></span>
+          </a>
+
+          <!-- Cart -->
+          <a href="<?php echo $siteurl; ?>cart.php" class="header-action-btn">
+            <?php
+            $cart_count = getCartCount($con, $siteprefix, $order_id);
+            ?>
+            <i class="bi bi-cart3"></i>
+            <span class="action-text d-none d-md-inline-block">Cart</span>
+            <?php if ($cart_count >= 0): ?>
+              <span class="badge cart-count"><?php echo $cart_count; ?></span>
+            <?php endif; ?>
+          </a>
+
+          <!-- Mobile Navigation Toggle -->
+          <i class="mobile-nav-toggle d-xl-none bi bi-list me-0"></i>
+
         </div>
       </div>
+    </div>
     </div>
 
     <!-- Navigation -->
@@ -273,54 +303,54 @@ if (isset($user_id) && !empty($user_id)) {
             <ul>
               <li><a href="<?php echo $siteurl; ?>index.php" class="active">Home</a></li>
               <li><a href="<?php echo $siteurl; ?>about.php">About Us</a></li>
-         <li><a href="<?php echo $siteurl; ?>blog.php">Blog</a></li>
+              <li><a href="<?php echo $siteurl; ?>blog.php">Blog</a></li>
 
-         <li><a href="<?php echo $siteurl; ?>create_ticket.php">Supports</a></li>
+              <li><a href="<?php echo $siteurl; ?>create_ticket.php">Supports</a></li>
               <li><a href="<?php echo $siteurl; ?>loyalty-program.php">Loyalty Program</a></li>
 
 
               <li class="products-megamenu-2">
-  <a href="#">
-    <span>Marketplace</span>
-    <i class="bi bi-chevron-down toggle-dropdown"></i>
-  </a>
-  <!-- Mobile Mega Menu for Marketplace -->
-  <ul class="mobile-megamenu">
-    <?php
-      $sql = "SELECT * FROM " . $siteprefix . "categories WHERE parent_id IS NULL";
-      $sql2 = mysqli_query($con, $sql);
-      while ($row = mysqli_fetch_array($sql2)) {
-          $category_name = $row['category_name'];
-          $slugs = $row['slug'];
-          echo '<li><a href="' . $siteurl . 'category/' . $slugs . '">' . $category_name . '</a></li>';
-      }
-    ?>
-    <li>
-      <a class="font-weight-bold" href="<?php echo $siteurl; ?>marketplace.php">View Marketplace</a>
-    </li>
-  </ul>
-  <!-- Desktop Mega Menu for Marketplace -->
-  <div class="desktop-megamenu">
-    <div class="row py-4 px-3">
-      <?php
-        $sql = "SELECT * FROM " . $siteprefix . "categories WHERE parent_id IS NULL";
-        $sql2 = mysqli_query($con, $sql);
-        $count = 0;
-        while ($row = mysqli_fetch_array($sql2)) {
-            $category_name = $row['category_name'];
-            $slugs = $row['slug'];
-            echo '<div class="col-md-4 col-6 mb-1">';
-            echo '<a class="dropdown-item" style="white-space: normal;" href="' . $siteurl . 'category/' . $slugs . '">' . $category_name . '</a>';
-            echo '</div>';
-            $count++;
-        }
-      ?>
-      <div class="col-12 mt-2">
-        <a class="dropdown-item font-weight-bold" style="white-space: normal;" href="<?php echo $siteurl; ?>marketplace.php">View Marketplace</a>
-      </div>
-    </div>
-  </div>
-</li>
+                <a href="#">
+                  <span>Marketplace</span>
+                  <i class="bi bi-chevron-down toggle-dropdown"></i>
+                </a>
+                <!-- Mobile Mega Menu for Marketplace -->
+                <ul class="mobile-megamenu">
+                  <?php
+                  $sql = "SELECT * FROM " . $siteprefix . "categories WHERE parent_id IS NULL";
+                  $sql2 = mysqli_query($con, $sql);
+                  while ($row = mysqli_fetch_array($sql2)) {
+                    $category_name = $row['category_name'];
+                    $slugs = $row['slug'];
+                    echo '<li><a href="' . $siteurl . 'category/' . $slugs . '">' . $category_name . '</a></li>';
+                  }
+                  ?>
+                  <li>
+                    <a class="font-weight-bold" href="<?php echo $siteurl; ?>marketplace.php">View Marketplace</a>
+                  </li>
+                </ul>
+                <!-- Desktop Mega Menu for Marketplace -->
+                <div class="desktop-megamenu">
+                  <div class="row py-4 px-3">
+                    <?php
+                    $sql = "SELECT * FROM " . $siteprefix . "categories WHERE parent_id IS NULL";
+                    $sql2 = mysqli_query($con, $sql);
+                    $count = 0;
+                    while ($row = mysqli_fetch_array($sql2)) {
+                      $category_name = $row['category_name'];
+                      $slugs = $row['slug'];
+                      echo '<div class="col-md-4 col-6 mb-1">';
+                      echo '<a class="dropdown-item" style="white-space: normal;" href="' . $siteurl . 'category/' . $slugs . '">' . $category_name . '</a>';
+                      echo '</div>';
+                      $count++;
+                    }
+                    ?>
+                    <div class="col-12 mt-2">
+                      <a class="dropdown-item font-weight-bold" style="white-space: normal;" href="<?php echo $siteurl; ?>marketplace.php">View Marketplace</a>
+                    </div>
+                  </div>
+                </div>
+              </li>
 
               <li><a href="<?php echo $siteurl; ?>contact.php">Contact</a></li>
 
@@ -330,36 +360,34 @@ if (isset($user_id) && !empty($user_id)) {
       </div>
     </div>
 
-       <!-- Announcement Bar -->
+    <!-- Announcement Bar -->
     <div class="announcement-bar py-2">
       <div class="container-fluid container-xl">
-    <div class="row align-items-center">
-      <div class="col-12 my-2 my-lg-0">
-        <ul class="list-unstyled d-flex flex-wrap mb-0 justify-content-center justify-content-lg-center">
-          <li>
-            <a class="text-white text-small" href="<?php echo $siteurl; ?>loyalty-program.php">Loyalty Program</a>
-          </li>
-          <li>&nbsp;|&nbsp</li>
-          <li>
-            <a class="text-white text-small" href="<?php echo $siteurl; ?>affiliate-details.php">Affiliate Program</a>
-          </li>
-          <li>&nbsp;|&nbsp</li>
-          <li>
-            <a class="text-white text-small" href="<?php echo $siteurl; ?>marketplace.php">Marketplace</a>
-          </li>
-          <li>&nbsp;|&nbsp</li>
-          <?php if($active_log==0){ ?>
-            <li>
-              <a class="text-white text-small" href="<?php echo $siteurl; ?>become_a_trainer.php">Become a Trainer</a>
-            </li>
-          <?php } else { ?>
-            <li>
-              <a class="text-white text-small" href="<?php echo $siteurl; ?>logout.php">Logout</a>
-            </li>
-          <?php } ?>
-        </ul>
-      </div>
-    </div>
+        <div class="row align-items-center">
+          <div class="col-12 my-2 my-lg-0">
+            <ul class="list-unstyled d-flex flex-wrap mb-0 justify-content-center justify-content-lg-center">
+              <li>
+                <a class="text-white text-small" href="<?php echo $siteurl; ?>trainers.php">Trainers</a>
+              </li>
+              <li>&nbsp;|&nbsp</li>
+              <li>
+                <a class="text-white text-small" href="<?php echo $siteurl; ?>events-by-state.php">Events By States in Nigeria</a>
+              </li>
+              <li>&nbsp;|&nbsp</li>
+              <li>
+                <a class="text-white text-small" href="<?php echo $siteurl; ?>events-by-month.php">Events by Month</a>
+              </li>
+              <li>&nbsp;|&nbsp</li>
+              <li>
+                <a class="text-white text-small" href="<?php echo $siteurl; ?>events-by-country.php">Events by Country</a>
+              </li>
+              <li>&nbsp;|&nbsp</li>
+              <li>
+                <a class="text-white text-small" href="<?php echo $siteurl; ?>events-by-format.php">Events by Format</a>
+              </li>
+            </ul>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -376,9 +404,11 @@ if (isset($user_id) && !empty($user_id)) {
         </form>
       </div>
     </div>
-   <input type="hidden" id="siteurl" value="<?php echo $siteurl; ?>">
+    <input type="hidden" id="siteurl" value="<?php echo $siteurl; ?>">
 
     <!-- hidden form input ---->
     <input type="hidden" id="order_id" value="<?php echo $order_id; ?>">
-     <input type="hidden" id="user_id" value="<?php if($active_log==1){echo $user_id; }?>">
+    <input type="hidden" id="user_id" value="<?php if ($active_log == 1) {
+                                                echo $user_id;
+                                              } ?>">
   </header>

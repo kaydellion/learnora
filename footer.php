@@ -106,11 +106,14 @@
               <div class="payment-methods">
                 <div class="payment-icons">
                   <i class="bi bi-master-card" aria-label="MasterCard"></i>
+                  <i class="bi bi-visa" aria-label="Visa"></i>
+                  <i class="bi bi-verve" aria-label="Verve"></i>
+                  <!--<i class="bi bi-amex" aria-label="American Express"></i>
                   <i class="bi bi-paypal" aria-label="PayPal"></i>
                   <i class="bi bi-apple" aria-label="Apple Pay"></i>
                   <i class="bi bi-paystack" aria-label="Paystack"></i>
                   <i class="bi bi-shop" aria-label="Shop Pay"></i>
-                  <i class="bi bi-cash" aria-label="Cash on Delivery"></i>
+                  <i class="bi bi-cash" aria-label="Cash on Delivery"></i>-->
                 </div>
               </div>
 
@@ -171,7 +174,19 @@
                     window.location.href = document.getElementById("refer").value;
                 },
                 onExit: function (response) {
-                    alert("Payment was cancelled.");
+            // 🚀 Trigger AJAX when modal is closed without payment
+            $.ajax({
+                url: "backend/checkout_abandoned.php",
+                method: "POST",
+                data: { abandoned_ref: orderId },
+                success: function(res){
+                    console.log("Abandoned checkout logged.");
+                                        alert('No worries! Your payment was cancelled. If you need help, feel free to reach out, or you can try checking out again anytime 😊');
+                },
+                error: function(err){
+                    console.error("Failed to log abandoned checkout", err);
+                }
+            });
                 }
             };
 

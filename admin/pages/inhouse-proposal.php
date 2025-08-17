@@ -68,14 +68,10 @@
                 <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#viewReportModal<?php echo $s; ?>">
                   View
                 </button>
-                <?php
-                if($user_type !== 'admin'){
-
-                  ?>
+                <?php  if($user_type !== 'admin'){ ?>
                <button class="btn btn-success btn-sm" data-toggle="modal" data-target="#sendMailModal<?php echo $s; ?>">
   Send Mail
 </button>
-
 <?php } ?>
 
               </td>

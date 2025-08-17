@@ -1,7 +1,100 @@
-<?php include "header.php"; ?>
-<section>
+<?php include "header.php"; 
+
+// Get filter parameters
+$alphabetical_filter = isset($_GET['letter']) ? mysqli_real_escape_string($con, $_GET['letter']) : '';
+$sort_by = isset($_GET['sort']) ? mysqli_real_escape_string($con, $_GET['sort']) : 'company_name';
+$sort_order = isset($_GET['order']) && $_GET['order'] === 'desc' ? 'DESC' : 'ASC';
+
+// Build WHERE clause for alphabetical filtering
+$where_conditions = ["u.trainer = '1'", "u.status = 'active'"];
+if (!empty($alphabetical_filter)) {
+    $where_conditions[] = "u.company_name LIKE '$alphabetical_filter%'";
+}
+$where_clause = implode(' AND ', $where_conditions);
+
+// Validate sort column
+$allowed_sorts = ['company_name', 'region', 'industry_sector'];
+if (!in_array($sort_by, $allowed_sorts)) {
+    $sort_by = 'company_name';
+}
+
+?>
+
+<section class="trainers-section py-5">
 <div class="container">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12 text-center">
+            <h1 class="display-4 mb-3">Our Trainers</h1>
+            <p class="lead text-muted">Explore our network of professional trainers and training organizations</p>
+        </div>
+    </div>
+
+    <!-- Alphabetical Filter -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Filter by First Letter</h5>
+                    <div class="alphabet-filter d-flex flex-wrap gap-2">
+                        <a href="trainers.php" class="btn btn-outline-primary btn-sm <?php echo empty($alphabetical_filter) ? 'active' : ''; ?>">All</a>
+                        <?php for ($i = 65; $i <= 90; $i++): 
+                            $letter = chr($i);
+                            $is_active = ($alphabetical_filter === $letter);
+                        ?>
+                            <a href="?letter=<?php echo $letter; ?>&sort=<?php echo $sort_by; ?>&order=<?php echo strtolower($sort_order); ?>" 
+                               class="btn btn-outline-primary btn-sm <?php echo $is_active ? 'active' : ''; ?>">
+                                <?php echo $letter; ?>
+                            </a>
+                        <?php endfor; ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Trainers Table -->
     <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th scope="col">
+                                        <a href="?letter=<?php echo $alphabetical_filter; ?>&sort=company_name&order=<?php echo ($sort_by === 'company_name' && $sort_order === 'ASC') ? 'desc' : 'asc'; ?>" 
+                                           class="text-decoration-none text-dark">
+                                            Company Name
+                                            <?php if ($sort_by === 'company_name'): ?>
+                                                <i class="bi bi-arrow-<?php echo $sort_order === 'ASC' ? 'up' : 'down'; ?>"></i>
+                                            <?php endif; ?>
+                                        </a>
+                                    </th>
+                                    <th scope="col">
+                                        <a href="?letter=<?php echo $alphabetical_filter; ?>&sort=region&order=<?php echo ($sort_by === 'region' && $sort_order === 'ASC') ? 'desc' : 'asc'; ?>" 
+                                           class="text-decoration-none text-dark">
+                                            Region
+                                            <?php if ($sort_by === 'region'): ?>
+                                                <i class="bi bi-arrow-<?php echo $sort_order === 'ASC' ? 'up' : 'down'; ?>"></i>
+                                            <?php endif; ?>
+                                        </a>
+                                    </th>
+                                    <th scope="col">
+                                        <a href="?letter=<?php echo $alphabetical_filter; ?>&sort=industry_sector&order=<?php echo ($sort_by === 'industry_sector' && $sort_order === 'ASC') ? 'desc' : 'asc'; ?>" 
+                                           class="text-decoration-none text-dark">
+                                            Industry Sector
+                                            <?php if ($sort_by === 'industry_sector'): ?>
+                                                <i class="bi bi-arrow-<?php echo $sort_order === 'ASC' ? 'up' : 'down'; ?>"></i>
+                                            <?php endif; ?>
+                                        </a>
+                                    </th>
+                                    <th scope="col">Courses</th>
+                                    <th scope="col">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
 <?php
 $sellers_query = "SELECT 
                     u.s AS seller_id,
@@ -10,28 +103,26 @@ $sellers_query = "SELECT
                     u.biography AS seller_about,
                     u.company_name,
                     u.company_profile,
+                    u.region,
+                    u.industry_sector,
                     u.facebook AS seller_facebook,
                     u.twitter AS seller_twitter,
                     u.instagram AS seller_instagram,
                     u.linkedin AS seller_linkedin
                   FROM {$siteprefix}users u
-                  WHERE u.trainer = '1' AND u.status = 'active'";
+                  WHERE $where_clause
+                  ORDER BY u.$sort_by $sort_order";
 $sellers_result = mysqli_query($con, $sellers_query);
 ?>
+
 <?php if (mysqli_num_rows($sellers_result) > 0): ?>
  <?php while ($seller = mysqli_fetch_assoc($sellers_result)): 
       $seller_id = $seller['seller_id'];
       $seller_name = htmlspecialchars($seller['seller_name']);
-      $seller_about_raw =$seller['seller_about'];
-      $about_words = explode(' ', strip_tags($seller_about_raw));
-      $seller_about = implode(' ', array_slice($about_words, 0, 8)) . (count($about_words) > 8 ? '...' : '');
+      $company_name = htmlspecialchars($seller['company_name'] ?: 'N/A');
+      $region = htmlspecialchars($seller['region'] ?: 'Not Specified');
+      $industry_sector = htmlspecialchars($seller['industry_sector'] ?: 'General');
       $seller_photo = !empty($seller['seller_photo']) ? $imagePath . $seller['seller_photo'] : 'default-avatar.png';
-
-      // Social Links
-    $seller_facebook = $seller['seller_facebook'];
-$seller_twitter = $seller['seller_twitter'];
-$seller_instagram = $seller['seller_instagram'];
-$seller_linkedin = $seller['seller_linkedin'];
 
       // Get seller resource count
       $count_query = mysqli_query($con, "SELECT COUNT(*) AS total FROM {$siteprefix}training WHERE user = '$seller_id' AND status = 'approved'");
@@ -39,52 +130,102 @@ $seller_linkedin = $seller['seller_linkedin'];
       $resource_count = $count_data['total'];
     ?>
 
-<div class="col-6 col-md-4 col-lg-3 mb-4">
-  <div class="card h-100 shadow-sm border-0">
-    <img src="<?php echo $seller_photo; ?>" class="card-img-top" alt="<?php echo $seller_name; ?>" style="object-fit: cover; height: 200px;">
-
-    <div class="card-body d-flex flex-column">
-      <h5 class="card-title d-flex justify-content-between align-items-center">
-        <span class="text-truncate" style="max-width: 70%;"><?php echo $seller_name; ?></span>
-        <span class="badge bg-success text-white"><?php echo $resource_count; ?> resources</span>
-      </h5>
-
-      <p class="card-text text-muted" style="font-size: 0.9rem;"><?php echo htmlspecialchars($seller_about); ?></p>
-
-      <div class="mt-auto mb-3">
-        <?php if (!empty($seller_facebook)) { ?>
-          <a href="<?php echo $seller_facebook; ?>" target="_blank" class="me-2">
-            <i class="bi bi-facebook fa-lg text-primary"></i>
-          </a>
-        <?php } ?>
-        <?php if (!empty($seller_twitter)) { ?>
-          <a href="<?php echo $seller_twitter; ?>" target="_blank" class="me-2">
-            <i class="fab fa-twitter fa-lg text-info"></i>
-          </a>
-        <?php } ?>
-        <?php if (!empty($seller_instagram)) { ?>
-          <a href="<?php echo $seller_instagram; ?>" target="_blank" class="me-2">
-            <i class="fab fa-instagram fa-lg text-danger"></i>
-          </a>
-        <?php } ?>
-        <?php if (!empty($seller_linkedin)) { ?>
-          <a href="<?php echo $seller_linkedin; ?>" target="_blank" class="me-2">
-            <i class="fab fa-linkedin fa-lg text-primary"></i>
-          </a>
-        <?php } ?>
-      </div>
-
-      <a href="<?php echo $siteurl; ?>trainer-store?seller_id=<?php echo $seller_id; ?>" class="btn btn-primary btn-sm w-100">View Profile</a>
-    </div>
-  </div>
-</div>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="<?php echo $seller_photo; ?>" 
+                                                 class="rounded-circle me-3" 
+                                                 alt="<?php echo $seller_name; ?>" 
+                                                 style="width: 50px; height: 50px; object-fit: cover;">
+                                            <div>
+                                                <h6 class="mb-0"><?php echo $company_name; ?></h6>
+                                                <small class="text-muted"><?php echo $seller_name; ?></small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-light text-dark"><?php echo $region; ?></span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-primary"><?php echo $industry_sector; ?></span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-success"><?php echo $resource_count; ?> courses</span>
+                                    </td>
+                                    <td>
+                                        <a href="<?php echo $siteurl; ?>trainer-store?seller_id=<?php echo $seller_id; ?>" 
+                                           class="btn btn-primary btn-sm">
+                                            <i class="bi bi-eye"></i> View Profile
+                                        </a>
+                                    </td>
+                                </tr>
 
     <?php endwhile; ?>
-  </div>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 <?php else: ?>
-  <p>No active sellers found.</p>
+    <div class="row">
+        <div class="col-12">
+            <div class="alert alert-info text-center">
+                <h4>No Trainers Found</h4>
+                <p>No active trainers found<?php if (!empty($alphabetical_filter)): ?> starting with "<?php echo $alphabetical_filter; ?>"<?php endif; ?>.</p>
+                <?php if (!empty($alphabetical_filter)): ?>
+                    <a href="trainers.php" class="btn btn-primary">View All Trainers</a>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
 <?php endif; ?>
- </div>
-  </div>
+
+</div>
 </section>
-<?php include "footer.php";  ?>
+
+<style>
+.alphabet-filter .btn {
+    min-width: 40px;
+}
+
+.alphabet-filter .btn.active {
+    background-color: #f36127;
+    border-color: #f36127;
+    color: white;
+}
+
+.table th a {
+    font-weight: 600;
+}
+
+.table th a:hover {
+    color: #f36127 !important;
+}
+
+.trainers-section {
+    background-color: #f8f9fa;
+}
+
+.card {
+    border-radius: 10px;
+}
+
+.table-responsive {
+    border-radius: 8px;
+}
+
+@media (max-width: 768px) {
+    .alphabet-filter {
+        justify-content: center;
+    }
+    
+    .table-responsive {
+        font-size: 0.9rem;
+    }
+}
+</style>
+
+<?php include "footer.php"; ?>

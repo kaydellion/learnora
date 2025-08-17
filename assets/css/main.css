@@ -601,7 +601,7 @@ h6 {
 }
 
 .header .announcement-bar {
-  background-color: var(--accent-color);
+  background-color: var(--surface-color);
   color: var(--contrast-color);
   text-align: center;
   font-weight: 500;

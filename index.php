@@ -440,7 +440,7 @@ $rating_data = calculateRating($training_id, $con, $siteprefix);
     <div class="row align-items-center affiliate-prompt-container">
         <!-- Image Column -->
        <div class="col-md-5 mb-4 mb-md-0">
-        <img src="<?php echo $siteurl;?>assets/img/lenora-affliate-3.png" alt="Join Marketplace" class="img-fluid affiliate-prompt-img">
+        <img src="<?php echo $siteurl;?>assets/img/lenora-affliate-3.png" alt="Join Marketplace" class="img-fluid affiliate-prompt-img" style="max-width:50%;height:auto;">
       </div>
       <!-- Content Column -->
       <div class="col-md-7">
@@ -448,7 +448,6 @@ $rating_data = calculateRating($training_id, $con, $siteprefix);
           <h2 class="mb-3">Join Affiliate</h2>
           <p class="mb-4">Want to turn your followers, friends, or blog readers into real cash?
 Join the Learnora.ng Affiliate Program and start earning 8% commission on every course sale — effortlessly!
-
 📚 Learnora.ng is Nigeria’s leading online learning platform, with in-demand courses in tech, business, personal growth, and more. The best part? You don’t need to be a pro — just share your unique link and earn every time someone signs up through you</p>
           <div class="affiliate-buttons d-flex justify-content-center justify-content-md-start gap-3 flex-wrap">
             <a href="<?php echo $siteurl; ?>affiliate-details" class="btn btn-primary register-btn">Join Affiliate</a>
