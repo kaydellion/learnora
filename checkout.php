@@ -224,12 +224,13 @@ include "header.php";
   document.addEventListener('DOMContentLoaded', function() {
   var manualPaymentModal = document.getElementById('manualPaymentModal');
   var orderId = document.getElementById("ref").value;
+  var siteurl = $('#siteurl').val();
   if (manualPaymentModal) {
     manualPaymentModal.addEventListener('hidden.bs.modal', function (event) {
       // Trigger your AJAX here
       // Example:
       $.ajax({
-        url: "backend/checkout_abandoned.php",
+        url: siteurl + "backend/checkout_abandoned",
         method: "POST",
         data: { order_id: orderId },
         success: function(res){

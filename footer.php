@@ -157,6 +157,7 @@
 (() => {
     const vpayButton = document.querySelector(".vpay-button");
     const orderId = document.getElementById("ref").value; // Assuming this is the order reference ID
+    var siteurl = $('#siteurl').val();
     if (vpayButton) {
         vpayButton.addEventListener("click", function () {
             const options = {
@@ -177,7 +178,7 @@
                 onExit: function (response) {
             // 🚀 Trigger AJAX when modal is closed without payment
             $.ajax({
-                url: "backend/checkout_abandoned.php",
+                url: siteurl + "backend/checkout_abandoned",
                 method: "POST",
                 data: { abandoned_ref: orderId },
                 success: function(res){
