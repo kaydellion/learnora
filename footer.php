@@ -164,11 +164,11 @@
                 amount: parseInt(document.getElementById("amount").value), // Use actual value
                 currency: 'NGN',
                 domain: 'sandbox', // Change to 'live' in production
-               key: '<?php echo $apikey; ?>',// Replace with your actual VPay public key
+                key: '<?php echo $apikey; ?>',// Replace with your actual VPay public key
                 email: document.getElementById("email-address").value,
                 transactionref: document.getElementById("ref").value,
-                customer_logo: 'https://www.vpay.africa/static/media/vpayLogo.91e11322.svg',
-                customer_service_channel: '+2348030007000, support@yourcompany.com',
+                customer_logo: siteurl + 'uploads/' + '<?php echo $siteimg; ?>',
+                customer_service_channel: '<?php echo $sitenumber; ?>,<?php echo $sitemail; ?>',
                 txn_charge: 6,
                 txn_charge_type: 'flat',
                 onSuccess: function (response) {
