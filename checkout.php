@@ -230,7 +230,7 @@ include "header.php";
       // Trigger your AJAX here
       // Example:
       $.ajax({
-        url: siteurl + "backend/checkout_abandoned",
+        url: siteurl + "backend/checkout_abandoned_new",
         method: "POST",
         data: { abandoned_ref: orderId },
         success: function(res){

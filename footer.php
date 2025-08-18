@@ -178,7 +178,7 @@
                 onExit: function (response) {
             // 🚀 Trigger AJAX when modal is closed without payment
             $.ajax({
-                url: siteurl + "backend/checkout_abandoned",
+                url: siteurl + "backend/checkout_abandoned_new",
                 method: "POST",
                 data: { abandoned_ref: orderId },
                 success: function(res){
