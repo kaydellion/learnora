@@ -4,13 +4,13 @@ include 'connect.php'; // Include your config file for database connection
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['abandoned_ref'])) {
     // Handle abandoned checkout
     $ref = mysqli_real_escape_string($con, $_POST['abandoned_ref']);
-    $query = mysqli_query($con, "SELECT * FROM orders WHERE order_reference='$ref' LIMIT 1");
+    $query = mysqli_query($con, "SELECT * FROM ln_orders WHERE order_reference='$ref' LIMIT 1");
     if (mysqli_num_rows($query) > 0) {
         $row = mysqli_fetch_assoc($query);
 
         // Update order to abandoned if not paid
         if ($row['status'] !== 'paid') {
-            mysqli_query($con, "UPDATE orders SET status='abandoned' WHERE order_reference='$ref'");
+            mysqli_query($con, "UPDATE ln_orders SET status='abandoned' WHERE order_reference='$ref'");
 
             // Send reminder email
             $buyerEmail = $row['buyer_email'];

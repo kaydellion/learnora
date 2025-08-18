@@ -232,7 +232,7 @@ include "header.php";
       $.ajax({
         url: siteurl + "backend/checkout_abandoned",
         method: "POST",
-        data: { order_id: orderId },
+        data: { abandoned_ref: orderId },
         success: function(res){
           console.log("Abandoned checkout logged.");
           alert('No worries! Your payment was cancelled. If you need help, feel free to reach out, or you can try checking out again anytime 😊');
