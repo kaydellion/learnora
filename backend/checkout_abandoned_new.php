@@ -46,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['abandoned_ref'])) {
                     $original_price = $row_item['original_price']; 
                     $resourceTitle = $row_item['resource_title'];
                     $pricing_type = $row_item['pricing'];
-                    $slug = $row_item['alt_title'];
+                    $slug = $row_item['slug'];
                     
                     // Get ticket information for paid items
                     $ticket_name = '';
