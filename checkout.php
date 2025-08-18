@@ -220,7 +220,30 @@ include "header.php";
     </div>
 </div>
 
-
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+  var manualPaymentModal = document.getElementById('manualPaymentModal');
+  var orderId = document.getElementById("ref").value;
+  if (manualPaymentModal) {
+    manualPaymentModal.addEventListener('hidden.bs.modal', function (event) {
+      // Trigger your AJAX here
+      // Example:
+      $.ajax({
+        url: "backend/checkout_abandoned.php",
+        method: "POST",
+        data: { order_id: orderId },
+        success: function(res){
+          console.log("Abandoned checkout logged.");
+          alert('No worries! Your payment was cancelled. If you need help, feel free to reach out, or you can try checking out again anytime 😊');
+        },
+        error: function(err){
+          console.error("Failed to log abandoned checkout", err);
+        }
+      });
+  });
+}
+});
+</script>
 
 <?php
 include "footer.php";

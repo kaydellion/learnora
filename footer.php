@@ -156,6 +156,7 @@
 <script>
 (() => {
     const vpayButton = document.querySelector(".vpay-button");
+    const orderId = document.getElementById("ref").value; // Assuming this is the order reference ID
     if (vpayButton) {
         vpayButton.addEventListener("click", function () {
             const options = {
