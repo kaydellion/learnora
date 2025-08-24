@@ -513,7 +513,7 @@ $promo_video = $_FILES['promo_video']['name'];
 if (!empty($promo_video)) {
     $fileKey = 'promo_video';
     $fileName = uniqid() . '_' . basename($promo_video);
-    $logopromo_video = handleFileUpload($fileKey, $uploadDir, $fileName);
+    $logopromo_video = handleFileUpload($fileKey, $uploadDir);
 
     // Check if promo video exists for this training_id
     $checkPromo = mysqli_query($con, "SELECT s FROM {$siteprefix}training_videos WHERE training_id = '$training_id' AND video_type = 'promo'");
@@ -532,7 +532,7 @@ $trailer_video = $_FILES['trailer_video']['name'];
 if (!empty($trailer_video)) {
     $fileKey = 'trailer_video';
     $fileName = uniqid() . '_' . basename($trailer_video);
-    $logotrailer_video = handleFileUpload($fileKey, $fileuploadDir, $fileName);
+    $logotrailer_video = handleFileUpload($fileKey, $fileuploadDir);
 
     // Check if trailer video exists for this training_id
     $checkTrailer = mysqli_query($con, "SELECT s FROM {$siteprefix}training_videos WHERE training_id = '$training_id' AND video_type = 'trailer'");
@@ -784,14 +784,14 @@ foreach ($categories as $catId) {
     if (!empty($promo_video)) { 
         $fileKey = 'promo_video';
         $fileName = uniqid() . '_' . basename($promo_video);
-        $logopromo_video = handleFileUpload($fileKey, $uploadDir, $promo_video);
+        $logopromo_video = handleFileUpload($fileKey, $uploadDir);
         $insertQuery=mysqli_query($con, "INSERT INTO {$siteprefix}training_videos (training_id, video_type, video_path, updated_at) VALUES ('$training_id', 'promo', '$logopromo_video', NOW())");
     } 
     $trailer_video = $_FILES['trailer_video']['name'];
     if (!empty($trailer_video)) {
         $fileKey = 'trailer_video';
         $fileName = uniqid() . '_' . basename($trailer_video);
-        $logotrailer_video = handleFileUpload($fileKey, $fileuploadDir, $trailer_video);
+        $logotrailer_video = handleFileUpload($fileKey, $fileuploadDir);
         $insertQuery=mysqli_query($con, "INSERT INTO {$siteprefix}training_videos (training_id, video_type, video_path, updated_at) VALUES ('$training_id', 'trailer', '$logotrailer_video', NOW())");
     } 
 
@@ -1444,7 +1444,7 @@ if(isset($_POST['settings'])){
     // Update profile picture if a new one is uploaded
     if (!empty($profilePicture)) {
         $fileName = uniqid() . '_' . basename($profilePicture);
-        $logo = handleFileUpload($fileKey, $uploadDir, $fileName);
+        $logo = handleFileUpload($fileKey, $uploadDir);
     } else {
         $logo = $siteimg; // Use the current picture  
     }
@@ -1501,7 +1501,7 @@ if(isset($_POST['update-profile'])){
 
     // Update profile picture if a new one is uploaded
     if (!empty($profilePicture)) {
-        $profilePicture = handleFileUpload($fileKey, $uploadDir, $fileName);
+        $profilePicture = handleFileUpload($fileKey, $uploadDir);
     } else {
         $profilePicture = $profile_picture; // Use the current profile picture if no new one is uploaded
     }
@@ -1851,7 +1851,7 @@ $companyProfilePicture = $_FILES['company_profile_picture']['name'] ?? '';
 
 if (!empty($companyProfilePicture)) {
     $fileKey = 'company_profile_picture';
-    $companyProfilePicture = handleFileUpload($fileKey, $uploadDir, $companyProfilePicture);
+    $companyProfilePicture = handleFileUpload($fileKey, $uploadDir);
 } else {
     // Get existing company logo from database if not uploading a new one
     $query = mysqli_query($con, "SELECT company_logo FROM {$siteprefix}users WHERE s = '$user_id'");
