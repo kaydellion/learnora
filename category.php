@@ -1,5 +1,5 @@
 <?php
-include "seo.php";
+
 include "header.php";
 
 // ✅ Step 1: Load main category by slug

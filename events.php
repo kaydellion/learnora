@@ -1,5 +1,5 @@
 <?php
-include "seo.php";
+
 include "header.php";
 include "event-details.php";
 

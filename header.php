@@ -114,7 +114,7 @@ if (in_array($current_page, $excluded_pages)) {
 
 ?>
 
-
+<?php include "seo.php"; ?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -163,30 +163,42 @@ if (in_array($current_page, $excluded_pages)) {
   <header id="header" class="header position-relative">
     <!-- Top Bar -->
     <!-- Top Bar -->
-    <div class="top-bar py-2 d-none d-lg-block">
-      <div class="container-fluid container-xl">
-        <div class="row align-items-center">
-          <div class="col-lg-6">
-            <div class="d-flex align-items-center">
-              <div class="top-bar-item me-4">
-                <i class="bi bi-telephone-fill me-2"></i>
-                <span>Customer Support: </span>
-                <a href="tel:<?php echo $sitenumber; ?>"><?php echo $sitenumber; ?></a>
-              </div>
-              <div class="top-bar-item">
-                <i class="bi bi-envelope-fill me-2"></i>
-                <a href="mailto:<?php echo $sitemail; ?>"><?php echo $sitemail; ?></a>
-              </div>
-            </div>
+   <div class="top-bar py-2 d-none d-lg-block">
+  <div class="container-fluid container-xl">
+    <div class="row align-items-center">
+      <div class="col-lg-6">
+        <div class="d-flex align-items-center">
+          <div class="top-bar-item me-4">
+            <i class="bi bi-telephone-fill me-2"></i>
+            <span>Customer Support: </span>
+            <a href="tel:<?php echo $sitenumber; ?>"><?php echo $sitenumber; ?></a>
           </div>
-
-          <div class="col-lg-6">
-            <div class="d-flex justify-content-end">
-            </div>
+          <div class="top-bar-item">
+            <i class="bi bi-envelope-fill me-2"></i>
+            <a href="mailto:<?php echo $sitemail; ?>"><?php echo $sitemail; ?></a>
           </div>
         </div>
       </div>
+
+      <div class="col-lg-6">
+        <div class="d-flex justify-content-end">
+          <a href="<?php echo $siteurl;?>trainers" class="btn btn-sm me-2" 
+             style="background-color: #f36127; color: white; font-weight: bold; border-radius: 4px;">
+            Trainers
+          </a>
+          <a href="<?php echo $siteurl;?>marketplace" class="btn btn-sm me-2" 
+             style="background-color: #f36127; color: white; font-weight: bold; border-radius: 4px;">
+            Marketplace
+          </a>
+          <a href="<?php echo $siteurl;?>blog" class="btn btn-sm" 
+             style="background-color: #f36127; color: white; font-weight: bold; border-radius: 4px;">
+            Blog
+          </a>
+        </div>
+      </div>
     </div>
+  </div>
+</div>
 
     <!-- Main Header -->
     <div class="main-header">
@@ -367,23 +379,23 @@ if (in_array($current_page, $excluded_pages)) {
           <div class="col-12 my-2 my-lg-0">
             <ul class="list-unstyled d-flex flex-wrap mb-0 justify-content-center justify-content-lg-center">
               <li>
-                <a class="text-white text-small btn-small" href="<?php echo $siteurl; ?>trainers.php">Trainers</a>
+                <a class="text-white text-small btn-small mb-2 mt-1" href="<?php echo $siteurl; ?>trainers.php">Trainers</a>
               </li>
               <li>&nbsp;&nbsp</li>
               <li>
-                <a class="text-white text-small btn-small" href="<?php echo $siteurl; ?>events-by-state.php">Events By States in Nigeria</a>
+                <a class="text-white text-small btn-small mb-2 mt-1" href="<?php echo $siteurl; ?>events-by-state.php">Events By States in Nigeria</a>
               </li>
               <li>&nbsp;&nbsp</li>
               <li>
-                <a class="text-white text-small btn-small" href="<?php echo $siteurl; ?>events-by-month.php">Events by Month</a>
+                <a class="text-white text-small btn-small mb-2 mt-1" href="<?php echo $siteurl; ?>events-by-month.php">Events by Month</a>
               </li>
               <li>&nbsp;&nbsp</li>
               <li>
-                <a class="text-white text-small btn-small" href="<?php echo $siteurl; ?>events-by-country.php">Events by Country</a>
+                <a class="text-white text-small btn-small mb-2 mt-1" href="<?php echo $siteurl; ?>events-by-country.php">Events by Country</a>
               </li>
               <li>&nbsp;&nbsp</li>
               <li>
-                <a class="text-white text-small btn-small" href="<?php echo $siteurl; ?>events-by-format.php">Events by Format</a>
+                <a class="text-white text-small btn-small mb-2 mt-1" href="<?php echo $siteurl; ?>events-by-format.php">Events by Format</a>
               </li>
             </ul>
           </div>

@@ -2614,6 +2614,7 @@ color: #fff;
 .btn-small{
   background-color: #6c757d;
   padding:5px;
+   margin-bottom: 5px;
 }
 .promo-cards {
   --default-color: #666;
