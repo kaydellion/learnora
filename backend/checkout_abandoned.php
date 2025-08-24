@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['abandoned_ref'])) {
             $buyerName = $row['buyer_name'];
             $resourceTitle = $row['resource_title'];
             $price = $row['amount'];
-            $checkoutLink = "https://$siteurl/checkout.php?ref=$ref";
+            $checkoutLink = "{$siteurl}/checkout.php?ref=$ref";
 
             $subject = "You left something behind – complete your purchase!";
             $message = "

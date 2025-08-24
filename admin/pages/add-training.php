@@ -95,6 +95,7 @@
                 <option value="beginner">Beginner</option>
                 <option value="intermediate">Intermediate</option>
                 <option value="advanced">Advanced</option>
+                <option value="All Levels">All Levels</option>
               </select>
             </div>
 
@@ -208,6 +209,7 @@
                 <option value="hybrid">Hybrid (Physical & Online)</option>
                    <option value="video">Video</option>
                 <option value="text">Text</option>
+                <option value="video_text">Video & Text</option>
                 
               </select>
             </div> 

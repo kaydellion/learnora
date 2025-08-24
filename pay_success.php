@@ -4,7 +4,7 @@
 global $ref;
 $ref = $_GET['ref'];
 $date = date('Y-m-d H:i:s');
-$attachment = [];
+$attachments = []; // store training file paths to attach
 
 
 // Get order details and order items
@@ -232,10 +232,10 @@ if (mysqli_query($con, $sql_update_order)) {
 }
 
 // Send order confirmation email
+// Send order confirmation email
 $subject = "Order Confirmation";
-// Email content with the table
-// Generate the table for purchased reports
-$tableRows = "";
+
+// Fetch order items
 $sql_items = "SELECT 
     oi.*, 
     t.*, 
@@ -251,6 +251,8 @@ WHERE oi.order_id = '$ref'";
 $sql_items_result = mysqli_query($con, $sql_items);
 
 $emailDetails = [];
+// store training file paths to attach
+
 while ($row = mysqli_fetch_assoc($sql_items_result)) {
     $event_dates = [];
     if (!empty($row['event_date']) && !empty($row['start_time']) && !empty($row['end_time'])) {
@@ -260,6 +262,7 @@ while ($row = mysqli_fetch_assoc($sql_items_result)) {
             'end_time' => $row['end_time']
         ];
     }
+
     $date_str = '';
     $time_str = '';
     if (count($event_dates) > 0) {
@@ -271,8 +274,12 @@ while ($row = mysqli_fetch_assoc($sql_items_result)) {
         }
         $time_str = date('h:i A', strtotime($first['start_time'])) . ' - ' . date('h:i A', strtotime($first['end_time']));
     }
+
     $format = ucfirst($row['delivery_format']);
     $details = '';
+    $training_id = $row['training_id'];
+
+    // Address/Link formats
     if ($format === 'Physical') {
         $fields = [
             'physical_address' => 'Address',
@@ -305,21 +312,47 @@ while ($row = mysqli_fetch_assoc($sql_items_result)) {
             $details .= "<li><strong>Link to join:</strong> <a href='" . htmlspecialchars($row['web_address']) . "'>" . htmlspecialchars($row['web_address']) . "</a></li>";
         }
     }
-    $training_title = $row['title'];
-    $ticket_name="";
-    $amount_paid ="";
 
-    if (!empty($row['ticket_name'])) {
-        $ticket_name = $row['ticket_name'];
-    } elseif ($row['pricing'] === 'free') {
-    $ticket_name = 'Free';
-} elseif ($row['pricing'] === 'donate') {
-    $ticket_name = 'Donate';
-}
+    // === NEW PART: Add training modules as attachments if format is Text / Video / Both ===
+    if ($format === 'Text' || $format === 'Video' || $format === 'Video_text') {
+        $details .= "<li><strong>Training Materials:</strong> (attached to this email)</li>";
 
+        // Video modules
+        if ($format === 'Video' || $format === 'Video_text') {
+            $video_sql = "SELECT * FROM {$siteprefix}training_video_modules WHERE training_id='$training_id'";
+            $video_res = mysqli_query($con, $video_sql);
+            while ($vm = mysqli_fetch_assoc($video_res)) {
+                if (!empty($vm['file_path'])) {
+                    $filePath = $fileuploadDir . "/" . $vm['file_path'];
+                    if (file_exists($filePath)) {
+                        $attachments[] = $filePath;
+                    }
+                }
+            }
+        }
+
+        // Text modules
+        if ($format === 'Text' || $format === 'Video_text') {
+            $text_sql = "SELECT * FROM {$siteprefix}training_texts_modules WHERE training_id='$training_id'";
+            $text_res = mysqli_query($con, $text_sql);
+            while ($tm = mysqli_fetch_assoc($text_res)) {
+                if (!empty($tm['file_path'])) {
+                    $filePath = $fileuploadDir . "/" . $tm['file_path'];
+                    if (file_exists($filePath)) {
+                        $attachments[] = $filePath;
+                    }
+                }
+            }
+        }
+    }
+
+    // Ticket name / price
+    $ticket_name = !empty($row['ticket_name']) ? $row['ticket_name'] : 
+        (($row['pricing'] === 'free') ? 'Free' : (($row['pricing'] === 'donate') ? 'Donate' : ''));
     $amount_paid = number_format($row['price'], 2);
+
     $emailDetails[] = [
-        'training_title' => $training_title,
+        'training_title' => $row['title'],
         'date_str' => $date_str,
         'time_str' => $time_str,
         'format' => $format,
@@ -328,9 +361,12 @@ while ($row = mysqli_fetch_assoc($sql_items_result)) {
         'details' => $details
     ];
 }
+
+// Build email message
 $user_first_name = explode(' ', $username)[0];
 $emailMessage = "<p>Hi $user_first_name,</p>";
 $emailMessage .= "<p>Thank you for registering for:</p>";
+
 foreach ($emailDetails as $ed) {
     $emailMessage .= "<ul>
         <li><strong>Training:</strong> {$ed['training_title']}</li>
@@ -348,8 +384,11 @@ foreach ($emailDetails as $ed) {
     </ul>
     <hr>";
 }
+
+// Send email with attachments
 $subject = "Your Training Registration Details";
-sendEmail2($email, $username, $siteName, $siteMail, $emailMessage, $subject, $attachment);
+sendEmail2($email, $username, $siteName, $siteMail, $emailMessage, $subject, $attachments);
+
 
 }
 ?>

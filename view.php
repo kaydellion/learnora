@@ -108,6 +108,51 @@ foreach ($fields as $col => $label) {
                         echo "<p><video controls width='100%' src='documents/{$filePath}'></video></p>";
                     }
                 }
+
+                // 3️⃣ Fetch from NEW training_video_modules
+    echo "<h5>Video Modules</h5>";
+    $stmt = $con->prepare("SELECT module_number, title, description, duration, file_path, video_link, video_quality, subtitles
+                           FROM {$siteprefix}training_video_modules 
+                           WHERE training_id = ?
+                           ORDER BY module_number ASC");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $modules = $stmt->get_result();
+
+    if ($modules->num_rows > 0) {
+        while ($m = $modules->fetch_assoc()) {
+            $title       = htmlspecialchars($m['title']);
+            $desc        = nl2br(htmlspecialchars($m['description']));
+            $duration    = htmlspecialchars($m['duration']);
+            $videoLink   = htmlspecialchars($m['video_link']);
+            $qualities   = htmlspecialchars($m['video_quality']);
+            $subtitles   = htmlspecialchars($m['subtitles']);
+            $filePath    = htmlspecialchars($m['file_path']);
+
+            echo "<div class='mb-4 p-3 border rounded'>";
+            echo "<h6>🎬 {$title}</h6>";
+            if (!empty($duration)) {
+                echo "<p><strong>Duration:</strong> {$duration} mins</p>";
+            }
+            if (!empty($desc)) {
+                echo "<p>{$desc}</p>";
+            }
+            if (!empty($videoLink)) {
+                echo "<p><iframe width='100%' height='315' src='{$videoLink}' frameborder='0' allowfullscreen></iframe></p>";
+            } elseif (!empty($filePath)) {
+                echo "<p><video controls width='100%' src='documents/{$filePath}'></video></p>";
+            }
+            if (!empty($qualities)) {
+                echo "<p><strong>Available Qualities:</strong> {$qualities}</p>";
+            }
+            if (!empty($subtitles)) {
+                echo "<p><strong>Subtitles:</strong> {$subtitles}</p>";
+            }
+            echo "</div>";
+        }
+    } else {
+        echo "<p>No video modules uploaded yet.</p>";
+    }
                 ?>
             </div>
 

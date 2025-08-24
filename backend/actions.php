@@ -226,8 +226,8 @@ $subcategory = isset($_POST['subcategory']) && is_array($_POST['subcategory']) ?
        else {
        $password=hashPassword($password);
             $query = "INSERT INTO ".$siteprefix."users (
-        title, display_name, first_name, middle_name, last_name, company_name, company_profile, company_logo, biography, profile_photo, age, gender, email_address, phone_number, skills_hobbies, language, proficiency, n_office_address, f_office_address, category, subcategory, facebook, instagram, twitter, linkedin, state, lga, country,address, type,status, trainer,password, last_login, created_date, reset_token, reset_token_expiry,affliate,loyalty,downloads,wallet,bank_name,bank_accname,bank_number
-    ) VALUES ('$title','$display_name','$firstName','$middleName','$lastName','$companyName','$companyProfile','$company_profile_picture','$biography','$profile_picture','$age','$gender','$email','$phone','$skills','$language','$proficiency','$nigeriaOffice','$foreignOffice','$category','$subcategory','$facebook','$instagram','$twitter','$linkedin','$state','$lga','$country','$address','$type', '$status', '$trainer','$password','$last_login','$created_date','$reset_token','$reset_token_expiry','','','','','','',''
+        title, display_name, first_name, middle_name, last_name, company_name, company_profile, company_logo, biography, profile_photo, age, gender, email_address, phone_number, skills_hobbies, language, proficiency, n_office_address, f_office_address, category, subcategory, facebook, instagram, twitter, linkedin, state, lga, country,address, type,status, trainer,password, last_login, created_date, reset_token, reset_token_expiry,affliate,loyalty,downloads,wallet,bank_name,bank_accname,bank_number,region,industry_sector
+    ) VALUES ('$title','$display_name','$firstName','$middleName','$lastName','$companyName','$companyProfile','$company_profile_picture','$biography','$profile_picture','$age','$gender','$email','$phone','$skills','$language','$proficiency','$nigeriaOffice','$foreignOffice','$category','$subcategory','$facebook','$instagram','$twitter','$linkedin','$state','$lga','$country','$address','$type', '$status', '$trainer','$password','$last_login','$created_date','$reset_token','$reset_token_expiry','','','','','','','','',''
     )";
 
         if (mysqli_query($con, $query)) {
@@ -339,8 +339,8 @@ if(isset($_POST['register-newuser'])){
        else {
        $password=hashPassword($password);
                      $query = "INSERT INTO ".$siteprefix."users (
-        title, display_name, first_name, middle_name, last_name, company_name, company_profile, company_logo, biography, profile_photo, age, gender, email_address, phone_number, skills_hobbies, language, proficiency, n_office_address, f_office_address, category, subcategory, facebook, instagram, twitter, linkedin, state, lga, country, address, type,status, trainer,password, last_login, created_date, reset_token, reset_token_expiry,affliate,loyalty,downloads,wallet,bank_name,bank_accname,bank_number
-    ) VALUES ('$title','$display_name','$firstName','$middleName','$lastName','','','','$profile','$profile_picture','','$gender','$email','$phone','','','','','','','','$facebook','$instagram','$twitter','$linkedin','$state','$lga','$country','$address', '$type', '', '','$password','$last_login','$created_date','$reset_token','$reset_token_expiry','','','','','','',''
+        title, display_name, first_name, middle_name, last_name, company_name, company_profile, company_logo, biography, profile_photo, age, gender, email_address, phone_number, skills_hobbies, language, proficiency, n_office_address, f_office_address, category, subcategory, facebook, instagram, twitter, linkedin, state, lga, country, address, type,status, trainer,password, last_login, created_date, reset_token, reset_token_expiry,affliate,loyalty,downloads,wallet,bank_name,bank_accname,bank_number,region,industry_sector
+    ) VALUES ('$title','$display_name','$firstName','$middleName','$lastName','','','','$profile','$profile_picture','','$gender','$email','$phone','','','','','','','','$facebook','$instagram','$twitter','$linkedin','$state','$lga','$country','$address', '$type', '', '','$password','$last_login','$created_date','$reset_token','$reset_token_expiry','','','','','','','','',''
     )";
 
         if (mysqli_query($con, $query)) {
@@ -777,7 +777,7 @@ $stmt->close();
 
 
 
-if ($delivery_format === 'video') {
+if ($delivery_format === 'video' || $delivery_format === 'video_text') {
     foreach ($_POST['video_module_title'] as $index => $title) {
         $desc        = $_POST['video_module_desc'][$index] ?? '';
         $duration    = $_POST['video_duration'][$index] ?? '';
@@ -817,7 +817,7 @@ if ($delivery_format === 'video') {
     }
 }
 
-elseif ($delivery_format === 'text') {
+elseif ($delivery_format === 'text' || $delivery_format === 'video_text') {
     // Loop through all text modules
     foreach ($_POST['text_module_title'] as $index => $title) {
         $desc         = $_POST['text_module_desc'][$index] ?? '';

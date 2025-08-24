@@ -1,115 +1,92 @@
-
-<?php 
+<?php
 include "seo.php";
-include "header.php"; 
+include "header.php";
 
+// ✅ Step 1: Load main category by slug
 if (isset($_GET['slugs'])) {
-    $raw_slug = $_GET['slugs'];
-  
-    $category_names = $raw_slug; // convert to lowercase for ma
-
-
-    // Prepare SQL: match using LOWER to handle case insensitivity
-    $sql = "SELECT * FROM " . $siteprefix . "categories WHERE slug = '$category_names'";
+    $slug = mysqli_real_escape_string($con, $_GET['slugs']);
+    $sql = "SELECT * FROM {$siteprefix}categories WHERE slug = '$slug' LIMIT 1";
     $sql2 = mysqli_query($con, $sql);
 
-    if (!$sql2) {
-        die("Query failed: " . mysqli_error($con));
+    if (!$sql2 || mysqli_num_rows($sql2) == 0) {
+        header("Location: " . $siteurl . "index.php");
+        exit();
     }
 
-    $count = 0;
-    while ($row = mysqli_fetch_array($sql2)) {
-        $id = $row['id'];
-        $category_name = $row['category_name'];
-        // You can use other fields here too if needed
-    }
+    $row = mysqli_fetch_assoc($sql2);
+    $id = $row['id'];
+    $category_name = $row['category_name'];
 } else {
     header("Location: " . $siteurl . "index.php");
     exit();
 }
-$limit = 16; // Number of reports per page
-$page = isset($_GET['page']) ? $_GET['page'] : 1;
+
+// ✅ Step 2: Pagination
+$limit = 16;
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $offset = ($page - 1) * $limit;
 
-// Handle sorting
+// ✅ Step 3: Sorting
 $sort = isset($_GET['sort']) ? $_GET['sort'] : 'relevance';
-$order_by = "t.training_id DESC"; // Default sorting by relevance
-if ($sort === 'price_high') {
-    $order_by = "tt.price DESC";
-} elseif ($sort === 'price_low') {
-    $order_by = "tt.price ASC";
-}
+$order_by = "t.training_id DESC";
+if ($sort === 'price_high') $order_by = "tt.price IS NULL, tt.price DESC";
+if ($sort === 'price_low') $order_by = "tt.price IS NULL, tt.price ASC";
 
-// Subcategory filtering
-$subcategory_filter = isset($_GET['subcategory']) ? $_GET['subcategory'] : '';
+// ✅ Step 4: Multi-level subcategory chain
+$subcategory_chain = isset($_GET['subcategory']) && $_GET['subcategory'] !== '' ? explode(',', $_GET['subcategory']) : [];
+
 $subcategory_condition = '';
-
-if (!empty($subcategory_filter) && $subcategory_filter !== 'all') {
-    $subcategory_slug = mysqli_real_escape_string($con, $subcategory_filter);
-    $subcat_result = mysqli_query($con, "SELECT id FROM {$siteprefix}categories WHERE slug = '$subcategory_slug'");
+if (!empty($subcategory_chain)) {
+    $last_slug = end($subcategory_chain);
+    $last_slug_safe = mysqli_real_escape_string($con, $last_slug);
+    $subcat_result = mysqli_query($con, "SELECT id FROM {$siteprefix}categories WHERE slug = '$last_slug_safe'");
     if ($subcat_row = mysqli_fetch_assoc($subcat_result)) {
         $subcat_id = $subcat_row['id'];
         $subcategory_condition = "AND FIND_IN_SET('$subcat_id', t.subcategory)";
     }
 }
 
-$query = "SELECT t.*, 
-                u.name AS display_name, 
-                tt.price, 
-                u.photo AS profile_picture, 
-                l.category_name AS category, 
-                sc.category_name AS subcategory, 
-                ti.picture 
+// ✅ Step 5: Main query
+$query = "SELECT t.*, u.name AS display_name, tt.price, u.photo AS profile_picture, 
+                 l.category_name AS category, sc.category_name AS subcategory, ti.picture 
           FROM {$siteprefix}training t
-          LEFT JOIN {$siteprefix}categories l ON t.category = l.id 
+          LEFT JOIN {$siteprefix}categories l ON t.category = l.id
           LEFT JOIN {$siteprefix}instructors u ON t.instructors = u.s
-          LEFT JOIN {$siteprefix}categories sc ON t.subcategory = sc.id 
+          LEFT JOIN {$siteprefix}categories sc ON t.subcategory = sc.id
           LEFT JOIN {$siteprefix}training_tickets tt ON t.training_id = tt.training_id
           LEFT JOIN {$siteprefix}training_images ti ON t.training_id = ti.training_id
-          WHERE t.status = 'approved'  
+          WHERE t.status = 'approved'
             AND FIND_IN_SET('$id', t.category) 
             $subcategory_condition
             AND EXISTS (
-                SELECT 1 
-                FROM {$siteprefix}training_event_dates d
-                WHERE d.training_id = t.training_id
-                AND (
-                    d.event_date > CURDATE() 
-                    OR (d.event_date = CURDATE() AND d.end_time >= CURTIME())
-                )
+                SELECT 1 FROM {$siteprefix}training_event_dates d
+                WHERE d.training_id = t.training_id 
+                  AND (d.event_date > CURDATE() OR (d.event_date = CURDATE() AND d.end_time >= CURTIME()))
             )
           GROUP BY t.training_id
-          ORDER BY $order_by 
+          ORDER BY $order_by
           LIMIT $limit OFFSET $offset";
 
 $result = mysqli_query($con, $query);
 $report_count = mysqli_num_rows($result);
 
-
-// Get total number of reports
-
+// ✅ Step 6: Total for pagination
 $total_query = "SELECT COUNT(DISTINCT t.training_id) AS total 
-                FROM {$siteprefix}training t 
-                LEFT JOIN {$siteprefix}categories sc ON t.subcategory = sc.id 
-                WHERE t.status = 'approved'  
+                FROM {$siteprefix}training t
+                WHERE t.status = 'approved'
                   AND FIND_IN_SET('$id', t.category) 
                   $subcategory_condition
                   AND EXISTS (
-                      SELECT 1 
-                      FROM {$siteprefix}training_event_dates d
-                      WHERE d.training_id = t.training_id
-                      AND (
-                          d.event_date > CURDATE() 
-                          OR (d.event_date = CURDATE() AND d.end_time >= CURTIME())
-                      )
+                      SELECT 1 FROM {$siteprefix}training_event_dates d
+                      WHERE d.training_id = t.training_id 
+                        AND (d.event_date > CURDATE() OR (d.event_date = CURDATE() AND d.end_time >= CURTIME()))
                   )";
-
 $total_result = mysqli_query($con, $total_query);
 $total_row = mysqli_fetch_assoc($total_result);
 $total_reports = $total_row['total'];
 $total_pages = ceil($total_reports / $limit);
-
 ?>
+
 
   <main class="main">
 
@@ -125,20 +102,18 @@ $total_pages = ceil($total_reports / $limit);
         </nav>
       </div>
     </div><!-- End Page Title -->
-
-        <div class="container" data-aos="fade-up">
-       <div class="row mb-3">
-        <div class="col-lg-12">
-
-          <!-- Category Header Section -->
+  <div class="container" data-aos="fade-up">
+    <!-- Filters -->
+    <div class="row mb-3">
+      <div class="col-lg-12">
+        <!-- Category Header Section -->
           <section id="category-header" class="category-header section">
+		    <div class="container" data-aos="fade-up">
 
-            <div class="container" data-aos="fade-up">
-
-              <!-- Filter and Sort Options -->
-              <div class="filter-container mb-4" data-aos="fade-up" data-aos-delay="100">
-                <div class="row g-3">
-                            <div class="col-7 col-md-3 col-lg-3">
+          <div class="filter-container mb-4" data-aos="fade-up" data-aos-delay="100">
+            <div class="row g-3">
+			
+			                      <div class="col-7 col-md-3 col-lg-3">
              <?php if ($active_log != "0"): ?>
                 <form method="POST" class="d-inline">
                     <?php
@@ -168,41 +143,66 @@ $total_pages = ceil($total_reports / $limit);
                 </form>
             <?php endif; ?>
             </div>
-                  <div class="col-6 col-md-5 col-lg-5">
-				    <div class="filter-item">
-                      <label for="priceRange" class="form-label">filter By Subcategory</label>
-         <select id="subcategory-select" class="form-select" onchange="filterBySubcategory(this.value)">
-        <option value="">-- Select Subcategory --</option>
-        <option value="all" <?= (!isset($_GET['subcategory']) || $_GET['subcategory'] === 'all') ? 'selected' : '' ?>>Show All</option>
-        <?php
-        $subcat_query = "SELECT DISTINCT slug, category_name AS subcategory 
-                         FROM {$siteprefix}categories 
-                         WHERE parent_id = $id";
-        $subcat_result = mysqli_query($con, $subcat_query);
-        while ($subcat_row = mysqli_fetch_assoc($subcat_result)) {
-            $subcategorySlug = $subcat_row['slug'];
-            $selected = (isset($_GET['subcategory']) && $_GET['subcategory'] === $subcategorySlug) ? 'selected' : '';
-            echo '<option value="' . htmlspecialchars($subcategorySlug) . '" ' . $selected . '>' . htmlspecialchars($subcat_row['subcategory']) . '</option>';
-        }
-        ?>
-      </select>
-                  </div>
-				    </div>
-
-                      <div class="col-6 col-md-4 col-lg-4">
-                    <div class="filter-item">
-                      <label for="sortBy" class="form-label">Sort By</label>
-                      <select id="sort-select" class="form-select" onchange="sortReports(this.value)">
-                        <option value="" <?php if ($sort === '') echo 'selected'; ?> disabled>- Sort By -</option>
-                <option value="relevance" <?php if ($sort === 'relevance') echo 'selected'; ?>>Relevance</option>
-                <option value="price_high" <?php if ($sort === 'price_high') echo 'selected'; ?>>Price - High To Low</option>
-                <option value="price_low" <?php if ($sort === 'price_low') echo 'selected'; ?>>Price - Low To High</option>
-            </select>
+              <!-- Subcategory Dropdown Chain -->
+              <div class="col-lg-5 col-12">
+                <div class="filter-item">
+                <label class="form-label">Filter by Subcategory</label>
                     </div>
-                  </div>
-                   </div>
+                <div id="subcategory-filters">
+                  <?php
+                  $current_parent_id = $id;
+                  $chain_so_far = [];
 
-                             <div class="row mt-3">
+                  // Render dropdowns for existing selections
+                  foreach ($subcategory_chain as $slug_part) {
+                      $slug_safe = mysqli_real_escape_string($con, $slug_part);
+                      $res = mysqli_query($con, "SELECT id, slug, category_name FROM {$siteprefix}categories WHERE slug = '$slug_safe'");
+                      if (!$res || mysqli_num_rows($res) === 0) break;
+                      $sub_row = mysqli_fetch_assoc($res);
+                      $sub_id = $sub_row['id'];
+                      $chain_so_far[] = $slug_part;
+
+                      // Load siblings for this level
+                      $siblings = mysqli_query($con, "SELECT id, slug, category_name FROM {$siteprefix}categories WHERE parent_id = $current_parent_id");
+                      if (mysqli_num_rows($siblings) > 0) {
+                          echo '<select class="form-select mb-2" onchange="loadNextLevel(this)">';
+                          echo '<option value="">-- Select --</option>';
+                          while ($sib = mysqli_fetch_assoc($siblings)) {
+                              $selected = ($sib['slug'] == $slug_part) ? 'selected' : '';
+                              echo '<option value="'.$sib['slug'].'" '.$selected.'>'.$sib['category_name'].'</option>';
+                          }
+                          echo '</select>';
+                      }
+                      $current_parent_id = $sub_id;
+                  }
+
+                  // Show next level if available
+                  $children = mysqli_query($con, "SELECT id, slug, category_name FROM {$siteprefix}categories WHERE parent_id = $current_parent_id");
+                  if (mysqli_num_rows($children) > 0) {
+                      echo '<select class="form-select mb-2" onchange="loadNextLevel(this)">';
+                      echo '<option value="">-- Select --</option>';
+                      while ($child = mysqli_fetch_assoc($children)) {
+                          echo '<option value="'.$child['slug'].'">'.$child['category_name'].'</option>';
+                      }
+                      echo '</select>';
+                  }
+                  ?>
+                </div>
+              </div>
+
+              <!-- Sort Dropdown -->
+              <div class="col-12 col-md-4">
+                <div class="filter-item">
+                <label for="sortBy" class="form-label">Sort By</label>
+                </div>
+                <select id="sort-select" class="form-select" onchange="sortReports(this.value)">
+                  <option value="relevance" <?php if ($sort === 'relevance') echo 'selected'; ?>>Relevance</option>
+                  <option value="price_high" <?php if ($sort === 'price_high') echo 'selected'; ?>>Price - High To Low</option>
+                  <option value="price_low" <?php if ($sort === 'price_low') echo 'selected'; ?>>Price - Low To High</option>
+                </select>
+              </div>
+            </div>
+                        <div class="row mt-3">
                   <div class="col-12" data-aos="fade-up" data-aos-delay="200">
                     <div class="active-filters">
                     
@@ -213,11 +213,9 @@ $total_pages = ceil($total_reports / $limit);
                     </div>
                   </div>
                 </div>
-                 </div>
-
-            </div>
-
-          </section><!-- /Category Header Section -->
+          </div>
+		    </div>
+        </section><!-- /Category Header Section -->
 
             <!-- Category Product List Section -->
           <section id="category-product-list" class="best-sellers section">
@@ -292,36 +290,37 @@ $rating_data = calculateRating($training_id, $con, $siteprefix);
 
 
                   <!-- Category Pagination Section -->
-          <section id="category-pagination" class="category-pagination section">
-
-            <div class="container">
-              <nav class="d-flex justify-content-center" aria-label="Page navigation">
-                <ul>
-                      <?php if ($page > 1): ?>
-                      <li>
-                    <a href="?id=<?php echo $id; ?>&page=<?php echo $page - 1; ?>&sort=<?php echo $sort; ?>" aria-label="Previous page">
-                      <i class="bi bi-arrow-left"></i>
-                      <span class="d-none d-sm-inline">Previous</span>
+       <!-- Pagination -->
+       <!-- Pagination -->
+        <section id="category-pagination" class="category-pagination section">
+          <div class="container">
+            <nav class="d-flex justify-content-center" aria-label="Page navigation">
+              <ul>
+                <?php if ($page > 1): ?>
+                  <li>
+                    <a href="?slug=<?php echo $slug; ?>&page=<?php echo $page-1; ?>&sort=<?php echo $sort; ?>&subcategory=<?php echo implode(',', $subcategory_chain); ?>">
+                      <i class="bi bi-arrow-left"></i> Previous
                     </a>
                   </li>
                 <?php endif; ?>
-               
-
-                
-                <?php for ($i = 1; $i <= $total_pages; $i++): ?>
-                     <li> <a href="?id=<?php echo $id; ?>&page=<?php echo $i; ?>&sort=<?php echo $sort; ?>" class="btn btn-secondary <?php if ($i == $page) echo 'active'; ?>"><?php echo $i; ?></a></li>
+                <?php for ($i=1; $i<=$total_pages; $i++): ?>
+                  <li>
+                    <a href="?slug=<?php echo $slug; ?>&page=<?php echo $i; ?>&sort=<?php echo $sort; ?>&subcategory=<?php echo implode(',', $subcategory_chain); ?>" class="<?php if ($i==$page) echo 'active'; ?>">
+                      <?php echo $i; ?>
+                    </a>
+                  </li>
                 <?php endfor; ?>
-
-                 <?php if ($page < $total_pages): ?>
-                   <li> <a href="?id=<?php echo $id; ?>&page=<?php echo $page + 1; ?>&sort=<?php echo $sort; ?>" class="btn btn-primary"><span class="d-none d-sm-inline">Next</span>
-                      <i class="bi bi-arrow-right"></i></a></li>
+                <?php if ($page < $total_pages): ?>
+                  <li>
+                    <a href="?slug=<?php echo $slug; ?>&page=<?php echo $page+1; ?>&sort=<?php echo $sort; ?>&subcategory=<?php echo implode(',', $subcategory_chain); ?>">
+                      Next <i class="bi bi-arrow-right"></i>
+                    </a>
+                  </li>
                 <?php endif; ?>
-                  
-                </ul>
-              </nav>
-            </div>
-
-          </section><!-- /Category Pagination Section -->
+              </ul>
+            </nav>
+          </div>
+        </section><!-- /Category Pagination Section -->
 		     </div>
 			    </div>
 				 </div>
@@ -377,11 +376,12 @@ $seller_linkedin = $seller['seller_linkedin'];
     <img src="<?php echo $siteurl.$seller_photo; ?>" class="card-img-top" alt="<?php echo $seller_name; ?>" style="object-fit: cover; height: 200px;">
 
     <div class="card-body d-flex flex-column">
-      <h5 class="card-title d-flex justify-content-between align-items-center">
-        <span class="text-truncate" style="max-width: 70%;"><?php echo $seller_name; ?></span>
+      <h5 class="card-title  justify-content-between align-items-center">
+        <span class="text-truncate" style="max-width: 70%;"><?php echo $seller_name; ?></span><br>
         <span class="badge bg-success text-white"><?php echo $resource_count; ?> resources</span>
       </h5>
-
+     <br>
+        
       <p class="card-text text-muted" style="font-size: 0.9rem;"><?php echo htmlspecialchars($seller_about); ?></p>
 
       <div class="mt-auto mb-3">
@@ -424,20 +424,25 @@ $seller_linkedin = $seller['seller_linkedin'];
 </main>
 
 
+
 <script>
+// ✅ Sorting
 function sortReports(sortValue) {
   const urlParams = new URLSearchParams(window.location.search);
   urlParams.set('sort', sortValue);
   window.location.search = urlParams.toString();
 }
 
-function filterBySubcategory(subcategory) {
+// ✅ Multi-level subcategory loader
+function loadNextLevel(selectEl) {
   const urlParams = new URLSearchParams(window.location.search);
-  if (subcategory === "all") {
-    urlParams.delete('subcategory');
-  } else {
-    urlParams.set('subcategory', subcategory);
-  }
+  let chain = [];
+
+  document.querySelectorAll('#subcategory-filters select').forEach(sel => {
+    if (sel.value) chain.push(sel.value);
+  });
+
+  urlParams.set('subcategory', chain.join(','));
   window.location.search = urlParams.toString();
 }
 </script>

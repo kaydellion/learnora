@@ -882,7 +882,7 @@ elseif ($quiz_method === 'form' && !empty($_POST['questions'])) {
     }
 }
 
-if ($delivery_format === 'video') {
+if ($delivery_format === 'video' || $delivery_format === 'video_text') {
     foreach ($_POST['video_module_title'] as $index => $title) {
         $desc        = $_POST['video_module_desc'][$index] ?? '';
         $duration    = $_POST['video_duration'][$index] ?? '';
@@ -890,10 +890,8 @@ if ($delivery_format === 'video') {
         $qualities   = isset($_POST['video_quality'][$index]) ? implode(',', $_POST['video_quality'][$index]) : '';
         $subtitles   = $_POST['video_subtitles'][$index] ?? '';
 
-        // Prepare file path
         $filePath = '';
         if (!empty($_FILES['video_file']['name'][$index])) {
-            // Temporarily restructure the file array for this index
             $tmpFileKey = 'single_video_upload';
             $_FILES[$tmpFileKey] = [
                 'name'     => $_FILES['video_file']['name'][$index],
@@ -903,13 +901,12 @@ if ($delivery_format === 'video') {
                 'size'     => $_FILES['video_file']['size'][$index]
             ];
 
-            $fileName = handleFileUpload($tmpFileKey, $fileuploadDir); // using your function
+            $fileName = handleFileUpload($tmpFileKey, $fileuploadDir);
             if ($fileName && strpos($fileName, 'Failed') === false && strpos($fileName, 'error') === false) {
-                $filePath =  $fileName;
+                $filePath = $fileName;
             }
         }
 
-        // Insert into DB
         $stmt = $con->prepare("
             INSERT INTO {$siteprefix}training_video_modules
             (training_id, module_number, title, description, duration, file_path, video_link, video_quality, subtitles, created_at, updated_at)
@@ -922,16 +919,13 @@ if ($delivery_format === 'video') {
     }
 }
 
-elseif ($delivery_format === 'text') {
-    // Loop through all text modules
+if ($delivery_format === 'text' || $delivery_format === 'video_text') {
     foreach ($_POST['text_module_title'] as $index => $title) {
-        $desc         = $_POST['text_module_desc'][$index] ?? '';
-        $readingTime  = $_POST['text_reading_time'][$index] ?? '';
+        $desc        = $_POST['text_module_desc'][$index] ?? '';
+        $readingTime = $_POST['text_reading_time'][$index] ?? '';
 
-        // Handle file upload for this index using your function
         $filePath = '';
         if (!empty($_FILES['text_file']['name'][$index])) {
-            // Create a temporary single-file array for this index
             $tmpFileKey = 'single_text_upload';
             $_FILES[$tmpFileKey] = [
                 'name'     => $_FILES['text_file']['name'][$index],
@@ -947,7 +941,6 @@ elseif ($delivery_format === 'text') {
             }
         }
 
-        // Insert into text table
         $stmt = $con->prepare("
             INSERT INTO {$siteprefix}training_texts_modules
             (training_id, module_number, title, description, reading_time, file_path, created_at, updated_at)
@@ -955,10 +948,7 @@ elseif ($delivery_format === 'text') {
         ");
         $module_number = $index + 1;
         $stmt->bind_param("sissss", $training_id, $module_number, $title, $desc, $readingTime, $filePath);
-
-        if (!$stmt->execute()) {
-            echo "Error inserting text module {$module_number}: " . $stmt->error . "<br>";
-        }
+        $stmt->execute();
         $stmt->close();
     }
 }
@@ -1288,64 +1278,57 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['approve_payment'])) {
             }
         }
     }
+// Send confirmation email to buyer
+$subject = "Your Training Registration Details";
 
-    // Send confirmation email to buyer
-    $subject = "Your Training Registration Details";
-    $sql_items = "SELECT oi.*, t.*, tem.event_date, tem.start_time, tem.end_time, tt.ticket_name
-                  FROM {$siteprefix}order_items oi
-                  JOIN {$siteprefix}training t ON oi.training_id = t.training_id
-                  LEFT JOIN {$siteprefix}training_event_dates tem ON t.training_id = tem.training_id
-                  LEFT JOIN {$siteprefix}training_tickets tt ON t.training_id = tt.training_id
-                  WHERE oi.order_id = '$order_id'";
-    $sql_items_result = mysqli_query($con, $sql_items);
+$sql_items = "SELECT oi.*, t.*, tem.event_date, tem.start_time, tem.end_time, tt.ticket_name
+              FROM {$siteprefix}order_items oi
+              JOIN {$siteprefix}training t ON oi.training_id = t.training_id
+              LEFT JOIN {$siteprefix}training_event_dates tem ON t.training_id = tem.training_id
+              LEFT JOIN {$siteprefix}training_tickets tt ON t.training_id = tt.training_id
+              WHERE oi.order_id = '$order_id'";
+$sql_items_result = mysqli_query($con, $sql_items);
 
-    $emailDetails = [];
-    while ($row = mysqli_fetch_assoc($sql_items_result)) {
-        $event_dates = [];
-        if (!empty($row['event_date']) && !empty($row['start_time']) && !empty($row['end_time'])) {
-            $event_dates[] = [
-                'event_date' => $row['event_date'],
-                'start_time' => $row['start_time'],
-                'end_time' => $row['end_time']
-            ];
-        }
+$emailDetails = [];
+$attachments  = []; // collect all files here
 
+while ($row = mysqli_fetch_assoc($sql_items_result)) {
+    // Unique key to avoid duplicates
+    $key = $row['training_id'] . '|' . $row['ticket_name'] . '|' . $row['event_date'];
+
+    if (!isset($emailDetails[$key])) {
+        // Handle event dates/times
         $date_str = '';
         $time_str = '';
-        if (count($event_dates) > 0) {
-            $first = $event_dates[0];
-            $last = end($event_dates);
-            $date_str = date('M d, Y', strtotime($first['event_date']));
-            if (count($event_dates) > 1 && $last['event_date'] !== $first['event_date']) {
-                $date_str .= ' – ' . date('M d, Y', strtotime($last['event_date']));
-            }
-            $time_str = date('h:i A', strtotime($first['start_time'])) . ' – ' . date('h:i A', strtotime($first['end_time']));
+        if (!empty($row['event_date']) && !empty($row['start_time']) && !empty($row['end_time'])) {
+            $date_str = date('M d, Y', strtotime($row['event_date']));
+            $time_str = date('h:i A', strtotime($row['start_time'])) . ' – ' . date('h:i A', strtotime($row['end_time']));
         }
 
+        // Delivery format details
         $format = ucfirst($row['delivery_format']);
         $details = '';
+        $fields = [];
+
         if ($format === 'Physical') {
             $fields = [
                 'physical_address' => 'Address',
-                'physical_state' => 'State',
-                'physical_lga' => 'LGA',
+                'physical_state'   => 'State',
+                'physical_lga'     => 'LGA',
                 'physical_country' => 'Country',
-                'foreign_address' => 'Foreign Address'
+                'foreign_address'  => 'Foreign Address'
             ];
         } elseif ($format === 'Hybrid') {
             $fields = [
                 'hybrid_physical_address' => 'Physical Address',
-                'hybrid_web_address' => 'Web Address',
-                'hybrid_state' => 'State',
-                'hybrid_lga' => 'LGA',
-                'hybrid_country' => 'Country',
-                'hybrid_foreign_address' => 'Foreign Address'
+                'hybrid_web_address'      => 'Web Address',
+                'hybrid_state'            => 'State',
+                'hybrid_lga'              => 'LGA',
+                'hybrid_country'          => 'Country',
+                'hybrid_foreign_address'  => 'Foreign Address'
             ];
-        } elseif ($format === 'Online') {
-            $fields = [];
-            if (!empty($row['web_address'])) {
-                $details .= "<li><strong>Link to join:</strong> <a href='" . htmlspecialchars($row['web_address']) . "'>" . htmlspecialchars($row['web_address']) . "</a></li>";
-            }
+        } elseif ($format === 'Online' && !empty($row['web_address'])) {
+            $details .= "<li><strong>Link to join:</strong> <a href='" . htmlspecialchars($row['web_address']) . "'>" . htmlspecialchars($row['web_address']) . "</a></li>";
         }
 
         if (!empty($fields)) {
@@ -1356,40 +1339,79 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['approve_payment'])) {
             }
         }
 
-        $training_title = $row['title'];
-        $ticket_name = $row['ticket_name'];
-        $amount_paid = number_format($row['price'], 2);
-        $emailDetails[] = [
-            'training_title' => $training_title,
-            'date_str' => $date_str,
-            'time_str' => $time_str,
-            'format' => $format,
-            'ticket_name' => $ticket_name,
-            'amount_paid' => $amount_paid,
-            'details' => $details
+        // 👉 Attachments for Text/Video trainings
+        $training_id = $row['training_id'];
+
+        if ($format === 'Text' || $format === 'Video' || $format === 'Video_text') {
+            // Video modules
+            if ($format === 'Video' || $format === 'Video_text') {
+                $video_sql = "SELECT * FROM {$siteprefix}training_video_modules WHERE training_id='$training_id'";
+                $video_res = mysqli_query($con, $video_sql);
+                while ($vm = mysqli_fetch_assoc($video_res)) {
+                    if (!empty($vm['file_path'])) {
+                        $filePath = $fileuploadDir . "/" . $vm['file_path'];
+                        if (file_exists($filePath)) {
+                            $attachments[] = $filePath;
+                        }
+                    }
+                }
+            }
+
+            // Text modules
+            if ($format === 'Text' || $format === 'Video_text') {
+                $text_sql = "SELECT * FROM {$siteprefix}training_texts_modules WHERE training_id='$training_id'";
+                $text_res = mysqli_query($con, $text_sql);
+                while ($tm = mysqli_fetch_assoc($text_res)) {
+                    if (!empty($tm['file_path'])) {
+                        $filePath = $fileuploadDir . "/" . $tm['file_path'];
+                        if (file_exists($filePath)) {
+                            $attachments[] = $filePath;
+                        }
+                    }
+                }
+            }
+        }
+
+        // Store unique training entry
+        $emailDetails[$key] = [
+            'training_title' => $row['title'],
+            'date_str'       => $date_str,
+            'time_str'       => $time_str,
+            'format'         => $format,
+            'ticket_name'    => $row['ticket_name'],
+            'amount_paid'    => number_format($row['price'], 2),
+            'details'        => $details
         ];
     }
+}
 
-    $user_first_name = explode(' ', $username)[0];
-    $emailMessage = "<p>Hi $user_first_name,</p><p>Thank you for registering for:</p>";
-    foreach ($emailDetails as $ed) {
-        $emailMessage .= "<ul>
-            <li>🎓 <strong>Training:</strong> {$ed['training_title']}</li>
-            <li>📅 <strong>Date(s):</strong> {$ed['date_str']}</li>
-            <li>🕒 <strong>Time:</strong> {$ed['time_str']}</li>
-            <li>🌍 <strong>Format:</strong> {$ed['format']}</li>
-            <li>⭐️ <strong>Ticket:</strong> {$ed['ticket_name']}</li>
-            <li>💰 <strong>Amount Paid:</strong> ₦{$ed['amount_paid']}</li>
-        </ul>
-        <p>Here’s what to expect:</p>
-        <ul>
-            {$ed['details']}
-            <li>You’ll get a reminder 24 hours before the event.</li>
-            <li>Save this email — it contains your access details.</li>
-        </ul><hr>";
-    }
+// Re-index clean array
+$emailDetails = array_values($emailDetails);
 
-    sendEmail2($email, $username, $siteName, $siteMail, $emailMessage, $subject, $attachments);
+// Build email body
+$user_first_name = explode(' ', $username)[0];
+$emailMessage = "<p>Hi $user_first_name,</p><p>Thank you for registering for:</p>";
+
+foreach ($emailDetails as $ed) {
+    $emailMessage .= "<ul>
+        <li>🎓 <strong>Training:</strong> {$ed['training_title']}</li>
+        <li>📅 <strong>Date(s):</strong> {$ed['date_str']}</li>
+        <li>🕒 <strong>Time:</strong> {$ed['time_str']}</li>
+        <li>🌍 <strong>Format:</strong> {$ed['format']}</li>
+        <li>⭐️ <strong>Ticket:</strong> {$ed['ticket_name']}</li>
+        <li>💰 <strong>Amount Paid:</strong> ₦{$ed['amount_paid']}</li>
+    </ul>
+    <p>Here’s what to expect:</p>
+    <ul>
+        {$ed['details']}
+        <li>You’ll get a reminder 24 hours before the event.</li>
+        <li>Save this email — it contains your access details.</li>
+    </ul><hr>";
+}
+
+// Send email with attachments
+sendEmail2($email, $username, $siteName, $siteMail, $emailMessage, $subject, $attachments);
+
 
     showSuccessModal('Processed', "Payment for Order ID $order_id has been approved successfully.");
     header("refresh:2;");

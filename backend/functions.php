@@ -100,7 +100,7 @@ function sendEmail($vendorEmail, $vendorName, $siteName, $siteMail, $emailMessag
 
     $htmlBody = "
         <div style='width:600px; padding:40px; background-color:#000000; color:#fff;'>
-            <p><img src='$siteurl/img/$siteimg' style='width:10%; height:auto;' /></p>
+            <p><img src='$siteurl/uploads/$siteimg' style='width:10%; height:auto;' /></p>
             <p style='font-size:14px; color:#fff;'>
                 <span style='font-size:14px; color:#F57C00;'>Dear $vendorName,</span><br>
                 $emailMessage
@@ -167,7 +167,7 @@ function sendEmail2($vendorEmail, $vendorName, $siteName, $siteMail, $emailMessa
 
     $htmlBody = "
         <div style='width:600px; padding:40px; background-color:#000000; color:#fff;'>
-            <p><img src='$siteurl/img/$siteimg' style='width:10%; height:auto;' /></p>
+            <p><img src='$siteurl/uploads/$siteimg' style='width:10%; height:auto;' /></p>
             <p style='font-size:14px; color:#fff;'>
                 <span style='font-size:14px; color:#F57C00;'>Dear $vendorName,</span><br>
                 $emailMessage
@@ -271,7 +271,7 @@ function sendEmailoldd($vendorEmail, $vendorName, $siteName, $siteMail, $emailMe
 
     $htmlBody = "
         <div style='width:600px; padding:40px; background-color:#000000; color:#fff;'>
-            <p><img src='$siteurl/img/$siteimg' style='width:10%; height:auto;' /></p>
+            <p><img src='$siteurl/uploads/$siteimg' style='width:10%; height:auto;' /></p>
             <p style='font-size:14px; color:#fff;'>
                 <span style='font-size:14px; color:#F57C00;'>Dear $vendorName,</span><br>
                 $emailMessage
@@ -517,7 +517,7 @@ function sendEmail2oldd($vendorEmail, $vendorName, $siteName, $siteMail, $emailM
 
         $mail->Body = "
             <div style='width:600px; padding:40px; background-color:#000000; color:#fff;'>
-                <p><img src='$siteurl/img/$siteimg' style='width:10%; height:auto;' /></p>
+                <p><img src='$siteurl/uploads/$siteimg' style='width:10%; height:auto;' /></p>
                 <p style='font-size:14px; color:#fff;'>
                     <span style='font-size:14px; color:#F57C00;'>Dear $vendorName,</span><br>
                     $emailMessage

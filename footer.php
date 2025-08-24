@@ -104,17 +104,12 @@
           <div class="col-lg-6 col-md-12">
             <div class="d-flex flex-wrap justify-content-lg-end justify-content-center align-items-center gap-4">
               <div class="payment-methods">
-                <div class="payment-icons">
-                  <i class="bi bi-master-card" aria-label="MasterCard"></i>
-                  <i class="bi bi-visa" aria-label="Visa"></i>
-                  <i class="bi bi-verve" aria-label="Verve"></i>
-                  <!--<i class="bi bi-amex" aria-label="American Express"></i>
-                  <i class="bi bi-paypal" aria-label="PayPal"></i>
-                  <i class="bi bi-apple" aria-label="Apple Pay"></i>
-                  <i class="bi bi-paystack" aria-label="Paystack"></i>
-                  <i class="bi bi-shop" aria-label="Shop Pay"></i>
-                  <i class="bi bi-cash" aria-label="Cash on Delivery"></i>-->
-                </div>
+<div class="payment-icons" style="display: flex; gap: 1rem; align-items: center;">
+  <img src="<?php echo $siteurl; ?>/assets/img/Mastercard-logo.png" alt="MasterCard" aria-label="MasterCard" style="height: 20px; width: auto;" />
+  <img src="<?php echo $siteurl; ?>/assets/img/Visa_Logo.png" alt="Visa" aria-label="Visa" style="height: 20px; width: auto;" />
+  <img src="<?php echo $siteurl; ?>/assets/img/Verve_Image.png" alt="Verve" aria-label="Verve" style="height: 20px; width: auto;" />
+</div>
+
               </div>
 
               <div class="legal-links">

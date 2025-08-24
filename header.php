@@ -124,7 +124,7 @@ if (in_array($current_page, $excluded_pages)) {
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
   <title><?= isset($page_title) ? htmlspecialchars($page_title) : $sitename ?></title>
   <meta name="description" content="<?= isset($sitedescription) ? htmlspecialchars($sitedescription) : $sitename ?>">
-  <meta name="keywords" content="<?= isset($sitekeywords) ? htmlspecialchars($sitekeywords) : $sitename ?>">
+   <meta name="keywords" content="<?= isset($meta_keywords) ? htmlspecialchars($meta_keywords) : $sitekeywords ?>">
   <meta name="author" content="<?= isset($sitename) ? htmlspecialchars($sitename) : $sitename ?>">
   <meta property="og:title" content="<?= isset($page_title) ? htmlspecialchars($page_title) : $sitename ?>" />
   <meta property="og:description" content="<?= isset($sitedescription) ? htmlspecialchars($sitedescription) : $sitename ?>" />
@@ -367,23 +367,23 @@ if (in_array($current_page, $excluded_pages)) {
           <div class="col-12 my-2 my-lg-0">
             <ul class="list-unstyled d-flex flex-wrap mb-0 justify-content-center justify-content-lg-center">
               <li>
-                <a class="text-white text-small" href="<?php echo $siteurl; ?>trainers.php">Trainers</a>
+                <a class="text-white text-small btn-small" href="<?php echo $siteurl; ?>trainers.php">Trainers</a>
               </li>
-              <li>&nbsp;|&nbsp</li>
+              <li>&nbsp;&nbsp</li>
               <li>
-                <a class="text-white text-small" href="<?php echo $siteurl; ?>events-by-state.php">Events By States in Nigeria</a>
+                <a class="text-white text-small btn-small" href="<?php echo $siteurl; ?>events-by-state.php">Events By States in Nigeria</a>
               </li>
-              <li>&nbsp;|&nbsp</li>
+              <li>&nbsp;&nbsp</li>
               <li>
-                <a class="text-white text-small" href="<?php echo $siteurl; ?>events-by-month.php">Events by Month</a>
+                <a class="text-white text-small btn-small" href="<?php echo $siteurl; ?>events-by-month.php">Events by Month</a>
               </li>
-              <li>&nbsp;|&nbsp</li>
+              <li>&nbsp;&nbsp</li>
               <li>
-                <a class="text-white text-small" href="<?php echo $siteurl; ?>events-by-country.php">Events by Country</a>
+                <a class="text-white text-small btn-small" href="<?php echo $siteurl; ?>events-by-country.php">Events by Country</a>
               </li>
-              <li>&nbsp;|&nbsp</li>
+              <li>&nbsp;&nbsp</li>
               <li>
-                <a class="text-white text-small" href="<?php echo $siteurl; ?>events-by-format.php">Events by Format</a>
+                <a class="text-white text-small btn-small" href="<?php echo $siteurl; ?>events-by-format.php">Events by Format</a>
               </li>
             </ul>
           </div>

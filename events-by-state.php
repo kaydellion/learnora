@@ -116,7 +116,7 @@ $total_pages = ceil($total_reports / $limit);
 ?>
 
     <!-- Page Title Section -->
-    <section id="page-title" class="page-title section">
+    <section id="page-title" class="page-title sections">
       <div class="container" data-aos="fade-up">
         <div class="text-center">
           <h1>Events by State</h1>
@@ -126,7 +126,7 @@ $total_pages = ceil($total_reports / $limit);
     </section>
 
     <!-- State Filter Section -->
-    <section id="state-filter" class="state-filter section">
+    <section id="state-filter" class="state-filter sections">
       <div class="container" data-aos="fade-up" data-aos-delay="100">
         <div class="row justify-content-center">
           <div class="col-lg-8">
@@ -177,7 +177,7 @@ $total_pages = ceil($total_reports / $limit);
     </section>
 
     <!-- Search Results Header Section -->
-    <section id="search-results-header" class="search-results-header section">
+    <section id="search-results-header" class="search-results-header sections">
 
       <div class="container" data-aos="fade-up" data-aos-delay="100">
 
@@ -209,7 +209,7 @@ $total_pages = ceil($total_reports / $limit);
     </section><!-- /Search Results Header Section -->
 
 
-    <section id="best-sellers" class="best-sellers section">
+    <section id="best-sellers" class="best-sellers sections">
 
       <div class="container" data-aos="fade-up" data-aos-delay="100">
 
@@ -279,7 +279,7 @@ $rating_data = calculateRating($training_id, $con, $siteprefix);
 
     </section><!-- /Search Product List Section -->
  <!-- Category Pagination Section -->
-    <section id="category-pagination" class="category-pagination section">
+    <section id="category-pagination" class="category-pagination sections">
 
       <div class="container">
         <nav class="d-flex justify-content-center" aria-label="Page navigation">

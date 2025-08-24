@@ -105,7 +105,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['abandoned_ref'])) {
             $time_ago_text = $hours_ago > 0 ? "$hours_ago hour(s) ago" : "less than an hour ago";
 
             // Create checkout link
-            $checkoutLink = "https://{$siteurl}/checkout.php?ref=$ref";
+            $checkoutLink = "{$siteurl}/checkout.php?ref=$ref";
 
             // Create comprehensive email
             $subject = "🎓 Don't Miss Out! Your Learning Journey Awaits - Complete Your Purchase";

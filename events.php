@@ -236,59 +236,7 @@ $user_review = $existing_review_result->fetch_assoc();
 
 
         <div class="col-12 mb-3 mt-2">
-          <div class="table-requirements">
-
-            <!-- Visa Requirement Section -->
-            <div class="collapsible-section mb-4">
-              <h6>Visa Requirement</h6>
-              <?php
-              $visa_text = '
-
-<strong>For Trainings in Nigeria:</strong><br>
-If you reside outside Nigeria and plan to attend one of our trainings, a visitor visa may be required. We recommend applying early, as visa processing can take time. Citizens of Visa Waiver Program countries may not need an invitation letter. For full details and application guidance, visit: <a href="https://portal.immigration.gov.ng/pages/welcome" target="_blank">https://portal.immigration.gov.ng/pages/welcome</a>.<br><br>
-
-<strong>For Trainings Outside Nigeria:</strong><br>
-Participants attending training sessions abroad will need to obtain a visa independently. Learnora (Kyneli Business Support Services) does not process visas on behalf of trainees. Please contact the appropriate embassy for visa requirements specific to your destination country.';
-
-              $visa_words = explode(' ', strip_tags($visa_text));
-              $visa_short = implode(' ', array_slice($visa_words, 0, 30));
-              $visa_long = $visa_text;
-              $visa_is_long = count($visa_words) > 30;
-              ?>
-              <p>
-                <span class="short-desc"><?php echo $visa_short; ?><?php if ($visa_is_long) echo '...'; ?></span>
-                <?php if ($visa_is_long): ?>
-                  <span class="full-desc" style="display:none;"><?php echo $visa_long; ?></span>
-                  <br>
-                  <button type="button" class="btn btn-link btn-sm p-0 read-more-btn" style="text-decoration: none;">Read More</button>
-                  <button type="button" class="btn btn-link btn-sm p-0 read-less-btn" style="text-decoration: none; display:none;">Read Less</button>
-                <?php endif; ?>
-              </p>
-            </div>
-
-            <!-- Cancellation Policy Section -->
-            <div class="collapsible-section">
-              <h6>Cancellation Policy</h6>
-              <?php
-              $cancel_text = 'All cancellations must be submitted in writing to <a href="mailto:hello@learnora.ng">hello@learnora.ng</a> at least three (3) days before the event. A twenty percent (20%) administrative fee applies to all cancellations. Substitutions are permitted at any time at no extra cost.';
-
-              $cancel_words = explode(' ', strip_tags($cancel_text));
-              $cancel_short = implode(' ', array_slice($cancel_words, 0, 30));
-              $cancel_long = $cancel_text;
-              $cancel_is_long = count($cancel_words) > 30;
-              ?>
-              <p>
-                <span class="short-desc"><?php echo $cancel_short; ?><?php if ($cancel_is_long) echo '...'; ?></span>
-                <?php if ($cancel_is_long): ?>
-                  <span class="full-desc" style="display:none;"><?php echo $cancel_long; ?></span>
-                  <br>
-                  <button type="button" class="btn btn-link btn-sm p-0 read-more-btn" style="text-decoration: none;">Read More</button>
-                  <button type="button" class="btn btn-link btn-sm p-0 read-less-btn" style="text-decoration: none; display:none;">Read Less</button>
-                <?php endif; ?>
-              </p>
-            </div>
-
-          </div>
+         
         </div>
 
 
@@ -538,7 +486,6 @@ Participants attending training sessions abroad will need to obtain a visa indep
                   <?php echo $delivery_details; ?>
 
                   <?php
-
                   // ✅ Fetch all event dates for this training
                   $event_dates = [];
                   $dates_sql = "SELECT event_date, start_time, end_time
@@ -594,7 +541,7 @@ while ($d = mysqli_fetch_assoc($dates_result)) {
         <div class="card shadow-sm">
           <div class="card-body">
             <!-- Nav tabs -->
-            <ul class="nav nav-tabs mb-3" id="courseTab" role="tablist">
+            <ul class="nav nav-tabs tabb mb-3" id="courseTab" role="tablist">
               <li class="nav-item" role="presentation">
                 <button class="nav-link active" id="info-tab" data-bs-toggle="tab" data-bs-target="#info" type="button" role="tab" aria-controls="info" aria-selected="true">
                   Course Info
@@ -603,14 +550,14 @@ while ($d = mysqli_fetch_assoc($dates_result)) {
                <?php if (!empty(trim($target_audience))): ?>
                 <li class="nav-item" role="presentation">
                   <button class="nav-link" id="audience-tab" data-bs-toggle="tab" data-bs-target="#audience" type="button" role="tab" aria-controls="audience" aria-selected="false">
-                    Target Audience / Who Should Attend
+                    Target Audience
                   </button>
                 </li>
               <?php endif; ?>
               <?php if (!empty($learning_objectives)): ?>
                 <li class="nav-item" role="presentation">
                   <button class="nav-link" id="objectives-tab" data-bs-toggle="tab" data-bs-target="#objectives" type="button" role="tab" aria-controls="objectives" aria-selected="false">
-                    Learning Objectives / Outcomes
+                    Learning Objectives 
                   </button>
                 </li>
               <?php endif; ?>
@@ -624,7 +571,7 @@ while ($d = mysqli_fetch_assoc($dates_result)) {
               <?php if (!empty($additional_notes)): ?>
                 <li class="nav-item" role="presentation">
                   <button class="nav-link" id="notes-tab" data-bs-toggle="tab" data-bs-target="#notes" type="button" role="tab" aria-controls="notes" aria-selected="false">
-                    Additional Instructions / Notes
+               Notes
                   </button>
                 </li>
               <?php endif; ?>
@@ -635,6 +582,18 @@ while ($d = mysqli_fetch_assoc($dates_result)) {
                   </button>
                 </li>
               <?php } ?>
+
+               <li class="nav-item" role="presentation">
+                  <button class="nav-link" id="visa-requirements-tab" data-bs-toggle="tab" data-bs-target="#visa-requirements" type="button" role="tab" aria-controls="review" aria-selected="false">
+                  Visa Requirement
+                  </button>
+                </li>
+
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link" id="cancellation-policy-tab" data-bs-toggle="tab" data-bs-target="#cancellation-policy" type="button" role="tab" aria-controls="cancellation-policy" aria-selected="false">
+                    Cancellation Policy
+                  </button>
+                </li>
               <?php if (!empty($training_video)) { ?>
                 <li class="nav-item" role="presentation">
                   <button class="nav-link" id="video-tab" data-bs-toggle="tab" data-bs-target="#video" type="button" role="tab" aria-controls="video" aria-selected="false">
@@ -703,8 +662,62 @@ while ($d = mysqli_fetch_assoc($dates_result)) {
                     <?php endif; ?>
                     </div>
                 </div>
+				</div>
+
+           <div class="tab-pane fade" id="visa-requirements" role="tabpanel" aria-labelledby="visa-requirements-tab">
+
+ <div class="collapsible-section mb-4">
+              <h6>Visa Requirement</h6>
+              <?php
+              $visa_text = '
+
+<strong>For Trainings in Nigeria:</strong><br>
+If you reside outside Nigeria and plan to attend one of our trainings, a visitor visa may be required. We recommend applying early, as visa processing can take time. Citizens of Visa Waiver Program countries may not need an invitation letter. For full details and application guidance, visit: <a href="https://portal.immigration.gov.ng/pages/welcome" target="_blank">https://portal.immigration.gov.ng/pages/welcome</a>.<br><br>
+
+<strong>For Trainings Outside Nigeria:</strong><br>
+Participants attending training sessions abroad will need to obtain a visa independently. Learnora (Kyneli Business Support Services) does not process visas on behalf of trainees. Please contact the appropriate embassy for visa requirements specific to your destination country.';
+
+              $visa_words = explode(' ', strip_tags($visa_text));
+              $visa_short = implode(' ', array_slice($visa_words, 0, 30));
+              $visa_long = $visa_text;
+              $visa_is_long = count($visa_words) > 30;
+              ?>
+              <p>
+                <span class="short-desc"><?php echo $visa_short; ?><?php if ($visa_is_long) echo '...'; ?></span>
+                <?php if ($visa_is_long): ?>
+                  <span class="full-desc" style="display:none;"><?php echo $visa_long; ?></span>
+                  <br>
+                  <button type="button" class="btn btn-link btn-sm p-0 read-more-btn" style="text-decoration: none;">Read More</button>
+                  <button type="button" class="btn btn-link btn-sm p-0 read-less-btn" style="text-decoration: none; display:none;">Read Less</button>
+                <?php endif; ?>
+              </p>
+            </div>
+
+                            </div>
+<div class="tab-pane fade" id="cancellation-policy" role="tabpanel" aria-labelledby="cancellation-policy-tab">
+    <div class="collapsible-section">
+              <h6>Cancellation Policy</h6>
+              <?php
+              $cancel_text = 'All cancellations must be submitted in writing to <a href="mailto:hello@learnora.ng">hello@learnora.ng</a> at least three (3) days before the event. A twenty percent (20%) administrative fee applies to all cancellations. Substitutions are permitted at any time at no extra cost.';
+
+              $cancel_words = explode(' ', strip_tags($cancel_text));
+              $cancel_short = implode(' ', array_slice($cancel_words, 0, 30));
+              $cancel_long = $cancel_text;
+              $cancel_is_long = count($cancel_words) > 30;
+              ?>
+              <p>
+                <span class="short-desc"><?php echo $cancel_short; ?><?php if ($cancel_is_long) echo '...'; ?></span>
+                <?php if ($cancel_is_long): ?>
+                  <span class="full-desc" style="display:none;"><?php echo $cancel_long; ?></span>
+                  <br>
+                  <button type="button" class="btn btn-link btn-sm p-0 read-more-btn" style="text-decoration: none;">Read More</button>
+                  <button type="button" class="btn btn-link btn-sm p-0 read-less-btn" style="text-decoration: none; display:none;">Read Less</button>
+                <?php endif; ?>
+              </p>
+            </div>
 
 
+                </div>
                 <div class="tab-pane fade" id="audience" role="tabpanel" aria-labelledby="audience-tab">
                   <div class="product-description mb-1">
                     <?php if (!empty($target_audience)): ?>

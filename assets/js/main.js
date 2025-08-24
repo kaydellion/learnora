@@ -2173,6 +2173,10 @@ function toggleDeliveryFields() {
   else if (format === 'text') {
     document.getElementById('textFields').style.display = 'block';
   }
+      else if (format === 'video_text') {
+    document.getElementById('videoFields').style.display = 'block';
+    document.getElementById('textFields').style.display = 'block';
+  }
 }
 
 function togglePhysicalLocationFields() {

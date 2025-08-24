@@ -229,6 +229,7 @@
                 <option value="hybrid">Hybrid (Physical & Online)</option>
                    <option value="video">Video</option>
                 <option value="text">Text</option>
+                 <option value="video_text">Video & Text</option>
                 
               </select>
             </div> 
