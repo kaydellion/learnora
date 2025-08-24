@@ -379,23 +379,23 @@ if (in_array($current_page, $excluded_pages)) {
           <div class="col-12 my-2 my-lg-0">
             <ul class="list-unstyled d-flex flex-wrap mb-0 justify-content-center justify-content-lg-center">
               <li>
-                <a class="text-white text-small btn-small mb-2 mt-1" href="<?php echo $siteurl; ?>trainers.php">Trainers</a>
+                <a class="text-white text-small btn-small m-1" href="<?php echo $siteurl; ?>trainers.php">Trainers</a>
               </li>
               <li>&nbsp;&nbsp</li>
               <li>
-                <a class="text-white text-small btn-small mb-2 mt-1" href="<?php echo $siteurl; ?>events-by-state.php">Events By States in Nigeria</a>
+                <a class="text-white text-small btn-small m-1" href="<?php echo $siteurl; ?>events-by-state.php">Events By States in Nigeria</a>
               </li>
               <li>&nbsp;&nbsp</li>
               <li>
-                <a class="text-white text-small btn-small mb-2 mt-1" href="<?php echo $siteurl; ?>events-by-month.php">Events by Month</a>
+                <a class="text-white text-small btn-small m-1" href="<?php echo $siteurl; ?>events-by-month.php">Events by Month</a>
               </li>
               <li>&nbsp;&nbsp</li>
               <li>
-                <a class="text-white text-small btn-small mb-2 mt-1" href="<?php echo $siteurl; ?>events-by-country.php">Events by Country</a>
+                <a class="text-white text-small btn-small m-1" href="<?php echo $siteurl; ?>events-by-country.php">Events by Country</a>
               </li>
               <li>&nbsp;&nbsp</li>
               <li>
-                <a class="text-white text-small btn-small mb-2 mt-1" href="<?php echo $siteurl; ?>events-by-format.php">Events by Format</a>
+                <a class="text-white text-small btn-small  m-1" href="<?php echo $siteurl; ?>events-by-format.php">Events by Format</a>
               </li>
             </ul>
           </div>
