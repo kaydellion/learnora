@@ -76,7 +76,7 @@ foreach ($fields as $col => $label) {
         <div class="tab-content p-3 border border-top-0">
             <!-- Overview Tab -->
             <div class="tab-pane fade show active" id="overview">
-                <p><?= nl2br(htmlspecialchars($row['course_description'])); ?></p>
+                <p><?= $row['course_description']; ?></p>
                 <p><strong>Instructor:</strong> <?= htmlspecialchars($row['instructor_name'] ?? ''); ?></p>
                 <?php if (!empty($row['instructor_photo'])): ?>
                     <img src="uploads/<?= htmlspecialchars($row['instructor_photo']); ?>" width="100" />
@@ -122,7 +122,7 @@ foreach ($fields as $col => $label) {
     if ($modules->num_rows > 0) {
         while ($m = $modules->fetch_assoc()) {
             $title       = htmlspecialchars($m['title']);
-            $desc        = nl2br(htmlspecialchars($m['description']));
+            $desc        = $m['description'];
             $duration    = htmlspecialchars($m['duration']);
             $videoLink   = htmlspecialchars($m['video_link']);
             $qualities   = htmlspecialchars($m['video_quality']);
