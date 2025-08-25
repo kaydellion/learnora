@@ -2617,7 +2617,7 @@ color: #fff;
    margin-bottom: 5px;
 }
 ul.list-unstyled.d-flex.flex-wrap li {
-  margin-bottom: 8px; /* adjust as you like */
+  margin-bottom: 12px; /* adjust as you like */
 }
 
 .promo-cards {
