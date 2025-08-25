@@ -416,6 +416,7 @@ while ($row = mysqli_fetch_assoc($eventTypeQuery)) {
     <option value="hybrid" <?= $format == 'hybrid' ? 'selected' : '' ?>>Hybrid (Physical & Online)</option>
     <option value="video" <?= $format == 'video' ? 'selected' : '' ?>>Video</option>
     <option value="text" <?= $format == 'text' ? 'selected' : '' ?>>Text</option>
+      <option value="video_text" <?= $format == 'video_text' ? 'selected' : '' ?>>Video & Text</option>
   </select>
 </div>
 
