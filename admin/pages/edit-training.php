@@ -580,73 +580,15 @@ while ($row = $textResult->fetch_assoc()):
 </div>
 
 
-
-
-
-      <?php
-$lessonQuery = mysqli_query($con, "SELECT * FROM {$siteprefix}training_video_lessons WHERE training_id = '$training_id'");
-$embedValue = ''; // to store the embed url for pre-filling
-?>
-
-<div class="mt-3">
-  <strong>Uploaded Lessons:</strong>
-  <ul class="list-group">
-    <?php while ($lesson = mysqli_fetch_assoc($lessonQuery)):
-      $lessonId = $lesson['s'];
-      $filePath = $lesson['file_path'];
-      $embedUrl = $lesson['video_url'];
-
-      // Set value for embed input (latest)
-      if (!empty($embedUrl)) $embedValue = $embedUrl;
-    ?>
-      <li class="list-group-item d-flex justify-content-between align-items-center" id="lesson_<?php echo $lessonId; ?>">
-        <div>
-          <?php if (!empty($filePath)): ?>
-            📁 <a href="<?php echo $siteurl . $filePath; ?>" target="_blank">View Uploaded Video</a>
-          <?php elseif (!empty($embedUrl)): ?>
-            🔗 <a href="<?php echo $embedUrl; ?>" target="_blank">View Embedded URL</a>
-          <?php endif; ?>
-        </div>
-        <button type="button" class="btn btn-sm btn-danger delete-video-lesson" data-video-id="<?php echo $lessonId; ?>">
-          Delete
-        </button>
-      </li>
-    <?php endwhile; ?>
-  </ul>
-</div>
-
 <!-- Video Upload & Embed Fields -->
-<div class="mb-3 mt-3">
-  <label class="form-label">Video Lessons (Upload or Embed URL)</label>
-  <input type="file" class="form-control mb-2" name="video_lessons[]" multiple accept="video/*">
 
-  <input type="url" class="form-control" name="video_embed_url" placeholder="Or paste video URL" value="<?php echo $embedValue; ?>">
-</div>
+  <input type="file" class="form-control mb-2" name="video_lessons[]" multiple accept="video/*" hidden>
+
+  <input type="url" class="form-control" name="video_embed_url" placeholder="Or paste video URL" value="" hidden>
 
 
-<?php
-$textQuery = mysqli_query($con, "SELECT * FROM {$siteprefix}training_text_modules WHERE training_id = '$training_id'");
-if ($textQuery && mysqli_num_rows($textQuery) > 0): ?>
-  <div class="mt-3">
-    <strong>Uploaded Text Modules:</strong>
-    <ul class="list-group">
-      <?php while ($text = mysqli_fetch_assoc($textQuery)):
-        $textId = $text['id'];
-        $textPath = $text['file_path'];
-      ?>
-        <li class="list-group-item d-flex justify-content-between align-items-center" id="text_<?php echo $textId; ?>">
-          <a href="<?php echo $siteurl . $textPath; ?>" target="_blank">📄 <?php echo basename($textPath); ?></a>
-          <button type="button" class="btn btn-sm btn-danger delete-text-module" data-id="<?php echo $textId; ?>">Delete</button>
-        </li>
-      <?php endwhile; ?>
-    </ul>
-  </div>
-<?php endif; ?>
-
-            <div class="mb-3">
-              <label class="form-label">Text Modules / PDFs / Readings (Upload)</label>
-              <input type="file" class="form-control" name="text_modules[]" multiple accept=".pdf,.txt,.doc,.docx">
-            </div>
+              <input type="file" class="form-control" name="text_modules[]" multiple accept=".pdf,.txt,.doc,.docx" hidden> 
+         
            
 
 <ul class="list-group mb-4">
@@ -682,36 +624,9 @@ if ($textQuery && mysqli_num_rows($textQuery) > 0): ?>
   <input type="file" class="form-control" name="promo_video" accept="video/*">
 </div>
 
-<ul class="list-group mb-4">
-  <h5>Trailer Videos</h5>
-  <?php
-  $sql3 = "SELECT * FROM " . $siteprefix . "training_videos WHERE training_id = '$training_id' AND video_type = 'trailer'";
-  $sql4 = mysqli_query($con, $sql3);
-  if (!$sql4) {
-    die("Query failed: " . mysqli_error($con));
-  }
-  while ($row = mysqli_fetch_array($sql4)) {
-    $videoId = $row['s'];
-    $filePath = $row['video_path'];
-  
-  ?>
-    <li class="list-group-item d-flex justify-content-between align-items-center" id="lesson_<?php echo $videoId; ?>">
-      <div>
-        <?php if (!empty($filePath)): ?>
-          📁 <a href="<?php echo $siteurl . 'documents/' . $filePath; ?>" target="_blank">View Uploaded Video</a>
-       
-        <?php endif; ?>
-      </div>
-      <button type="button" class="btn btn-sm btn-danger delete-video-trailer" data-video-id="<?php echo $videoId; ?>">
-        Delete
-      </button>
-    </li>
-  <?php } ?>
-</ul>
-
- <div class="mb-3">
+<div class="mb-3">
               <label class="form-label">Course Trailer/Intro Video (Optional)</label>
-              <input type="file" class="form-control" name="trailer_video" accept="video/*">
+              <input type="file" class="form-control" name="trailer_video" accept="video/*" hidden>
             </div>
        
 

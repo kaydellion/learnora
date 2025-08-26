@@ -1281,112 +1281,118 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['approve_payment'])) {
 // Send confirmation email to buyer
 $subject = "Your Training Registration Details";
 
-$sql_items = "SELECT oi.*, t.*, tem.event_date, tem.start_time, tem.end_time, tt.ticket_name
+$sql_items = "SELECT 
+                oi.*, 
+                t.*, 
+                GROUP_CONCAT(DISTINCT DATE_FORMAT(tem.event_date, '%b %d, %Y') 
+                             ORDER BY tem.event_date SEPARATOR ', ') AS event_dates,
+                GROUP_CONCAT(DISTINCT CONCAT(
+                    DATE_FORMAT(tem.start_time, '%h:%i %p'),
+                    ' – ',
+                    DATE_FORMAT(tem.end_time, '%h:%i %p')
+                ) ORDER BY tem.event_date SEPARATOR ', ') AS event_times,
+                tt.ticket_name
               FROM {$siteprefix}order_items oi
               JOIN {$siteprefix}training t ON oi.training_id = t.training_id
               LEFT JOIN {$siteprefix}training_event_dates tem ON t.training_id = tem.training_id
               LEFT JOIN {$siteprefix}training_tickets tt ON t.training_id = tt.training_id
-              WHERE oi.order_id = '$order_id'";
+              WHERE oi.order_id = '$order_id'
+              GROUP BY oi.order_item_id";
+
 $sql_items_result = mysqli_query($con, $sql_items);
 
 $emailDetails = [];
 $attachments  = []; // collect all files here
 
 while ($row = mysqli_fetch_assoc($sql_items_result)) {
-    // Unique key to avoid duplicates
-    $key = $row['training_id'] . '|' . $row['ticket_name'] . '|' . $row['event_date'];
+    // Dates / times (already grouped by SQL)
+    $date_str = $row['event_dates'] ?? '';
+    $time_str = $row['event_times'] ?? '';
 
-    if (!isset($emailDetails[$key])) {
-        // Handle event dates/times
-        $date_str = '';
-        $time_str = '';
-        if (!empty($row['event_date']) && !empty($row['start_time']) && !empty($row['end_time'])) {
-            $date_str = date('M d, Y', strtotime($row['event_date']));
-            $time_str = date('h:i A', strtotime($row['start_time'])) . ' – ' . date('h:i A', strtotime($row['end_time']));
-        }
+    // Delivery format details
+    $format  = ucfirst($row['delivery_format']);
+    $details = '';
+    $fields  = [];
 
-        // Delivery format details
-        $format = ucfirst($row['delivery_format']);
-        $details = '';
-        $fields = [];
-
-        if ($format === 'Physical') {
-            $fields = [
-                'physical_address' => 'Address',
-                'physical_state'   => 'State',
-                'physical_lga'     => 'LGA',
-                'physical_country' => 'Country',
-                'foreign_address'  => 'Foreign Address'
-            ];
-        } elseif ($format === 'Hybrid') {
-            $fields = [
-                'hybrid_physical_address' => 'Physical Address',
-                'hybrid_web_address'      => 'Web Address',
-                'hybrid_state'            => 'State',
-                'hybrid_lga'              => 'LGA',
-                'hybrid_country'          => 'Country',
-                'hybrid_foreign_address'  => 'Foreign Address'
-            ];
-        } elseif ($format === 'Online' && !empty($row['web_address'])) {
-            $details .= "<li><strong>Link to join:</strong> <a href='" . htmlspecialchars($row['web_address']) . "'>" . htmlspecialchars($row['web_address']) . "</a></li>";
-        }
-
-        if (!empty($fields)) {
-            foreach ($fields as $col => $label) {
-                if (!empty($row[$col])) {
-                    $details .= "<li><strong>$label:</strong> " . htmlspecialchars($row[$col]) . "</li>";
-                }
-            }
-        }
-
-        // 👉 Attachments for Text/Video trainings
-        $training_id = $row['training_id'];
-
-        if ($format === 'Text' || $format === 'Video' || $format === 'Video_text') {
-            // Video modules
-            if ($format === 'Video' || $format === 'Video_text') {
-                $video_sql = "SELECT * FROM {$siteprefix}training_video_modules WHERE training_id='$training_id'";
-                $video_res = mysqli_query($con, $video_sql);
-                while ($vm = mysqli_fetch_assoc($video_res)) {
-                    if (!empty($vm['file_path'])) {
-                        $filePath = $fileuploadDir . "/" . $vm['file_path'];
-                        if (file_exists($filePath)) {
-                            $attachments[] = $filePath;
-                        }
-                    }
-                }
-            }
-
-            // Text modules
-            if ($format === 'Text' || $format === 'Video_text') {
-                $text_sql = "SELECT * FROM {$siteprefix}training_texts_modules WHERE training_id='$training_id'";
-                $text_res = mysqli_query($con, $text_sql);
-                while ($tm = mysqli_fetch_assoc($text_res)) {
-                    if (!empty($tm['file_path'])) {
-                        $filePath = $fileuploadDir . "/" . $tm['file_path'];
-                        if (file_exists($filePath)) {
-                            $attachments[] = $filePath;
-                        }
-                    }
-                }
-            }
-        }
-
-        // Store unique training entry
-        $emailDetails[$key] = [
-            'training_title' => $row['title'],
-            'date_str'       => $date_str,
-            'time_str'       => $time_str,
-            'format'         => $format,
-            'ticket_name'    => $row['ticket_name'],
-            'amount_paid'    => number_format($row['price'], 2),
-            'details'        => $details
+    if ($format === 'Physical') {
+        $fields = [
+            'physical_address' => 'Address',
+            'physical_state'   => 'State',
+            'physical_lga'     => 'LGA',
+            'physical_country' => 'Country',
+            'foreign_address'  => 'Foreign Address'
         ];
+    } elseif ($format === 'Hybrid') {
+        $fields = [
+            'hybrid_physical_address' => 'Physical Address',
+            'hybrid_web_address'      => 'Web Address',
+            'hybrid_state'            => 'State',
+            'hybrid_lga'              => 'LGA',
+            'hybrid_country'          => 'Country',
+            'hybrid_foreign_address'  => 'Foreign Address'
+        ];
+    } elseif ($format === 'Online' && !empty($row['web_address'])) {
+        $details .= "<li><strong>Link to join:</strong> <a href='" . htmlspecialchars($row['web_address']) . "'>" . htmlspecialchars($row['web_address']) . "</a></li>";
     }
-}
 
-// Re-index clean array
-$emailDetails = array_values($emailDetails);
+    if (!empty($fields)) {
+        foreach ($fields as $col => $label) {
+            if (!empty($row[$col])) {
+                $details .= "<li><strong>$label:</strong> " . htmlspecialchars($row[$col]) . "</li>";
+            }
+        }
+    }
+
+    // 👉 Attachments for Text/Video trainings
+    $training_id = $row['training_id'];
+
+    if ($format === 'Text' || $format === 'Video' || $format === 'Video_text') {
+        $details .= "<li><strong>Training Materials:</strong> (attached to this email)</li>";
+
+        // Video modules
+        if ($format === 'Video' || $format === 'Video_text') {
+            $video_sql = "SELECT file_path FROM {$siteprefix}training_video_modules WHERE training_id='$training_id'";
+            $video_res = mysqli_query($con, $video_sql);
+            while ($vm = mysqli_fetch_assoc($video_res)) {
+                if (!empty($vm['file_path'])) {
+                    $filePath = $fileuploadDir . "/" . $vm['file_path'];
+                    if (file_exists($filePath)) {
+                        $attachments[] = $filePath;
+                    }
+                }
+            }
+        }
+
+        // Text modules
+        if ($format === 'Text' || $format === 'Video_text') {
+            $text_sql = "SELECT file_path FROM {$siteprefix}training_texts_modules WHERE training_id='$training_id'";
+            $text_res = mysqli_query($con, $text_sql);
+            while ($tm = mysqli_fetch_assoc($text_res)) {
+                if (!empty($tm['file_path'])) {
+                    $filePath = $fileuploadDir . "/" . $tm['file_path'];
+                    if (file_exists($filePath)) {
+                        $attachments[] = $filePath;
+                    }
+                }
+            }
+        }
+    }
+
+    // Ticket name / price
+    $ticket_name = !empty($row['ticket_name']) ? $row['ticket_name'] : 
+        (($row['pricing'] === 'free') ? 'Free' : (($row['pricing'] === 'donate') ? 'Donate' : ''));
+    $amount_paid = number_format($row['price'], 2);
+
+    $emailDetails[] = [
+        'training_title' => $row['title'],
+        'date_str'       => $date_str,
+        'time_str'       => $time_str,
+        'format'         => $format,
+        'ticket_name'    => $ticket_name,
+        'amount_paid'    => $amount_paid,
+        'details'        => $details
+    ];
+}
 
 // Build email body
 $user_first_name = explode(' ', $username)[0];
@@ -1411,6 +1417,7 @@ foreach ($emailDetails as $ed) {
 
 // Send email with attachments
 sendEmail2($email, $username, $siteName, $siteMail, $emailMessage, $subject, $attachments);
+
 
 
     showSuccessModal('Processed', "Payment for Order ID $order_id has been approved successfully.");

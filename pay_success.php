@@ -232,54 +232,43 @@ if (mysqli_query($con, $sql_update_order)) {
 }
 
 // Send order confirmation email
-// Send order confirmation email
 $subject = "Order Confirmation";
 
-// Fetch order items
+// === Fetch order items (grouping event dates into one row per training) ===
 $sql_items = "SELECT 
     oi.*, 
     t.*, 
-    tem.event_date, 
-    tem.start_time, 
-    tem.end_time, 
+    GROUP_CONCAT(DISTINCT DATE_FORMAT(tem.event_date, '%b %d, %Y') 
+                 ORDER BY tem.event_date SEPARATOR ', ') AS event_dates,
+    GROUP_CONCAT(DISTINCT CONCAT(
+        DATE_FORMAT(tem.start_time, '%h:%i %p'),
+        ' - ',
+        DATE_FORMAT(tem.end_time, '%h:%i %p')
+    ) ORDER BY tem.event_date SEPARATOR ', ') AS event_times,
     tt.ticket_name
 FROM {$siteprefix}order_items oi
 JOIN {$siteprefix}training t ON oi.training_id = t.training_id
 LEFT JOIN {$siteprefix}training_event_dates tem ON t.training_id = tem.training_id
 LEFT JOIN {$siteprefix}training_tickets tt ON t.training_id = tt.training_id
-WHERE oi.order_id = '$ref'";
+WHERE oi.order_id = '$ref'
+GROUP BY oi.order_item_id";
+
 $sql_items_result = mysqli_query($con, $sql_items);
 
 $emailDetails = [];
-// store training file paths to attach
+$attachments = []; // initialize once outside loop
 
 while ($row = mysqli_fetch_assoc($sql_items_result)) {
-    $event_dates = [];
-    if (!empty($row['event_date']) && !empty($row['start_time']) && !empty($row['end_time'])) {
-        $event_dates[] = [
-            'event_date' => $row['event_date'],
-            'start_time' => $row['start_time'],
-            'end_time' => $row['end_time']
-        ];
-    }
+    $training_id = $row['training_id'];
 
-    $date_str = '';
-    $time_str = '';
-    if (count($event_dates) > 0) {
-        $first = $event_dates[0];
-        $last = end($event_dates);
-        $date_str = date('M d, Y', strtotime($first['event_date']));
-        if (count($event_dates) > 1 && $last['event_date'] !== $first['event_date']) {
-            $date_str .= ' - ' . date('M d, Y', strtotime($last['event_date']));
-        }
-        $time_str = date('h:i A', strtotime($first['start_time'])) . ' - ' . date('h:i A', strtotime($first['end_time']));
-    }
+    // Dates and Times
+    $date_str = !empty($row['event_dates']) ? $row['event_dates'] : '';
+    $time_str = !empty($row['event_times']) ? $row['event_times'] : '';
 
     $format = ucfirst($row['delivery_format']);
     $details = '';
-    $training_id = $row['training_id'];
 
-    // Address/Link formats
+    // === Address/Link formats ===
     if ($format === 'Physical') {
         $fields = [
             'physical_address' => 'Address',
@@ -313,7 +302,7 @@ while ($row = mysqli_fetch_assoc($sql_items_result)) {
         }
     }
 
-    // === NEW PART: Add training modules as attachments if format is Text / Video / Both ===
+    // === Training Materials attachments ===
     if ($format === 'Text' || $format === 'Video' || $format === 'Video_text') {
         $details .= "<li><strong>Training Materials:</strong> (attached to this email)</li>";
 
@@ -362,7 +351,7 @@ while ($row = mysqli_fetch_assoc($sql_items_result)) {
     ];
 }
 
-// Build email message
+// === Build email message ===
 $user_first_name = explode(' ', $username)[0];
 $emailMessage = "<p>Hi $user_first_name,</p>";
 $emailMessage .= "<p>Thank you for registering for:</p>";
@@ -385,7 +374,7 @@ foreach ($emailDetails as $ed) {
     <hr>";
 }
 
-// Send email with attachments
+// === Send email with attachments ===
 $subject = "Your Training Registration Details";
 sendEmail2($email, $username, $siteName, $siteMail, $emailMessage, $subject, $attachments);
 

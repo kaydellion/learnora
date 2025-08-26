@@ -346,22 +346,15 @@
 </div>
 
 
-            <h6>Course Content Uploads</h6>
-            <div class="mb-3">
-              <label class="form-label">Video Lessons (Upload or Embed URL)</label>
-              <input type="file" class="form-control mb-2" name="video_lessons[]" multiple accept="video/*">
-              <input type="url" class="form-control" name="video_embed_url" placeholder="Or paste video URL">
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Text Modules / PDFs / Readings (Upload)</label>
-              <input type="file" class="form-control" name="text_modules[]" multiple accept=".pdf,.txt,.doc,.docx">
-            </div>
-            <div class="mb-3">
-              <div>
-              <label class="form-label">Quizzes & Assignments</label>
-          </div>
-         <label>Choose how to provide quiz/assignment content:</label>
-          <select onchange="toggleQuizOption(this.value)" name="quiz_method" class="form-control mb-3">
+
+              <input type="file" class="form-control mb-2" name="video_lessons[]" multiple accept="video/*" hidden>
+              <input type="url" class="form-control" name="video_embed_url" placeholder="Or paste video URL" hidden>
+
+
+              <input type="file" class="form-control" name="text_modules[]" multiple accept=".pdf,.txt,.doc,.docx" hidden>
+
+    
+          <select onchange="toggleQuizOption(this.value)" name="quiz_method" class="form-control mb-3" hidden>
             <option value="">-- Select Option --</option>
             <option value="text">Text Entry</option>
             <option value="upload">Upload Files</option>
@@ -388,7 +381,7 @@
       <div id="quizModal" class="modal" style="display:none;">
   <div class="modal-content">
     <span class="close" onclick="closeQuizModal()">&times;</span>
-    <h3>🧠 Add Quiz Questions</h3>
+    <h3>ðŸ§  Add Quiz Questions</h3>
     
 <div id="quizBuilderModal">
   <div class="mb-3">
@@ -425,16 +418,12 @@
 
     <button type="button" onclick="addQuizQuestionModal()" class="btn btn-secondary"><i class="bx bx-plus me-1"></i>Add Another Question</button>
     <br><br>
-    <button type="button" onclick="closeQuizModal()" class="btn btn-primary">✅ Done</button>
+    <button type="button" onclick="closeQuizModal()" class="btn btn-primary">âœ… Done</button>
   </div>
 </div>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Course Trailer/Intro Video (Optional)</label>
-              <input type="file" class="form-control" name="trailer_video" accept="video/*">
-            </div>
-
-         
+            
+          
+              <input type="file" class="form-control" name="trailer_video" accept="video/*" hidden>
 
                             <?php
     // Fetch instructors from the database

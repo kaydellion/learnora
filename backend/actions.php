@@ -1981,8 +1981,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['edit_event'])) {
 
     $title = mysqli_real_escape_string($con, $_POST['title']);
     $description = mysqli_real_escape_string($con, $_POST['description']);
-    $category = implode(',', $_POST['category']);
-    $subcategory = implode(',', $_POST['subcategory']);
+     $category = isset($_POST['category']) && is_array($_POST['category']) ? implode(',', $_POST['category']) : '';
+$subcategory = isset($_POST['subcategory']) && is_array($_POST['subcategory']) ? implode(',', $_POST['subcategory']) : '';
     $event_type = mysqli_real_escape_string($con, $_POST['event_type']);
     $attendee = mysqli_real_escape_string($con, $_POST['who_should_attend']);
     $user = mysqli_real_escape_string($con, $_POST['user']);

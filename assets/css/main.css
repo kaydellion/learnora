@@ -2611,6 +2611,11 @@ background-color: var(--accent-color);
 color: #fff;
 }
 
+.nav-link{
+background-color: var(--accent-color);
+color: #fff;
+}
+
 .btn-small{
   background-color: #6c757d;
   padding:5px;

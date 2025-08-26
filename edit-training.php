@@ -238,6 +238,14 @@ while ($row = mysqli_fetch_assoc($result)) {
               </select>
             </div>
 
+             <?php
+          // Fetch event types from the database
+          $eventTypes = [];
+          $eventTypeQuery = mysqli_query($con, "SELECT s, name FROM {$siteprefix}event_types");
+          while ($row = mysqli_fetch_assoc($eventTypeQuery)) {
+              $eventTypes[] = $row;
+          }
+          ?>
             
 <div class="mb-3">
   <label class="form-label">Type of Training & Events</label>
@@ -641,74 +649,16 @@ while ($row = $textResult->fetch_assoc()):
       <input type="hidden" name="user_id" value="<?php echo $user_id; ?>">
 </div>
            
-           
-
-
-
-      <?php
-$lessonQuery = mysqli_query($con, "SELECT * FROM {$siteprefix}training_video_lessons WHERE training_id = '$training_id'");
-$embedValue = ''; // to store the embed url for pre-filling
-?>
-
-<div class="mt-3">
-  <strong>Uploaded Lessons:</strong>
-  <ul class="list-group">
-    <?php while ($lesson = mysqli_fetch_assoc($lessonQuery)):
-      $lessonId = $lesson['s'];
-      $filePath = $lesson['file_path'];
-      $embedUrl = $lesson['video_url'];
-
-      // Set value for embed input (latest)
-      if (!empty($embedUrl)) $embedValue = $embedUrl;
-    ?>
-      <li class="list-group-item d-flex justify-content-between align-items-center" id="lesson_<?php echo $lessonId; ?>">
-        <div>
-          <?php if (!empty($filePath)): ?>
-            📁 <a href="<?php echo $siteurl . $filePath; ?>" target="_blank">View Uploaded Video</a>
-          <?php elseif (!empty($embedUrl)): ?>
-            🔗 <a href="<?php echo $embedUrl; ?>" target="_blank">View Embedded URL</a>
-          <?php endif; ?>
-        </div>
-        <button type="button" class="btn btn-sm btn-danger delete-video-lesson" data-video-id="<?php echo $lessonId; ?>">
-          Delete
-        </button>
-      </li>
-    <?php endwhile; ?>
-  </ul>
-</div>
 
 <!-- Video Upload & Embed Fields -->
-<div class="mb-3 mt-3">
-  <label class="form-label">Video Lessons (Upload or Embed URL)</label>
-  <input type="file" class="form-control mb-2" name="video_lessons[]" multiple accept="video/*">
 
-  <input type="url" class="form-control" name="video_embed_url" placeholder="Or paste video URL" value="<?php echo $embedValue; ?>">
-</div>
+  <input type="file" class="form-control mb-2" name="video_lessons[]" multiple accept="video/*" hidden>
+
+  <input type="url" class="form-control" name="video_embed_url" placeholder="Or paste video URL" hidden>
 
 
-<?php
-$textQuery = mysqli_query($con, "SELECT * FROM {$siteprefix}training_text_modules WHERE training_id = '$training_id'");
-if ($textQuery && mysqli_num_rows($textQuery) > 0): ?>
-  <div class="mt-3">
-    <strong>Uploaded Text Modules:</strong>
-    <ul class="list-group">
-      <?php while ($text = mysqli_fetch_assoc($textQuery)):
-        $textId = $text['id'];
-        $textPath = $text['file_path'];
-      ?>
-        <li class="list-group-item d-flex justify-content-between align-items-center" id="text_<?php echo $textId; ?>">
-          <a href="<?php echo $siteurl . $textPath; ?>" target="_blank">📄 <?php echo basename($textPath); ?></a>
-          <button type="button" class="btn btn-sm btn-danger delete-text-module" data-id="<?php echo $textId; ?>">Delete</button>
-        </li>
-      <?php endwhile; ?>
-    </ul>
-  </div>
-<?php endif; ?>
+              <input type="file" class="form-control" name="text_modules[]" multiple accept=".pdf,.txt,.doc,.docx" hidden>
 
-            <div class="mb-3">
-              <label class="form-label">Text Modules / PDFs / Readings (Upload)</label>
-              <input type="file" class="form-control" name="text_modules[]" multiple accept=".pdf,.txt,.doc,.docx">
-            </div>
            
 
 <ul class="list-group mb-4">
@@ -869,6 +819,7 @@ document.addEventListener('DOMContentLoaded', function () {
 </script>
 
 
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   // Trigger fetch after DOM loads
@@ -906,53 +857,44 @@ function updateTags(checkbox, type) {
   if (type === 'category') fetchSubcategories();
 }
 
-function fetchSubcategories(categoryIds) {
-  const $subSelect = $j('#subcategory-select');
-  const $subContainer = $j('#subcategory-container');
-  $subSelect.html('');
+function fetchSubcategories() {
+  const selectedCategories = Array.from(document.querySelectorAll('input[name="category[]"]:checked')).map(cb => cb.value);
+  const subWrapper = document.getElementById('subcategory-wrapper');
+  const subOptions = document.getElementById('subcategory-options');
 
-  if (!categoryIds.length) {
-    $subContainer.hide();
+  subOptions.innerHTML = '';
+
+  if (selectedCategories.length === 0) {
+    subWrapper.style.display = 'none';
     return;
   }
 
-  // Fetch all nested subcategories in one request
-  fetch(`get_subcategories.php?parent_ids=${categoryIds.join(',')}`)
+  fetch(`get_subcategories.php?parent_ids=${selectedCategories.join(',')}`)
     .then(res => res.json())
     .then(data => {
       if (data.length > 0) {
-        // Build a map for parent-child relationships
-        const byParent = {};
-        data.forEach(cat => {
-          if (!byParent[cat.parent_id]) byParent[cat.parent_id] = [];
-          byParent[cat.parent_id].push(cat);
+        subWrapper.style.display = 'block';
+        const selectedSub = <?= json_encode($selected_subcategories) ?>;
+
+        data.forEach(sub => {
+          const isChecked = selectedSub.includes(sub.s);
+          const div = document.createElement('div');
+          div.className = 'custom-option';
+          div.innerHTML = `
+            <label>
+              <input type="checkbox" name="subcategory[]" value="${sub.s}" onchange="updateTags(this, 'subcategory')" ${isChecked ? 'checked' : ''}>
+              ${sub.title}
+            </label>
+          `;
+          subOptions.appendChild(div);
         });
-
-        // Recursive rendering for nested subcategories
-        function renderOptions(parentId = null, level = 0) {
-          (byParent[parentId] || []).forEach(cat => {
-            const isSelected = selectedSubcategoryIds.includes(cat.s.toString()) ? 'selected' : '';
-            $subSelect.append(`<option value="${cat.s}" ${isSelected}>${'— '.repeat(level)}${cat.title}</option>`);
-            renderOptions(cat.s, level + 1);
-          });
-        }
-        renderOptions();
-
-        $subContainer.show();
-        if ($subSelect.hasClass('select2-hidden-accessible')) {
-          $subSelect.select2('destroy');
-        }
-        $subSelect.select2();
       } else {
-        $subContainer.hide();
+        subWrapper.style.display = 'none';
       }
-    })
-    .catch(() => {
-      $subContainer.hide();
     });
 }
-
 </script>
+
 
             <?php include "footer.php"; ?>
 
