@@ -151,17 +151,19 @@
 <script>
 (() => {
     const vpayButton = document.querySelector(".vpay-button");
+    const orderId = document.getElementById("ref").value; // Assuming this is the order reference ID
+    var siteurl = $('#siteurl').val();
     if (vpayButton) {
         vpayButton.addEventListener("click", function () {
             const options = {
                 amount: parseInt(document.getElementById("amount").value), // Use actual value
                 currency: 'NGN',
-                domain: 'live', // Change to 'live' in production
-               key: '<?php echo $apikey; ?>',// Replace with your actual VPay public key
+                domain: 'sandbox', // Change to 'live' in production
+                key: '<?php echo $apikey; ?>',// Replace with your actual VPay public key
                 email: document.getElementById("email-address").value,
                 transactionref: document.getElementById("ref").value,
-                customer_logo: 'https://www.vpay.africa/static/media/vpayLogo.91e11322.svg',
-                customer_service_channel: '+2348030007000, support@yourcompany.com',
+                customer_logo: siteurl + 'uploads/' + '<?php echo $siteimg; ?>',
+                customer_service_channel: '<?php echo $sitenumber; ?>,<?php echo $sitemail; ?>',
                 txn_charge: 6,
                 txn_charge_type: 'flat',
                 onSuccess: function (response) {
@@ -169,7 +171,19 @@
                     window.location.href = document.getElementById("refer").value;
                 },
                 onExit: function (response) {
-                    alert("Payment was cancelled.");
+            // 🚀 Trigger AJAX when modal is closed without payment
+            $.ajax({
+                url: siteurl + "backend/checkout_abandoned_new",
+                method: "POST",
+                data: { abandoned_ref: orderId },
+                success: function(res){
+                    console.log("Abandoned checkout logged.");
+                                        alert('No worries! Your payment was cancelled. If you need help, feel free to reach out, or you can try checking out again anytime 😊');
+                },
+                error: function(err){
+                    console.error("Failed to log abandoned checkout", err);
+                }
+            });
                 }
             };
 
@@ -183,6 +197,7 @@
     }
 })();
 </script>
+
 </body>
 
 </html>
