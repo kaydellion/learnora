@@ -883,7 +883,7 @@ elseif ($quiz_method === 'form' && !empty($_POST['questions'])) {
 }
 
 if ($delivery_format === 'video' || $delivery_format === 'video_text') {
-    foreach ($_POST['video_module_title'] as $index => $title) {
+    foreach ($_POST['video_module_title'] as $index => $titless) {
         $desc        = $_POST['video_module_desc'][$index] ?? '';
         $duration    = $_POST['video_duration'][$index] ?? '';
         $videoLink   = $_POST['video_link'][$index] ?? '';
@@ -913,14 +913,14 @@ if ($delivery_format === 'video' || $delivery_format === 'video_text') {
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())
         ");
         $module_number = $index + 1;
-        $stmt->bind_param("sisssssss", $training_id, $module_number, $title, $desc, $duration, $filePath, $videoLink, $qualities, $subtitles);
+        $stmt->bind_param("sisssssss", $training_id, $module_number, $titless, $desc, $duration, $filePath, $videoLink, $qualities, $subtitles);
         $stmt->execute();
         $stmt->close();
     }
 }
 
 if ($delivery_format === 'text' || $delivery_format === 'video_text') {
-    foreach ($_POST['text_module_title'] as $index => $title) {
+    foreach ($_POST['text_module_title'] as $index => $tit) {
         $desc        = $_POST['text_module_desc'][$index] ?? '';
         $readingTime = $_POST['text_reading_time'][$index] ?? '';
 
@@ -947,7 +947,7 @@ if ($delivery_format === 'text' || $delivery_format === 'video_text') {
             VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())
         ");
         $module_number = $index + 1;
-        $stmt->bind_param("sissss", $training_id, $module_number, $title, $desc, $readingTime, $filePath);
+        $stmt->bind_param("sissss", $training_id, $module_number, $tit, $desc, $readingTime, $filePath);
         $stmt->execute();
         $stmt->close();
     }
