@@ -1330,7 +1330,7 @@ $sql_items = "SELECT
               LEFT JOIN {$siteprefix}training_event_dates tem ON t.training_id = tem.training_id
               LEFT JOIN {$siteprefix}training_tickets tt ON t.training_id = tt.training_id
               WHERE oi.order_id = '$order_id'
-              GROUP BY oi.order_item_id";
+              GROUP BY oi.item_id";
 
 $sql_items_result = mysqli_query($con, $sql_items);
 
