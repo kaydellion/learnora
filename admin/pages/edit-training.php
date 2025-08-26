@@ -671,39 +671,61 @@ while ($row = $textResult->fetch_assoc()):
                  
 
           
-                         <script>
-                        document.querySelector('select[name="category"]').addEventListener('change', function() {
-                          let parentId = this.value;
-                          let subSelect = document.getElementById('subcategory-container');
-                          let subcategorySelect = document.getElementById('subcategory-select');
-                          
-                          fetch(`get_subcategories.php?parent_id=${parentId}`)
-                            .then(response => response.json())
-                            .then(data => {
-                              console.log('Received data:', data);
-                              if (data.length > 0) {
-                                subcategorySelect.innerHTML = '<option selected>- Select Subcategory -</option>';
-                                // Recursive rendering for nested subcategories
-                                function renderSubcategoryOptions(categories, parentId = null, level = 0) {
-                                  categories
-                                    .filter(cat => cat.parent_id == parentId)
-                                    .forEach(cat => {
-                                      subcategorySelect.innerHTML += `<option value="${cat.s}">${'— '.repeat(level)}${cat.title}</option>`;
-                                      renderSubcategoryOptions(categories, cat.s, level + 1);
-                                    });
-                                }
+<script>
+var $j = jQuery.noConflict();
 
-                                renderSubcategoryOptions(data);  subSelect.style.display = 'block';
-                              } else {
-                                console.log('No subcategories found');
-                                subSelect.style.display = 'none';
-                              }
-                            })
-                            .catch(error => {
-                              console.error('Error fetching subcategories:', error);
-                            });
-                        });
-                        </script>
+const selectedSubcategoryIds = <?= json_encode($selected_subcategories ?? []) ?>;
+const selectedCategoryIds = <?= json_encode($selected_categories ?? []) ?>;
+
+function fetchSubcategoriesForEdit(categoryIds) {
+  const $subSelect = $j('#subcategory-select');
+  const $subContainer = $j('#subcategory-container');
+  $subSelect.html('');
+
+  if (!categoryIds.length) {
+    $subContainer.hide();
+    return;
+  }
+
+  Promise.all(categoryIds.map(id =>
+    fetch(`get_subcategories.php?parent_id=${id}`)
+      .then(res => res.json())
+      .catch(() => [])
+  )).then(allResults => {
+    let found = false;
+
+    allResults.flat().forEach(cat => {
+      if ($subSelect.find(`option[value="${cat.s}"]`).length === 0) {
+        const isSelected = selectedSubcategoryIds.includes(cat.s.toString()) ? 'selected' : '';
+        $subSelect.append(`<option value="${cat.s}" ${isSelected}>${cat.title}</option>`);
+        found = true;
+      }
+    });
+
+    if (found) {
+      $subContainer.show();
+      if ($subSelect.hasClass('select2-hidden-accessible')) {
+        $subSelect.select2('destroy');
+      }
+      $subSelect.select2();
+    } else {
+      $subContainer.hide();
+    }
+  });
+}
+
+$j(document).ready(function () {
+  $j('.select-multiple').select2();
+
+  fetchSubcategoriesForEdit(selectedCategoryIds);
+
+  $j('#category-select').on('change', function () {
+    const selected = $j(this).val() || [];
+    fetchSubcategoriesForEdit(selected);
+  });
+});
+</script>
+
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
