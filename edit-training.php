@@ -350,32 +350,34 @@ $selected_subcategories = explode(',', $subcategory_id);
 ?>
 <div class="mb-3">
   <label>Areas of Specialization & Expertise</label>
+
+  <!-- Main Categories -->
   <div class="custom-select-wrapper" id="category-wrapper">
     <div class="custom-select-display" onclick="toggleDropdown('category')">
       <div class="custom-select-tags" id="category-tags">
         <?php
           foreach ($selected_categories as $cat_id) {
             $cat_id = trim($cat_id);
-            $cat_query = mysqli_query($con, "SELECT category_name FROM " . $siteprefix . "categories WHERE id = '$cat_id'");
+            $cat_query = mysqli_query($con, "SELECT category_name FROM {$siteprefix}categories WHERE id = '$cat_id'");
             if ($row = mysqli_fetch_assoc($cat_query)) {
-              echo '<span class="custom-tag" id="category-tag-' . $cat_id . '">' . htmlspecialchars($row['category_name']) . '</span>';
+              echo '<span class="custom-tag" id="category-tag-'.$cat_id.'">'.htmlspecialchars($row['category_name']).'</span>';
             }
           }
         ?>
       </div>
     </div>
     <div class="custom-select-dropdown" id="category-dropdown">
-      <input type="search" class="form-control" placeholder="Search categories..." onkeyup="filterOptions(this, 'category-options')">
+      <input type="search" class="form-control" placeholder="Search categories..." onkeyup="filterOptions(this,'category-options')">
       <div id="category-options">
         <?php
-          $sql = "SELECT * FROM " . $siteprefix . "categories WHERE parent_id IS NULL";
+          $sql = "SELECT * FROM {$siteprefix}categories WHERE parent_id IS NULL";
           $res = mysqli_query($con, $sql);
           while ($row = mysqli_fetch_assoc($res)) {
             $checked = in_array($row['id'], $selected_categories) ? 'checked' : '';
             echo '<div class="custom-option">
                     <label>
-                      <input type="checkbox" name="category[]" value="' . $row['id'] . '" onchange="updateTags(this, \'category\')" ' . $checked . '>
-                      ' . htmlspecialchars($row['category_name']) . '
+                      <input type="checkbox" name="category[]" value="'.$row['id'].'" onchange="updateTags(this,\'category\')" '.$checked.'>
+                      '.htmlspecialchars($row['category_name']).'
                     </label>
                   </div>';
           }
@@ -384,29 +386,29 @@ $selected_subcategories = explode(',', $subcategory_id);
     </div>
   </div>
 
-  <label>Subcategory</label>
-  <div class="custom-select-wrapper" id="subcategory-wrapper" style="margin-top: 20px; display: none;">
+  <!-- Subcategories (all tiers go here) -->
+  <label style="margin-top:20px;">Subcategories</label>
+  <div class="custom-select-wrapper" id="subcategory-wrapper" style="display:none;">
     <div class="custom-select-display" onclick="toggleDropdown('subcategory')">
       <div class="custom-select-tags" id="subcategory-tags">
         <?php
           foreach ($selected_subcategories as $sub_id) {
             $sub_id = trim($sub_id);
-            $sub_query = mysqli_query($con, "SELECT category_name FROM " . $siteprefix . "categories WHERE id = '$sub_id'");
+            $sub_query = mysqli_query($con, "SELECT category_name FROM {$siteprefix}categories WHERE id = '$sub_id'");
             if ($row = mysqli_fetch_assoc($sub_query)) {
-              echo '<span class="custom-tag" id="subcategory-tag-' . $sub_id . '">' . htmlspecialchars($row['category_name']) . '</span>';
+              echo '<span class="custom-tag" id="subcategory-tag-'.$sub_id.'">'.htmlspecialchars($row['category_name']).'</span>';
             }
           }
         ?>
       </div>
     </div>
     <div class="custom-select-dropdown" id="subcategory-dropdown">
-      <input class="form-control" type="search" placeholder="Search subcategories..." onkeyup="filterOptions(this, 'subcategory-options')">
-      <div id="subcategory-options">
-        <!-- JS will inject matching subcategories -->
-      </div>
+      <input type="search" class="form-control" placeholder="Search subcategories..." onkeyup="filterOptions(this,'subcategory-options')">
+      <div id="subcategory-options"></div>
     </div>
   </div>
 </div>
+
 
 
                 <h6 class="mb-3">Course Content Details</h6>
@@ -822,7 +824,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  // Trigger fetch after DOM loads
   fetchSubcategories();
 });
 
@@ -857,11 +858,33 @@ function updateTags(checkbox, type) {
   if (type === 'category') fetchSubcategories();
 }
 
+// Recursive renderer for children
+function renderOptions(data, container, selectedSubs) {
+  data.forEach(item => {
+    const isChecked = selectedSubs.includes(item.s);
+    const div = document.createElement('div');
+    div.className = 'custom-option';
+    div.innerHTML = `
+      <label>
+        <input type="checkbox" name="subcategory[]" value="${item.s}" onchange="updateTags(this, 'subcategory')" ${isChecked ? 'checked' : ''}>
+        ${item.title}
+      </label>
+    `;
+    container.appendChild(div);
+
+    if (item.children && item.children.length > 0) {
+      const childDiv = document.createElement('div');
+      childDiv.style.marginLeft = "20px"; // indent for hierarchy
+      container.appendChild(childDiv);
+      renderOptions(item.children, childDiv, selectedSubs);
+    }
+  });
+}
+
 function fetchSubcategories() {
   const selectedCategories = Array.from(document.querySelectorAll('input[name="category[]"]:checked')).map(cb => cb.value);
   const subWrapper = document.getElementById('subcategory-wrapper');
   const subOptions = document.getElementById('subcategory-options');
-
   subOptions.innerHTML = '';
 
   if (selectedCategories.length === 0) {
@@ -874,25 +897,14 @@ function fetchSubcategories() {
     .then(data => {
       if (data.length > 0) {
         subWrapper.style.display = 'block';
-        const selectedSub = <?= json_encode($selected_subcategories) ?>;
-
-        data.forEach(sub => {
-          const isChecked = selectedSub.includes(sub.s);
-          const div = document.createElement('div');
-          div.className = 'custom-option';
-          div.innerHTML = `
-            <label>
-              <input type="checkbox" name="subcategory[]" value="${sub.s}" onchange="updateTags(this, 'subcategory')" ${isChecked ? 'checked' : ''}>
-              ${sub.title}
-            </label>
-          `;
-          subOptions.appendChild(div);
-        });
+        const selectedSubs = <?= json_encode($selected_subcategories) ?>;
+        renderOptions(data, subOptions, selectedSubs);
       } else {
         subWrapper.style.display = 'none';
       }
     });
 }
+
 </script>
 
 

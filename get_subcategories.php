@@ -1,35 +1,30 @@
 <?php
 include "backend/connect.php";
 
-function getSubcategories($parentIds, $con, $siteprefix) {
-  $allSubcategories = [];
-  $queue = $parentIds;
+function buildTree($parentIds, $con, $siteprefix) {
+  $tree = [];
 
-  while (!empty($queue)) {
-    $safe_ids = array_map(function($id) use ($con) {
-      return "'" . mysqli_real_escape_string($con, trim($id)) . "'";
-    }, $queue);
-
-    $id_list = implode(',', $safe_ids);
-    $query = "SELECT id, category_name AS title, parent_id FROM " . $siteprefix . "categories WHERE parent_id IN ($id_list)";
+  foreach ($parentIds as $parentId) {
+    $safe_id = mysqli_real_escape_string($con, trim($parentId));
+    $query = "SELECT id, category_name FROM {$siteprefix}categories WHERE parent_id = '$safe_id'";
     $result = mysqli_query($con, $query);
 
-    $queue = []; // Prepare for next level
     while ($row = mysqli_fetch_assoc($result)) {
-      $allSubcategories[] = [
+      $children = buildTree([$row['id']], $con, $siteprefix);
+      $tree[] = [
         's' => $row['id'],
-        'title' => $row['title'],
-        'parent_id' => $row['parent_id']
+        'title' => $row['category_name'],
+        'children' => $children
       ];
-      $queue[] = $row['id']; // Add for next recursion
     }
   }
-  return $allSubcategories;
+
+  return $tree;
 }
 
 if (isset($_GET['parent_ids'])) {
   $ids = explode(',', $_GET['parent_ids']);
-  $subcategories = getSubcategories($ids, $con, $siteprefix);
+  $subcategories = buildTree($ids, $con, $siteprefix);
 
   header('Content-Type: application/json');
   echo json_encode($subcategories);

@@ -85,8 +85,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['edit_event'])) {
     $status = $_POST['status'];
     $title = mysqli_real_escape_string($con, $_POST['title']);
     $description = mysqli_real_escape_string($con, $_POST['description']);
-    $category = implode(',', $_POST['category']);
-    $subcategory = implode(',', $_POST['subcategory']);
+   // Main category (Tier 1)
+    $category = !empty($_POST['category']) ? implode(',', $_POST['category']) : '';
+
+    // Collect subcategories (Tiers 2+)
+    $allSubs = [];
+
+    if (!empty($_POST['subcategory'])) {
+        $allSubs = array_merge($allSubs, $_POST['subcategory']);
+    }
+    if (!empty($_POST['subsubcategory'])) {
+        $allSubs = array_merge($allSubs, $_POST['subsubcategory']);
+    }
+    if (!empty($_POST['subsubsubcategory'])) {
+        $allSubs = array_merge($allSubs, $_POST['subsubsubcategory']);
+    }
+
+    $allSubs = array_unique($allSubs);
+    $subcategory = implode(',', $allSubs);
+
     $event_type = mysqli_real_escape_string($con, $_POST['event_type']);
     $attendee = mysqli_real_escape_string($con, $_POST['who_should_attend']);
     $loyalty = isset($_POST['loyalty']) ? 1 : 0;
@@ -669,8 +686,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_event'])) {
     $trainingId = mysqli_real_escape_string($con, $_POST['id']);
     $title = mysqli_real_escape_string($con, $_POST['title']);
     $description = mysqli_real_escape_string($con, $_POST['description']);
-    $category = implode(',', $_POST['category']);
-    $subcategory = implode(',', $_POST['subcategory']);
+    // Main category (Tier 1)
+        $category = !empty($_POST['category']) ? implode(',', $_POST['category']) : '';
+
+        // Collect subcategories (Tiers 2+)
+        $allSubs = [];
+
+        if (!empty($_POST['subcategory'])) {
+            $allSubs = array_merge($allSubs, $_POST['subcategory']);
+        }
+        if (!empty($_POST['subsubcategory'])) {
+            $allSubs = array_merge($allSubs, $_POST['subsubcategory']);
+        }
+        if (!empty($_POST['subsubsubcategory'])) {
+            $allSubs = array_merge($allSubs, $_POST['subsubsubcategory']);
+        }
+
+        $allSubs = array_unique($allSubs); // remove duplicates
+        $subcategory = implode(',', $allSubs);
     $event_type = mysqli_real_escape_string($con, $_POST['event_type']);
     $attendee = mysqli_real_escape_string($con, $_POST['who_should_attend']);
     $loyalty = isset($_POST['loyalty']) ? 1 : 0;

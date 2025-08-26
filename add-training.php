@@ -161,44 +161,46 @@
 <button type="button" id="addTicketBtn" class="btn btn-secondary">Add Another Ticket</button>
 </div>
 
-       <div class="mb-3">
-                          <label>Category</label>
-                      <div class="custom-select-wrapper" id="category-wrapper">
-  <div class="custom-select-display" onclick="toggleDropdown('category')">
-    <div class="custom-select-tags" id="category-tags"></div>
-  </div>
-  <div class="custom-select-dropdown" id="category-dropdown">
-    <input type="search" class="form-control" placeholder="Search categories..." onkeyup="filterOptions(this, 'category-options')">
-    <div id="category-options">
-      <?php
-        $sql = "SELECT * FROM " . $siteprefix . "categories WHERE parent_id IS NULL";
-        $res = mysqli_query($con, $sql);
-        while ($row = mysqli_fetch_assoc($res)) {
-          echo '<div class="custom-option">
-                  <label>
-                    <input type="checkbox" name="category[]" value="' . $row['id'] . '" onchange="updateTags(this, \'category\')">
-                    ' . htmlspecialchars($row['category_name']) . '
-                  </label>
-                </div>';
-        }
-      ?>
+   <div class="mb-3">
+  <label>Category</label>
+  <div class="custom-select-wrapper" id="category-wrapper">
+    <div class="custom-select-display" onclick="toggleDropdown('category')">
+      <div class="custom-select-tags" id="category-tags"></div>
+    </div>
+    <div class="custom-select-dropdown" id="category-dropdown">
+      <input type="search" class="form-control" placeholder="Search categories..." onkeyup="filterOptions(this, 'category-options')">
+      <div id="category-options">
+        <?php
+          $sql = "SELECT * FROM {$siteprefix}categories WHERE parent_id IS NULL";
+          $res = mysqli_query($con, $sql);
+          while ($row = mysqli_fetch_assoc($res)) {
+            echo '<div class="custom-option">
+                    <label>
+                      <input type="checkbox" name="category[]" value="' . $row['id'] . '" onchange="updateTags(this, \'category\')">
+                      ' . htmlspecialchars($row['category_name']) . '
+                    </label>
+                  </div>';
+          }
+        ?>
+      </div>
     </div>
   </div>
 </div>
 
-<label>Subcategory</label>
-<div class="custom-select-wrapper" id="subcategory-wrapper" style="margin-top: 20px; display: none;">
-  <div class="custom-select-display" onclick="toggleDropdown('subcategory')">
-    <div class="custom-select-tags" id="subcategory-tags"></div>
-  </div>
-  <div class="custom-select-dropdown" id="subcategory-dropdown">
-    <input class="form-control" type="search" placeholder="Search subcategories..." onkeyup="filterOptions(this, 'subcategory-options')">
-    <div id="subcategory-options">
-      <!-- Subcategory checkboxes inserted dynamically -->
+<div class="mb-3">
+  <label>Subcategory</label>
+  <div class="custom-select-wrapper" id="subcategory-wrapper" style="margin-top: 20px; display: none;">
+    <div class="custom-select-display" onclick="toggleDropdown('subcategory')">
+      <div class="custom-select-tags" id="subcategory-tags"></div>
+    </div>
+    <div class="custom-select-dropdown" id="subcategory-dropdown">
+      <input class="form-control" type="search" placeholder="Search subcategories..." onkeyup="filterOptions(this, 'subcategory-options')">
+      <div id="subcategory-options">
+        <!-- Subcategory checkboxes inserted dynamically -->
+      </div>
     </div>
   </div>
 </div>
-                        </div>
             
 
 
@@ -535,8 +537,7 @@
  </section>
 
 
-          
-   <script>
+    <script>
 function toggleDropdown(type) {
   document.getElementById(`${type}-dropdown`).classList.toggle('show');
 }
@@ -565,7 +566,30 @@ function updateTags(checkbox, type) {
     existingTag.remove();
   }
 
+  // If category changed, fetch its subcategories
   if (type === 'category') fetchSubcategories();
+}
+
+function renderOptions(subs, container, type) {
+  subs.forEach(sub => {
+    const div = document.createElement('div');
+    div.className = 'custom-option';
+    div.innerHTML = `
+      <label>
+        <input type="checkbox" name="${type}[]" value="${sub.s}" onchange="updateTags(this, '${type}')">
+        ${sub.title}
+      </label>
+    `;
+
+    if (sub.children && sub.children.length > 0) {
+      const nestedDiv = document.createElement('div');
+      nestedDiv.style.marginLeft = '20px';
+      renderOptions(sub.children, nestedDiv, type);
+      div.appendChild(nestedDiv);
+    }
+
+    container.appendChild(div);
+  });
 }
 
 function fetchSubcategories() {
@@ -585,35 +609,14 @@ function fetchSubcategories() {
     .then(data => {
       if (data.length > 0) {
         subWrapper.style.display = 'block';
-        data.forEach(sub => {
-          const div = document.createElement('div');
-          div.className = 'custom-option';
-          div.innerHTML = `
-            <label>
-              <input type="checkbox" name="subcategory[]" value="${sub.s}" onchange="updateTags(this, 'subcategory')">
-              ${sub.title}
-            </label>
-          `;
-          if (sub.children && sub.children.length > 0) {
-            const nestedDiv = document.createElement('div');
-            nestedDiv.style.marginLeft = '20px';
-            sub.children.forEach(child => {
-              const childDiv = document.createElement('div');
-              childDiv.className = 'custom-option';
-              childDiv.innerHTML = `
-                <label>
-                  <input type="checkbox" name="subcategory[]" value="${child.s}" onchange="updateTags(this, 'subcategory')">
-                  ${child.title}
-                </label>
-              `;
-              nestedDiv.appendChild(childDiv);
-            });
-            div.appendChild(nestedDiv);
-          }  subOptions.appendChild(div);
-        });
+        renderOptions(data, subOptions, 'subcategory');
       } else {
         subWrapper.style.display = 'none';
       }
+    })
+    .catch(err => {
+      console.error("Error loading subcategories", err);
+      subWrapper.style.display = 'none';
     });
 }
 </script>

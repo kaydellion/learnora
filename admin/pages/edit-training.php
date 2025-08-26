@@ -325,24 +325,50 @@ while ($row = mysqli_fetch_assoc($eventTypeQuery)) {
 
 
 
+<h6>Area of Specialization</h6>
 
-     <h6>Area of Specialization</h6>
 <div class="mb-3">
-   <select class="form-select select-multiple w-100" name="category[]" id="category-select" multiple required>
-  <?php
-  $sql = "SELECT * FROM " . $siteprefix . "categories WHERE parent_id IS NULL";
-  $sql2 = mysqli_query($con, $sql);
-  while ($row = mysqli_fetch_array($sql2)) {
-    $selected = in_array($row['id'], $selected_categories) ? 'selected' : '';
-    echo '<option value="' . $row['id'] . '" ' . $selected . '>' . $row['category_name'] . '</option>';
-  }
-  ?>
-</select>
+  <label>Main Category</label>
+  <select class="form-select select-multiple w-100" 
+          name="category[]" 
+          id="category-select" 
+          multiple required>
+    <?php
+      $sql = "SELECT * FROM {$siteprefix}categories WHERE parent_id IS NULL";
+      $sql2 = mysqli_query($con, $sql);
+      while ($row = mysqli_fetch_array($sql2)) {
+        $selected = in_array($row['id'], $selected_categories) ? 'selected' : '';
+        echo '<option value="' . $row['id'] . '" ' . $selected . '>' . $row['category_name'] . '</option>';
+      }
+    ?>
+  </select>
 </div>
 
-<div class="mb-3" id="subcategory-container" style="display:block;">
-  <select class="form-select select-multiple w-100" name="subcategory[]" id="subcategory-select" multiple required>
-    <!-- Subcategories will be filled via JS -->
+<div class="mb-3" id="subcategory-container" style="display:none;">
+  <label>Subcategory</label>
+  <select class="form-select select-multiple w-100" 
+          name="subcategory[]" 
+          id="subcategory-select" 
+          multiple>
+    <!-- JS will fill and preselect -->
+  </select>
+</div>
+
+<div class="mb-3" id="subsubcategory-container" style="display:none;">
+  <label>Sub-Subcategory</label>
+  <select class="form-select select-multiple w-100" 
+          name="subsubcategory[]" 
+          id="subsubcategory-select" 
+          multiple>
+  </select>
+</div>
+
+<div class="mb-3" id="subsubsubcategory-container" style="display:none;">
+  <label>Sub-Sub-Subcategory</label>
+  <select class="form-select select-multiple w-100" 
+          name="subsubsubcategory[]" 
+          id="subsubsubcategory-select" 
+          multiple>
   </select>
 </div>
 
@@ -523,6 +549,7 @@ while ($row = $textResult->fetch_assoc()):
 <?php endwhile; ?>
 </div>
 </div>
+
 <div id="videoFields" style="display:none;">
 <div id="videoModules">
 <?php while ($row = $result->fetch_assoc()): ?>
@@ -732,67 +759,88 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 <script>
+  window.preselectedCategories    = <?php echo json_encode($selected_categories); ?>;
+  window.preselectedSubcategories = <?php echo json_encode($selected_subcategories); ?>;
+</script>
+<script>
 var $j = jQuery.noConflict();
 
-const selectedSubcategoryIds = <?= json_encode($selected_subcategories ?? []) ?>;
-const selectedCategoryIds = <?= json_encode($selected_categories ?? []) ?>;
+$j(document).ready(function () {
+  $j('.select-multiple').select2({ width: '100%' });
 
-function fetchSubcategoriesForEdit(categoryIds) {
-  const $subSelect = $j('#subcategory-select');
-  const $subContainer = $j('#subcategory-container');
-  $subSelect.html('');
+  function loadSubcategories(parentIds, $select, $container, preselectedValues, nextLoader) {
+    $select.html('');
+    if (!parentIds || parentIds.length === 0) {
+      $container.hide();
+      return;
+    }
 
-  if (!categoryIds.length) {
-    $subContainer.hide();
-    return;
+    // Fetch each parent_id individually (your get_subcategories.php)
+    let promises = parentIds.map(id => fetch(`get_subcategories.php?parent_id=${id}`).then(res => res.json()));
+
+    Promise.all(promises).then(results => {
+      let data = results.flat(); // merge arrays
+      if (data.length === 0) {
+        $container.hide();
+        return;
+      }
+
+      data.forEach(cat => {
+        let option = new Option(cat.title, cat.id, false, preselectedValues.includes(cat.id.toString()));
+        $select.append(option);
+      });
+
+      if ($select.hasClass('select2-hidden-accessible')) {
+        $select.select2('destroy');
+      }
+      $select.select2({ width: '100%' });
+      $container.show();
+
+      // Auto-load next tier for preselected values
+      if (preselectedValues.length > 0 && typeof nextLoader === 'function') {
+        // Pass only preselected children IDs to next tier
+        let childIds = data.filter(c => preselectedValues.includes(c.id.toString())).map(c => c.id);
+        if (childIds.length > 0) nextLoader(childIds);
+      }
+    });
   }
 
-  // Fetch all nested subcategories in one request
-  fetch(`get_subcategories.php?parent_ids=${categoryIds.join(',')}`)
-    .then(res => res.json())
-    .then(data => {
-      if (data.length > 0) {
-        // Build a map for parent-child relationships
-        const byParent = {};
-        data.forEach(cat => {
-          if (!byParent[cat.parent_id]) byParent[cat.parent_id] = [];
-          byParent[cat.parent_id].push(cat);
-        });
+  // Tier loaders
+  function loadTier2(categoryIds) {
+    loadSubcategories(categoryIds, $j('#subcategory-select'), $j('#subcategory-container'), window.preselectedSubcategories, loadTier3);
+  }
+  function loadTier3(subcategoryIds) {
+    loadSubcategories(subcategoryIds, $j('#subsubcategory-select'), $j('#subsubcategory-container'), window.preselectedSubcategories, loadTier4);
+  }
+  function loadTier4(subsubcategoryIds) {
+    loadSubcategories(subsubcategoryIds, $j('#subsubsubcategory-select'), $j('#subsubsubcategory-container'), window.preselectedSubcategories);
+  }
 
-        // Recursive rendering for nested subcategories
-        function renderOptions(parentId = null, level = 0) {
-          (byParent[parentId] || []).forEach(cat => {
-            const isSelected = selectedSubcategoryIds.includes(cat.s.toString()) ? 'selected' : '';
-            $subSelect.append(`<option value="${cat.s}" ${isSelected}>${'— '.repeat(level)}${cat.title}</option>`);
-            renderOptions(cat.s, level + 1);
-          });
-        }
-        renderOptions();
-
-        $subContainer.show();
-        if ($subSelect.hasClass('select2-hidden-accessible')) {
-          $subSelect.select2('destroy');
-        }
-        $subSelect.select2();
-      } else {
-        $subContainer.hide();
-      }
-    })
-    .catch(() => {
-      $subContainer.hide();
-    });
-}
-
-$j(document).ready(function () {
-  $j('.select-multiple').select2();
-
-  fetchSubcategoriesForEdit(selectedCategoryIds);
-
+  // On change handlers
   $j('#category-select').on('change', function () {
-    const selected = $j(this).val() || [];
-    fetchSubcategoriesForEdit(selected);
+    let categoryIds = $j(this).val() || [];
+    loadTier2(categoryIds);
+    $j('#subsubcategory-container, #subsubsubcategory-container').hide();
   });
+
+  $j('#subcategory-select').on('change', function () {
+    let subcategoryIds = $j(this).val() || [];
+    loadTier3(subcategoryIds);
+    $j('#subsubsubcategory-container').hide();
+  });
+
+  $j('#subsubcategory-select').on('change', function () {
+    let subsubcategoryIds = $j(this).val() || [];
+    loadTier4(subsubcategoryIds);
+  });
+
+  // Initial load (for update form)
+  if (window.preselectedCategories.length > 0) {
+    loadTier2(window.preselectedCategories);
+  }
 });
+
+
 </script>
 
 

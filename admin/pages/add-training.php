@@ -161,24 +161,46 @@
 <button type="button" id="addTicketBtn" class="btn btn-secondary">Add Another Ticket</button>
 </div>
 
-                         <div class="mb-3">
-                          <label>Category </label>
-                        <select class="form-select select-multiple w-100" name="category[]" id="category-select" multiple required>
-                          <option  disabled>- Select Category -</option>
-                          <?php
-                    $sql = "SELECT * FROM " . $siteprefix . "categories WHERE parent_id IS NULL ";
-                     $sql2 = mysqli_query($con, $sql);
-                     while ($row = mysqli_fetch_array($sql2)) {
-                     echo '<option value="' . $row['id'] . '">' . $row['category_name'] . '</option>'; }?>
-                        </select>
-                        </div>
+                    <div class="mb-3">
+  <label>Main Category</label>
+  <select class="form-select select-multiple w-100" 
+          id="category-select" 
+          name="category[]" 
+          multiple required>
+    <option disabled>- Select Category -</option>
+    <?php
+      $sql = "SELECT * FROM {$siteprefix}categories WHERE parent_id IS NULL";
+      $sql2 = mysqli_query($con, $sql);
+      while ($row = mysqli_fetch_array($sql2)) {
+          echo '<option value="' . $row['id'] . '">' . $row['category_name'] . '</option>';
+      }
+    ?>
+  </select>
+</div>
 
-                        <div class="mb-3" id="subcategory-container" style="display:none;">
-                            <label>SubCategory </label>
-                          <select  class="form-select select-multiple" name="subcategory[]" id="subcategory-select" multiple required>
-                            <option  disabled>- Select Subcategory -</option>
-                          </select>
-                        </div>
+<div class="mb-3" id="subcategory-container" style="display:none;">
+  <label>Subcategory</label>
+  <select class="form-select select-multiple w-100" 
+          id="subcategory-select" 
+          name="subcategory[]" 
+          multiple></select>
+</div>
+
+<div class="mb-3" id="subsubcategory-container" style="display:none;">
+  <label>Sub-Subcategory</label>
+  <select class="form-select select-multiple w-100" 
+          id="subsubcategory-select" 
+          name="subsubcategory[]" 
+          multiple></select>
+</div>
+
+<div class="mb-3" id="subsubsubcategory-container" style="display:none;">
+  <label>Sub-Sub-Subcategory</label>
+  <select class="form-select select-multiple w-100" 
+          id="subsubsubcategory-select" 
+          name="subsubsubcategory[]" 
+          multiple></select>
+</div>
 
     
 
@@ -520,52 +542,58 @@
 
           
                 <script>
-  var $j = jQuery.noConflict();
+var $j = jQuery.noConflict();
 
-  $j(document).ready(function () {
-    $j('.select-multiple').select2();
+$j(document).ready(function () {
+  $j('.select-multiple').select2();
 
-    $j('#category-select').on('change', function () {
-      const selectedCategories = Array.from(this.selectedOptions).map(opt => opt.value);
-      const $subSelect = $j('#subcategory-select');
-      const $subContainer = $j('#subcategory-container');
-
-      // Clear subcategory options
-      $subSelect.html('');
-
-      if (selectedCategories.length === 0) {
-      $subContainer.hide();
+  function loadSubcategories(parentId, $select, $container) {
+    $select.html('');
+    if (!parentId) {
+      $container.hide();
       return;
-      }
+    }
 
-      // Fetch all nested subcategories for selected categories
-      fetch(`get_subcategories.php?parent_ids=${selectedCategories.join(',')}`)
-      .then(response => response.json())
-      .then(allSubcats => {
-        let found = false;
-        allSubcats.forEach(cat => {
-        if ($subSelect.find(`option[value="${cat.s}"]`).length === 0) {
-          $subSelect.append(new Option(cat.title, cat.s));
-          found = true;
-        }
-        });
+    fetch(`get_subcategories.php?parent_id=${parentId}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.length > 0) {
+          data.forEach(cat => {
+            $select.append(new Option(cat.title, cat.id));
+          });
 
-        if (found) {
-        $subContainer.show();
-        if ($subSelect.hasClass('select2-hidden-accessible')) {
-          $subSelect.select2('destroy');
-        }
-        $subSelect.select2();
+         if ($select.hasClass('select2-hidden-accessible')) {
+  $select.select2('destroy');
+}
+$select.select2({ width: '100%' });
+          $container.show();
         } else {
-        $subContainer.hide();
+          $container.hide();
         }
-      })
-      .catch(error => {
-        console.error('Error fetching subcategories', error);
-        $subContainer.hide();
       });
-    });
+  }
+
+  // Tier 1 → Tier 2
+  $j('#category-select').on('change', function () {
+    let parentId = this.value;
+    loadSubcategories(parentId, $j('#subcategory-select'), $j('#subcategory-container'));
+    $j('#subsubcategory-container, #subsubsubcategory-container').hide();
   });
+
+  // Tier 2 → Tier 3
+  $j('#subcategory-select').on('change', function () {
+    let parentId = this.value;
+    loadSubcategories(parentId, $j('#subsubcategory-select'), $j('#subsubcategory-container'));
+    $j('#subsubsubcategory-container').hide();
+  });
+
+  // Tier 3 → Tier 4
+  $j('#subsubcategory-select').on('change', function () {
+    let parentId = this.value;
+    loadSubcategories(parentId, $j('#subsubsubcategory-select'), $j('#subsubsubcategory-container'));
+  });
+});
+
 </script>
 
             <?php include "footer.php"; ?>
