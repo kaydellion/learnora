@@ -144,76 +144,51 @@ $total_pages = ceil($total_reports / $limit);
             <?php endif; ?>
             </div>
               <!-- Subcategory Dropdown Chain -->
- 
-  <!-- Tier 1: Main Category (already selected by slug) -->
-  <!-- Tier 2: Subcategory -->
-  <div class="col-lg-3 col-12">
-    <div class="filter-item">
-      <label class="form-label">Subcategory</label>
-      <select class="form-select" id="subcategory-select" onchange="updateCategoryFilters()">
-        <option value="">-- Select Subcategory --</option>
-        <?php
-        $subcat_query = "SELECT slug, category_name FROM {$siteprefix}categories WHERE parent_id = '$id'";
-        $subcat_result = mysqli_query($con, $subcat_query);
-        while ($subcat_row = mysqli_fetch_assoc($subcat_result)) {
-          $selected = (isset($subcategory_chain[0]) && $subcategory_chain[0] === $subcat_row['slug']) ? 'selected' : '';
-          echo '<option value="' . htmlspecialchars($subcat_row['slug']) . '" ' . $selected . '>' . htmlspecialchars($subcat_row['category_name']) . '</option>';
-        }
-        ?>
-      </select>
-    </div>
-  </div>
-  <!-- Tier 3: Sub-subcategory -->
-  <div class="col-lg-3 col-12">
-    <div class="filter-item">
-      <label class="form-label">Sub-subcategory</label>
-      <select class="form-select" id="subsubcategory-select" onchange="updateCategoryFilters()">
-        <option value="">-- Select Sub-subcategory --</option>
-        <?php
-        $subcat_id = '';
-        if (isset($subcategory_chain[0])) {
-          $slug_safe = mysqli_real_escape_string($con, $subcategory_chain[0]);
-          $res = mysqli_query($con, "SELECT id FROM {$siteprefix}categories WHERE slug = '$slug_safe'");
-          if ($row = mysqli_fetch_assoc($res)) $subcat_id = $row['id'];
-        }
-        if ($subcat_id) {
-          $subsubcat_query = "SELECT slug, category_name FROM {$siteprefix}categories WHERE parent_id = '$subcat_id'";
-          $subsubcat_result = mysqli_query($con, $subsubcat_query);
-          while ($subsubcat_row = mysqli_fetch_assoc($subsubcat_result)) {
-            $selected = (isset($subcategory_chain[1]) && $subcategory_chain[1] === $subsubcat_row['slug']) ? 'selected' : '';
-            echo '<option value="' . htmlspecialchars($subsubcat_row['slug']) . '" ' . $selected . '>' . htmlspecialchars($subsubcat_row['category_name']) . '</option>';
-          }
-        }
-        ?>
-      </select>
-    </div>
-  </div>
-  <!-- Tier 4: Sub-sub-subcategory -->
-  <div class="col-lg-3 col-12">
-    <div class="filter-item">
-      <label class="form-label">Sub-sub-subcategory</label>
-      <select class="form-select" id="subsubsubcategory-select" onchange="updateCategoryFilters()">
-        <option value="">-- Select Sub-sub-subcategory --</option>
-        <?php
-        $subsubcat_id = '';
-        if (isset($subcategory_chain[1])) {
-          $slug_safe = mysqli_real_escape_string($con, $subcategory_chain[1]);
-          $res = mysqli_query($con, "SELECT id FROM {$siteprefix}categories WHERE slug = '$slug_safe'");
-          if ($row = mysqli_fetch_assoc($res)) $subsubcat_id = $row['id'];
-        }
-        if ($subsubcat_id) {
-          $subsubsubcat_query = "SELECT slug, category_name FROM {$siteprefix}categories WHERE parent_id = '$subsubcat_id'";
-          $subsubsubcat_result = mysqli_query($con, $subsubsubcat_query);
-          while ($subsubsubcat_row = mysqli_fetch_assoc($subsubsubcat_result)) {
-            $selected = (isset($subcategory_chain[2]) && $subcategory_chain[2] === $subsubsubcat_row['slug']) ? 'selected' : '';
-            echo '<option value="' . htmlspecialchars($subsubsubcat_row['slug']) . '" ' . $selected . '>' . htmlspecialchars($subsubsubcat_row['category_name']) . '</option>';
-          }
-        }
-        ?>
-      </select>
-    </div>
-  </div>
+              <div class="col-lg-5 col-12">
+                <div class="filter-item">
+                <label class="form-label">Filter by Subcategory</label>
+                    </div>
+                <div id="subcategory-filters">
+                  <?php
+                  $current_parent_id = $id;
+                  $chain_so_far = [];
 
+                  // Render dropdowns for existing selections
+                  foreach ($subcategory_chain as $slug_part) {
+                      $slug_safe = mysqli_real_escape_string($con, $slug_part);
+                      $res = mysqli_query($con, "SELECT id, slug, category_name FROM {$siteprefix}categories WHERE slug = '$slug_safe'");
+                      if (!$res || mysqli_num_rows($res) === 0) break;
+                      $sub_row = mysqli_fetch_assoc($res);
+                      $sub_id = $sub_row['id'];
+                      $chain_so_far[] = $slug_part;
+
+                      // Load siblings for this level
+                      $siblings = mysqli_query($con, "SELECT id, slug, category_name FROM {$siteprefix}categories WHERE parent_id = $current_parent_id");
+                      if (mysqli_num_rows($siblings) > 0) {
+                          echo '<select class="form-select mb-2" onchange="loadNextLevel(this)">';
+                          echo '<option value="">-- Select --</option>';
+                          while ($sib = mysqli_fetch_assoc($siblings)) {
+                              $selected = ($sib['slug'] == $slug_part) ? 'selected' : '';
+                              echo '<option value="'.$sib['slug'].'" '.$selected.'>'.$sib['category_name'].'</option>';
+                          }
+                          echo '</select>';
+                      }
+                      $current_parent_id = $sub_id;
+                  }
+
+                  // Show next level if available
+                  $children = mysqli_query($con, "SELECT id, slug, category_name FROM {$siteprefix}categories WHERE parent_id = $current_parent_id");
+                  if (mysqli_num_rows($children) > 0) {
+                      echo '<select class="form-select mb-2" onchange="loadNextLevel(this)">';
+                      echo '<option value="">-- Select --</option>';
+                      while ($child = mysqli_fetch_assoc($children)) {
+                          echo '<option value="'.$child['slug'].'">'.$child['category_name'].'</option>';
+                      }
+                      echo '</select>';
+                  }
+                  ?>
+                </div>
+              </div>
 
               <!-- Sort Dropdown -->
               <div class="col-12 col-md-4">
@@ -459,16 +434,14 @@ function sortReports(sortValue) {
 }
 
 // ✅ Multi-level subcategory loader
-function updateCategoryFilters() {
-  const subcat = document.getElementById('subcategory-select').value;
-  const subsubcat = document.getElementById('subsubcategory-select').value;
-  const subsubsubcat = document.getElementById('subsubsubcategory-select').value;
-  const chain = [];
-  if (subcat) chain.push(subcat);
-  if (subsubcat) chain.push(subsubcat);
-  if (subsubsubcat) chain.push(subsubsubcat);
-
+function loadNextLevel(selectEl) {
   const urlParams = new URLSearchParams(window.location.search);
+  let chain = [];
+
+  document.querySelectorAll('#subcategory-filters select').forEach(sel => {
+    if (sel.value) chain.push(sel.value);
+  });
+
   urlParams.set('subcategory', chain.join(','));
   window.location.search = urlParams.toString();
 }
