@@ -85,7 +85,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const options = {
                 amount: amount,
                 currency: 'NGN',
-                domain: 'sandbox', // change to 'live' when you go live
+                domain: 'live', // change to 'live' when you go live
                 key: '<?php echo $apikey; ?>', // your VPay public key
                 email: email,
                 transactionref: ref,
