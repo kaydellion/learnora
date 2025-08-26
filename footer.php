@@ -151,72 +151,38 @@
 <script>
 (() => {
     const vpayButton = document.querySelector(".vpay-button");
+    if (vpayButton) {
+        vpayButton.addEventListener("click", function () {
+            const options = {
+                amount: parseInt(document.getElementById("amount").value), // Use actual value
+                currency: 'NGN',
+                domain: 'live', // Change to 'live' in production
+               key: '<?php echo $apikey; ?>',// Replace with your actual VPay public key
+                email: document.getElementById("email-address").value,
+                transactionref: document.getElementById("ref").value,
+                customer_logo: 'https://www.vpay.africa/static/media/vpayLogo.91e11322.svg',
+                customer_service_channel: '+2348030007000, support@yourcompany.com',
+                txn_charge: 6,
+                txn_charge_type: 'flat',
+                onSuccess: function (response) {
+                    // Redirect to your success page
+                    window.location.href = document.getElementById("refer").value;
+                },
+                onExit: function (response) {
+                    alert("Payment was cancelled.");
+                }
+            };
 
-    if (!vpayButton) return; // Exit if button not found
-
-    vpayButton.addEventListener("click", function () {
-        const orderId = document.getElementById("ref")?.value || "";
-        const amount = parseInt(document.getElementById("amount")?.value) || 0;
-        const email = document.getElementById("email-address")?.value || "";
-        const successRedirect = document.getElementById("refer")?.value || "/";
-        const siteurl = document.getElementById("siteurl")?.value || "";
-
-        // ✅ Validate before opening payment modal
-        if (!amount || !email || !orderId) {
-            alert("Missing required checkout details. Please refresh and try again.");
-            return;
-        }
-
-        const options = {
-            amount: amount,
-            currency: 'NGN',
-            domain: 'live', // Use 'sandbox' for testing
-            key: '<?php echo $apikey; ?>', // Your LIVE public key
-            email: email,
-            transactionref: orderId, // Must be unique per transaction
-            customer_logo: siteurl + 'uploads/' + '<?php echo $siteimg; ?>',
-            customer_service_channel: '<?php echo $sitenumber; ?>, <?php echo $sitemail; ?>',
-            txn_charge: 6,
-            txn_charge_type: 'flat',
-
-            // ✅ Success Callback
-            onSuccess: function (response) {
-                console.log("Payment successful:", response);
-                window.location.href = successRedirect;
-            },
-
-            //  Exit / Abandoned Callback
-            onExit: function (response) {
-                console.log("Checkout abandoned:", response);
-
-                // Log abandoned checkout via AJAX
-                $.ajax({
-                    url: siteurl + "backend/checkout_abandoned_new",
-                    method: "POST",
-                    data: { abandoned_ref: orderId },
-                    success: function (res) {
-                        console.log("Abandoned checkout logged.");
-                        alert("No worries! Your payment was cancelled. You can try again anytime 😊");
-                    },
-                    error: function (err) {
-                        console.error("Failed to log abandoned checkout", err);
-                    }
-                });
+            if (window.VPayDropin) {
+                const { open, exit } = VPayDropin.create(options);
+                open();
+            } else {
+                alert("VPayDropin library not loaded.");
             }
-        };
-
-        // ✅ Open VPay Modal
-        if (window.VPayDropin) {
-            const { open } = VPayDropin.create(options);
-            open();
-        } else {
-            alert("Payment library not loaded. Please check your VPay script include.");
-        }
-    });
+        });
+    }
 })();
 </script>
-
-
 </body>
 
 </html>
