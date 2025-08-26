@@ -523,8 +523,6 @@ while ($row = $textResult->fetch_assoc()):
 <?php endwhile; ?>
 </div>
 </div>
-
-
 <div id="videoFields" style="display:none;">
 <div id="videoModules">
 <?php while ($row = $result->fetch_assoc()): ?>
@@ -670,11 +668,7 @@ while ($row = $textResult->fetch_assoc()):
 
 
 
-                    <script>
-                    document.addEventListener('DOMContentLoaded', function () {
-                        toggleQuizOption("<?= $quiz_type ?>");
-                    });
-                    </script>
+                 
 
           
                          <script>
