@@ -1208,10 +1208,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['addPlan'])) {
 // Approve payment
 // Approve payment
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['approve_payment'])) {
+
     $order_id = mysqli_real_escape_string($con, $_POST['order_id']);
     $user_id = mysqli_real_escape_string($con, $_POST['user_id']);
     $amount = mysqli_real_escape_string($con, $_POST['amount']);
     $date = date('Y-m-d H:i:s');
+     $fileuploadDir = '../../documents';
 
     $attachments = [];
 
