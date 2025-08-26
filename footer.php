@@ -149,53 +149,70 @@
   <!-- Main JS File -->
   <script src="<?php echo $siteurl; ?>assets/js/main.js"></script>
 <script>
-(() => {
+document.addEventListener("DOMContentLoaded", function () {
     const vpayButton = document.querySelector(".vpay-button");
-    const orderId = document.getElementById("ref").value; // Assuming this is the order reference ID
-    var siteurl = $('#siteurl').val();
-    if (vpayButton) {
-        vpayButton.addEventListener("click", function () {
-            const options = {
-                amount: parseInt(document.getElementById("amount").value), // Use actual value
-                currency: 'NGN',
-                domain: 'sandbox', // Change to 'live' in production
-                key: '<?php echo $apikey; ?>',// Replace with your actual VPay public key
-                email: document.getElementById("email-address").value,
-                transactionref: document.getElementById("ref").value,
-                customer_logo: siteurl + 'uploads/' + '<?php echo $siteimg; ?>',
-                customer_service_channel: '<?php echo $sitenumber; ?>,<?php echo $sitemail; ?>',
-                txn_charge: 6,
-                txn_charge_type: 'flat',
-                onSuccess: function (response) {
-                    // Redirect to your success page
-                    window.location.href = document.getElementById("refer").value;
-                },
-                onExit: function (response) {
-            // 🚀 Trigger AJAX when modal is closed without payment
-            $.ajax({
-                url: siteurl + "backend/checkout_abandoned_new",
-                method: "POST",
-                data: { abandoned_ref: orderId },
-                success: function(res){
-                    console.log("Abandoned checkout logged.");
-                                        alert('No worries! Your payment was cancelled. If you need help, feel free to reach out, or you can try checking out again anytime 😊');
-                },
-                error: function(err){
-                    console.error("Failed to log abandoned checkout", err);
-                }
-            });
-                }
-            };
 
-            if (window.VPayDropin) {
-                const { open, exit } = VPayDropin.create(options);
-                open();
-            } else {
-                alert("VPayDropin library not loaded.");
-            }
-        });
+    if (!vpayButton) {
+        console.error("VPay button not found.");
+        return;
     }
-})();
+
+    vpayButton.addEventListener("click", function () {
+        const siteurlEl = document.getElementById("siteurl");
+        const amountEl = document.getElementById("amount");
+        const emailEl = document.getElementById("email-address");
+        const refEl = document.getElementById("ref");
+        const referEl = document.getElementById("refer");
+
+        if (!siteurlEl || !amountEl || !emailEl || !refEl || !referEl) {
+            alert("Missing required payment fields.");
+            return;
+        }
+
+        const siteurl = siteurlEl.value;
+        const orderId = refEl.value;
+
+        const options = {
+            amount: parseFloat(amountEl.value), // Allows decimals
+            currency: 'NGN',
+            domain: 'sandbox', // Change to 'live' in production
+            key: '<?php echo $apikey; ?>', // Your VPay public key
+            email: emailEl.value,
+            transactionref: orderId,
+            customer_logo: siteurl + 'uploads/' + '<?php echo $siteimg; ?>',
+            customer_service_channel: '<?php echo $sitenumber; ?>,<?php echo $sitemail; ?>',
+            txn_charge: 6,
+            txn_charge_type: 'flat',
+            onSuccess: function (response) {
+                window.location.href = referEl.value;
+            },
+            onExit: function (response) {
+                // Use fetch instead of jQuery AJAX to avoid dependency
+                fetch(siteurl + "backend/checkout_abandoned_new", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                    body: "abandoned_ref=" + encodeURIComponent(orderId)
+                })
+                .then(res => res.text())
+                .then(() => {
+                    setTimeout(() => {
+                        alert('No worries! Your payment was cancelled. If you need help, feel free to reach out, or you can try checking out again anytime 😊');
+                    }, 500);
+                })
+                .catch(err => {
+                    console.error("Failed to log abandoned checkout", err);
+                });
+            }
+        };
+
+        if (window.VPayDropin) {
+            const { open, exit } = VPayDropin.create(options);
+            open();
+        } else {
+            alert("VPayDropin library not loaded.");
+        }
+    });
+});
 </script>
 
 </body>
