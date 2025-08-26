@@ -51,8 +51,9 @@ include "header.php";
                       <input type="email" class="form-control" name="email" id="email-address" placeholder="Your Email"  required="" value="<?php echo $email_address;?>" >
                     </div>
                     <input type="hidden" id="amount" value="<?php echo $order_total; ?>"/>
-              <input type="hidden" id="ref"   value="<?php echo  $order_id; ?>  "  />
-              <input type="hidden" id="refer" value="<?php echo $siteurl; ?>/pay_success.php?ref=<?php echo $order_id; ?> " />
+             <input type="hidden" id="ref" value="<?php echo trim($order_id); ?>" />
+<input type="hidden" id="refer" value="<?php echo $siteurl; ?>pay_success.php?ref=<?php echo urlencode($order_id); ?>" />
+
                     <div class="form-group mb-2">
                       <label for="phone">Phone Number</label>
                       <input type="tel" class="form-control" name="phone" id="mobile-number" placeholder="Your Phone Number" required="" value="<?php echo $phone_number;?>">
