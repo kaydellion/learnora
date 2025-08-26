@@ -158,7 +158,7 @@
             const options = {
                 amount: parseInt(document.getElementById("amount").value), // Use actual value
                 currency: 'NGN',
-                domain: 'sandbox', // Change to 'live' in production
+                domain: 'live', // Change to 'live' in production
                 key: '<?php echo $apikey; ?>',// Replace with your actual VPay public key
                 email: document.getElementById("email-address").value,
                 transactionref: document.getElementById("ref").value,
