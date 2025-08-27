@@ -518,7 +518,7 @@ if (isset($_POST['pricing']) && $_POST['pricing'] === 'paid') {
                     price = '$price',
                     seats = '$seats',
                     seatremain = '$seats'
-                WHERE ticket_id = '$ticket_id' 
+                WHERE s = '$ticket_id' 
                   AND training_id = '$training_id'");
         } else {
             // Insert new ticket
