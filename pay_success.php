@@ -312,7 +312,7 @@ while ($row = mysqli_fetch_assoc($sql_items_result)) {
             $video_res = mysqli_query($con, $video_sql);
             while ($vm = mysqli_fetch_assoc($video_res)) {
                 if (!empty($vm['file_path'])) {
-                    $filePath = $fileuploadDir . "/" . $vm['file_path'];
+                    $filePath = $documentPath . $vm['file_path'];
                     if (file_exists($filePath)) {
                         $attachments[] = $filePath;
                     }
@@ -326,7 +326,7 @@ while ($row = mysqli_fetch_assoc($sql_items_result)) {
             $text_res = mysqli_query($con, $text_sql);
             while ($tm = mysqli_fetch_assoc($text_res)) {
                 if (!empty($tm['file_path'])) {
-                    $filePath = $fileuploadDir . "/" . $tm['file_path'];
+                    $filePath = $documentPath . $tm['file_path'];
                     if (file_exists($filePath)) {
                         $attachments[] = $filePath;
                     }
