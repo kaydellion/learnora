@@ -364,11 +364,11 @@ $emailMessage .= "<p>Thank you for registering for:</p>";
 
 foreach ($emailDetails as $ed) {
     $emailMessage .= "<ul>
-        <li><strong>Training:</strong> {$ed['training_title']}</li>
-         <li>📅 <strong>Schedule:</strong> {$ed['date_time_str']}</li>
-        <li><strong>Format:</strong> {$ed['format']}</li>
-        <li><strong>Ticket:</strong> {$ed['ticket_name']}</li>
-        <li><strong>Amount Paid:</strong> {$ed['amount_paid']}</li>
+        <li>🎓 <strong>Training:</strong> {$ed['training_title']}</li>
+        <li>📅 <strong>Schedule:</strong> {$ed['date_time_str']}</li>
+        <li>🌍 <strong>Format:</strong> {$ed['format']}</li>
+        <li>⭐️ <strong>Ticket:</strong> {$ed['ticket_name']}</li>
+        <li>💰 <strong>Amount Paid:</strong> ₦{$ed['amount_paid']}</li>
     </ul>
     <p>Here's what to expect:</p>
     <ul>
