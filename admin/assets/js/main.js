@@ -2325,7 +2325,7 @@ document.getElementById('addTicketBtn').addEventListener('click', function () {
       <input type="text" class="form-control mb-2" name="ticket_name[]" placeholder="e.g. General Admission">
 
       <label class="form-label">Benefits</label>
-      <textarea class="form-control editor mb-2" name="ticket_benefits[]" placeholder="e.g. Certificate, Lunch"></textarea>
+      <textarea class="editor mb-2" name="ticket_benefits[]" placeholder="e.g. Certificate, Lunch"></textarea>
 
       <label class="form-label">Price</label>
       <input type="number" class="form-control mb-2" name="ticket_price[]" min="0" step="0.01" placeholder="e.g. 5000">

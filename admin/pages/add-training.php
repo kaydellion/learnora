@@ -148,7 +148,7 @@
   <label class="form-label">Ticket Name</label>
   <input type="text" class="form-control mb-2" name="ticket_name[]" placeholder="e.g. General Admission">
   <label class="form-label">Benefits</label>
-  <input type="text" class="form-control mb-2 editor" name="ticket_benefits[]" placeholder="e.g. Certificate, Lunch, Materials">
+  <textarea class="mb-2 editor" name="ticket_benefits[]" placeholder="e.g. Certificate, Lunch, Materials"></textarea>
   <label class="form-label">Price</label>
   <input type="number" class="form-control mb-2" name="ticket_price[]" min="0" step="0.01" placeholder="e.g. 5000">
   <label class="form-label">Number of Seats Available</label>
