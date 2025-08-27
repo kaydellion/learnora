@@ -1319,18 +1319,25 @@ $subject = "Your Training Registration Details";
 $sql_items = "SELECT 
                 oi.*, 
                 t.*, 
-                GROUP_CONCAT(DISTINCT DATE_FORMAT(tem.event_date, '%b %d, %Y') 
-                             ORDER BY tem.event_date SEPARATOR ', ') AS event_dates,
-                GROUP_CONCAT(DISTINCT CONCAT(
-                    DATE_FORMAT(tem.start_time, '%h:%i %p'),
-                    ' – ',
-                    DATE_FORMAT(tem.end_time, '%h:%i %p')
-                ) ORDER BY tem.event_date SEPARATOR ', ') AS event_times,
+                GROUP_CONCAT(
+                    DISTINCT CONCAT(
+                        DATE_FORMAT(tem.event_date, '%b %d, %Y'),
+                        ' (',
+                        DATE_FORMAT(tem.start_time, '%h:%i %p'),
+                        ' – ',
+                        DATE_FORMAT(tem.end_time, '%h:%i %p'),
+                        ')'
+                    )
+                    ORDER BY tem.event_date SEPARATOR ', '
+                ) AS event_datetime,
                 tt.ticket_name
               FROM {$siteprefix}order_items oi
-              JOIN {$siteprefix}training t ON oi.training_id = t.training_id
-              LEFT JOIN {$siteprefix}training_event_dates tem ON t.training_id = tem.training_id
-              LEFT JOIN {$siteprefix}training_tickets tt ON t.training_id = tt.training_id
+              JOIN {$siteprefix}training t 
+                   ON oi.training_id = t.training_id
+              LEFT JOIN {$siteprefix}training_event_dates tem 
+                   ON t.training_id = tem.training_id
+              LEFT JOIN {$siteprefix}training_tickets tt 
+                   ON oi.ticket_id = tt.ticket_id   -- ✅ safer: exact ticket
               WHERE oi.order_id = '$order_id'
               GROUP BY oi.item_id";
 
@@ -1341,8 +1348,8 @@ $attachments  = []; // collect all files here
 
 while ($row = mysqli_fetch_assoc($sql_items_result)) {
     // Dates / times (already grouped by SQL)
-    $date_str = $row['event_dates'] ?? '';
-    $time_str = $row['event_times'] ?? '';
+   $date_time_str = $row['event_datetime'] ?? '';
+
 
     // Delivery format details
     $format  = ucfirst($row['delivery_format']);
@@ -1420,8 +1427,7 @@ while ($row = mysqli_fetch_assoc($sql_items_result)) {
 
     $emailDetails[] = [
         'training_title' => $row['title'],
-        'date_str'       => $date_str,
-        'time_str'       => $time_str,
+        'date_time_str'  => $date_time_str,
         'format'         => $format,
         'ticket_name'    => $ticket_name,
         'amount_paid'    => $amount_paid,
@@ -1436,8 +1442,7 @@ $emailMessage = "<p>Hi $user_first_name,</p><p>Thank you for registering for:</p
 foreach ($emailDetails as $ed) {
     $emailMessage .= "<ul>
         <li>🎓 <strong>Training:</strong> {$ed['training_title']}</li>
-        <li>📅 <strong>Date(s):</strong> {$ed['date_str']}</li>
-        <li>🕒 <strong>Time:</strong> {$ed['time_str']}</li>
+        <li>📅 <strong>Schedule:</strong> {$ed['date_time_str']}</li>
         <li>🌍 <strong>Format:</strong> {$ed['format']}</li>
         <li>⭐️ <strong>Ticket:</strong> {$ed['ticket_name']}</li>
         <li>💰 <strong>Amount Paid:</strong> ₦{$ed['amount_paid']}</li>
