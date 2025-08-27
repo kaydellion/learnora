@@ -697,37 +697,9 @@ while ($row = $textResult->fetch_assoc()):
   <input type="file" class="form-control" name="promo_video" accept="video/*">
 </div>
 
-<ul class="list-group mb-4">
-  <h5>Trailer Videos</h5>
-  <?php
-  $sql3 = "SELECT * FROM " . $siteprefix . "training_videos WHERE training_id = '$training_id' AND video_type = 'trailer'";
-  $sql4 = mysqli_query($con, $sql3);
-  if (!$sql4) {
-    die("Query failed: " . mysqli_error($con));
-  }
-  while ($row = mysqli_fetch_array($sql4)) {
-    $videoId = $row['s'];
-    $filePath = $row['video_path'];
-  
-  ?>
-    <li class="list-group-item d-flex justify-content-between align-items-center" id="lesson_<?php echo $videoId; ?>">
-      <div>
-        <?php if (!empty($filePath)): ?>
-          📁 <a href="<?php echo $siteurl . 'documents/' . $filePath; ?>" target="_blank">View Uploaded Video</a>
-       
-        <?php endif; ?>
-      </div>
-      <button type="button" class="btn btn-sm btn-danger delete-video-trailer" data-video-id="<?php echo $videoId; ?>">
-        Delete
-      </button>
-    </li>
-  <?php } ?>
-</ul>
 
- <div class="mb-3">
-              <label class="form-label">Course Trailer/Intro Video (Optional)</label>
-              <input type="file" class="form-control" name="trailer_video" accept="video/*">
-            </div>
+              <input type="file" class="form-control" name="trailer_video" accept="video/*" hidden>
+
        
 
 
@@ -751,14 +723,6 @@ while ($row = $textResult->fetch_assoc()):
     </div>
   </div>
 </div>
-
-
-
-                    <script>
-                    document.addEventListener('DOMContentLoaded', function () {
-                        toggleQuizOption("<?= $quiz_type ?>");
-                    });
-                    </script>
 
           
                         <script>
