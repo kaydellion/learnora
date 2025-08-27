@@ -1337,7 +1337,7 @@ $sql_items = "SELECT
               LEFT JOIN {$siteprefix}training_event_dates tem 
                    ON t.training_id = tem.training_id
               LEFT JOIN {$siteprefix}training_tickets tt 
-                   ON oi.ticket_id = tt.ticket_id   -- ✅ safer: exact ticket
+                   ON oi.item_id = tt.s   
               WHERE oi.order_id = '$order_id'
               GROUP BY oi.item_id";
 
