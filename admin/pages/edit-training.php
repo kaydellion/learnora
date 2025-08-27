@@ -293,7 +293,7 @@ while ($row = mysqli_fetch_assoc($eventTypeQuery)) {
       <input type="text" class="form-control mb-2" name="ticket_name[]" value="<?php echo htmlspecialchars($ticket['ticket_name']); ?>" placeholder="e.g. General Admission">
 
       <label class="form-label">Benefits</label>
-      <input type="text" class="form-control mb-2" name="ticket_benefits[]" value="<?php echo htmlspecialchars($ticket['benefits']); ?>" placeholder="e.g. Certificate, Lunch, Materials">
+      <input type="text" class="form-control mb-2 editor" name="ticket_benefits[]" value="<?php echo htmlspecialchars($ticket['benefits']); ?>" placeholder="e.g. Certificate, Lunch, Materials">
 
       <label class="form-label">Price</label>
       <input type="number" class="form-control mb-2" name="ticket_price[]" min="0" step="0.01" value="<?php echo htmlspecialchars($ticket['price']); ?>" placeholder="e.g. 5000">

@@ -312,7 +312,7 @@ while ($row = mysqli_fetch_assoc($result)) {
     <input type="text" class="form-control mb-2" name="ticket_name[]" placeholder="e.g. General Admission">
 
     <label class="form-label">Benefits</label>
-    <input type="text" class="form-control mb-2" name="ticket_benefits[]" placeholder="e.g. Certificate, Lunch, Materials">
+    <input type="text" class="form-control mb-2 editor" name="ticket_benefits[]" placeholder="e.g. Certificate, Lunch, Materials">
 
     <label class="form-label">Price</label>
     <input type="number" class="form-control mb-2" name="ticket_price[]" min="0" step="0.01" placeholder="e.g. 5000">
