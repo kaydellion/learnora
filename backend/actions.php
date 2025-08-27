@@ -2230,25 +2230,30 @@ if (isset($_POST['video_embed_url']) && !empty($_POST['video_embed_url'])) {
     }
 }
 
-if ($_POST['pricing'] === 'paid') {
-    $ticket_ids = $_POST['ticket_ids'];
-    $ticket_names = $_POST['ticket_name'];
-    $ticket_benefits = $_POST['ticket_benefits'];
-    $ticket_prices = $_POST['ticket_price'];
-    $ticket_seats = $_POST['ticket_seats'];
+if (isset($_POST['pricing']) && $_POST['pricing'] === 'paid') {
+    $ticket_ids      = $_POST['ticket_ids']      ?? [];
+    $ticket_names    = $_POST['ticket_name']     ?? [];
+    $ticket_benefits = $_POST['ticket_benefits'] ?? [];
+    $ticket_prices   = $_POST['ticket_price']    ?? [];
+    $ticket_seats    = $_POST['ticket_seats']    ?? [];
 
     foreach ($ticket_names as $index => $name) {
-        $ticket_id = intval($ticket_ids[$index]); // This will be 0 if empty
-        $name = mysqli_real_escape_string($con, $name);
-        $benefits = mysqli_real_escape_string($con, $ticket_benefits[$index]);
-        $price = floatval($ticket_prices[$index]);
-        $seats = intval($ticket_seats[$index]);
+        $ticket_id = isset($ticket_ids[$index]) ? intval($ticket_ids[$index]) : 0;
+        $name      = mysqli_real_escape_string($con, $name ?? '');
+        $benefits  = mysqli_real_escape_string($con, $ticket_benefits[$index] ?? '');
+        $price     = floatval($ticket_prices[$index] ?? 0);
+        $seats     = intval($ticket_seats[$index] ?? 0);
 
         if ($ticket_id > 0) {
             // Update existing ticket
             mysqli_query($con, "UPDATE {$siteprefix}training_tickets 
-                SET ticket_name = '$name', benefits = '$benefits', price = '$price', seats = '$seats', seatremain = '$seats'
-                WHERE s = '$ticket_id' AND training_id = '$training_id'");
+                SET ticket_name = '$name',
+                    benefits = '$benefits',
+                    price = '$price',
+                    seats = '$seats',
+                    seatremain = '$seats'
+                WHERE s = '$ticket_id' 
+                  AND training_id = '$training_id'");
         } else {
             // Insert new ticket
             mysqli_query($con, "INSERT INTO {$siteprefix}training_tickets 
