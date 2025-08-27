@@ -28,6 +28,7 @@ $row = mysqli_fetch_assoc($result);
 // Format details
 $format = ucfirst($row['delivery_format']);
 $details = '';
+$fields    = []; // always initialize
 
 if ($format === 'Physical') {
     $fields = [
@@ -97,17 +98,6 @@ foreach ($fields as $col => $label) {
                     echo "<video controls width='100%' src='uploads/{$videoPath}'></video><hr>";
                 }
 
-                echo "<h5>Video Lessons</h5>";
-                $lessons = mysqli_query($con, "SELECT file_path, video_url FROM {$siteprefix}training_video_lessons WHERE training_id = '$id'");
-                while ($l = mysqli_fetch_assoc($lessons)) {
-                    $filePath = htmlspecialchars($l['file_path']);
-                    $videoUrl = htmlspecialchars($l['video_url']);
-                    if (!empty($videoUrl)) {
-                        echo "<p><iframe width='100%' height='315' src='{$videoUrl}' frameborder='0' allowfullscreen></iframe></p>";
-                    } elseif (!empty($filePath)) {
-                        echo "<p><video controls width='100%' src='documents/{$filePath}'></video></p>";
-                    }
-                }
 
                 // 3️⃣ Fetch from NEW training_video_modules
     echo "<h5>Video Modules</h5>";
