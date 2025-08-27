@@ -175,7 +175,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const options = {
             amount: parseFloat(amountEl.value), // Allows decimals
             currency: 'NGN',
-            domain: 'live', // Change to 'live' in production
+            domain: 'sandbox', // Change to 'live' in production
             key: '<?php echo $apikey; ?>', // Your VPay public key
             email: emailEl.value,
             transactionref: orderId,
