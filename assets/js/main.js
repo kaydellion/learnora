@@ -3029,6 +3029,7 @@ $('.wishlist-btn').click(function(e) {
 });
 
 
+
 document.getElementById('addTicketBtn').addEventListener('click', function () {
   const wrapper = document.getElementById('ticketWrapper');
   const ticketHTML = `
@@ -3037,7 +3038,7 @@ document.getElementById('addTicketBtn').addEventListener('click', function () {
       <input type="text" class="form-control mb-2" name="ticket_name[]" placeholder="e.g. General Admission">
 
       <label class="form-label">Benefits</label>
-      <input type="text" class="form-control mb-2" name="ticket_benefits[]" placeholder="e.g. Certificate, Lunch">
+      <textarea class="editor mb-2" name="ticket_benefits[]" placeholder="e.g. Certificate, Lunch"></textarea>
 
       <label class="form-label">Price</label>
       <input type="number" class="form-control mb-2" name="ticket_price[]" min="0" step="0.01" placeholder="e.g. 5000">
@@ -3047,4 +3048,18 @@ document.getElementById('addTicketBtn').addEventListener('click', function () {
     </div>
   `;
   wrapper.insertAdjacentHTML('beforeend', ticketHTML);
+  
+  // Re-init TinyMCE for new textarea
+  tinymce.remove('.editor');
+  tinymce.init({
+    selector: '.editor',
+    toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
+    tinycomments_mode: 'embedded',
+    tinycomments_author: 'Author name',
+    mergetags_list: [
+      { value: 'First.Name', title: 'First Name' },
+      { value: 'Email', title: 'Email' },
+    ],
+    ai_request: (request, respondWith) => respondWith.string(() => Promise.reject('See docs to implement AI Assistant')),
+  });
 });
