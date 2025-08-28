@@ -2618,7 +2618,9 @@ color: #fff;
 
 .btn-small{
   background-color: #6c757d;
-  padding:5px;
+  padding:10px;
+  font-size: 18px;
+  border-radius:24px;
  
  
 }

@@ -46,7 +46,7 @@ if ($result && mysqli_num_rows($result) > 0) {
         <select class="form-control" id="parentId" name="parentId">
             <option value="">-- Select Category --</option>
             <?php
-            $mainCategories = mysqli_query($con, "SELECT id, category_name FROM {$siteprefix}categories WHERE parent_id IS NULL ORDER BY category_name ASC");
+            $mainCategories = mysqli_query($con, "SELECT id, category_name FROM {$siteprefix}categories ORDER BY category_name ASC");
             while ($cat = mysqli_fetch_assoc($mainCategories)) {
                 $selected = ($cat['id'] == $parentId) ? 'selected' : '';
                 echo "<option value='{$cat['id']}' $selected>" . htmlspecialchars($cat['category_name']) . "</option>";

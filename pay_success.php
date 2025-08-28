@@ -242,23 +242,23 @@ $sql_items = "SELECT
                     DISTINCT CONCAT(
                         DATE_FORMAT(tem.event_date, '%b %d, %Y'),
                         ' (',
-                        DATE_FORMAT(tem.start_time, '%h:%i %p'),
+                        IFNULL(DATE_FORMAT(tem.start_time, '%h:%i %p'), 'N/A'),
                         ' – ',
-                        DATE_FORMAT(tem.end_time, '%h:%i %p'),
+                        IFNULL(DATE_FORMAT(tem.end_time, '%h:%i %p'), 'N/A'),
                         ')'
                     )
                     ORDER BY tem.event_date SEPARATOR ', '
                 ) AS event_datetime,
-    tt.ticket_name
-FROM {$siteprefix}order_items oi
-JOIN {$siteprefix}training t ON oi.training_id = t.training_id
-LEFT JOIN {$siteprefix}training_event_dates tem ON t.training_id = tem.training_id
-         LEFT JOIN {$siteprefix}training_tickets tt 
-                   ON oi.item_id = tt.s   
-WHERE oi.order_id = '$ref'
-GROUP BY oi.item_id";
-
-
+                tt.ticket_name
+              FROM {$siteprefix}order_items oi
+              JOIN {$siteprefix}training t 
+                   ON oi.training_id = t.training_id
+              LEFT JOIN {$siteprefix}training_event_dates tem 
+                   ON t.training_id = tem.training_id
+              LEFT JOIN {$siteprefix}training_tickets tt 
+                   ON oi.item_id = tt.s
+              WHERE oi.order_id = '$ref'
+              GROUP BY oi.item_id";
 
 
 $sql_items_result = mysqli_query($con, $sql_items);
