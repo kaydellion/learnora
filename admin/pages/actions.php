@@ -2290,6 +2290,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['addSubCategory'])) {
             $statusAction = "Duplicate Sub-Category!";
             $statusMessage = "Sub-category \"$subCategoryName\" already exists under the selected category.";
             showErrorModal2($statusAction, $statusMessage);
+             header("refresh:2; url=add-subcategory.php");
         } else {
             // Insert sub-category with unique slug
             $insertQuery = "INSERT INTO {$siteprefix}categories (parent_id, category_name, slug) VALUES ($parentId, '$subCategoryName', '$alt_title')";
@@ -2302,6 +2303,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['addSubCategory'])) {
                 $statusAction = "Error!";
                 $statusMessage = "Failed to add sub-category: " . mysqli_error($con);
                 showErrorModal2($statusAction, $statusMessage);
+                 header("refresh:2; url=add-subcategory.php");
             }
         }
     } else {
