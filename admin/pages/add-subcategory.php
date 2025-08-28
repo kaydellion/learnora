@@ -14,7 +14,7 @@
                     <select class="form-control" id="parentId" name="parentId" required>
                         <option value="">-- Select Category --</option>
                         <?php
-                        $result = mysqli_query($con, "SELECT id, category_name FROM {$siteprefix}categories WHERE parent_id IS NULL");
+                        $result = mysqli_query($con, "SELECT id, category_name FROM {$siteprefix}categories");
                         while ($row = mysqli_fetch_assoc($result)) {
                             echo "<option value='{$row['id']}'>" . htmlspecialchars($row['category_name']) . "</option>";
                         }
