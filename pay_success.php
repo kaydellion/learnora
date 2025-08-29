@@ -235,14 +235,22 @@ if (mysqli_query($con, $sql_update_order)) {
 $subject = "Order Confirmation";
 
 // === Fetch order items (grouping event dates into one row per training) ===
-$sql_items = "SELECT
+$sql_items = "
+    SELECT 
         oi.*,
         t.*,
         tt.ticket_name,
         tt.price,
-        DATE_FORMAT(tem.event_date, '%b %d, %Y') AS event_date,
-        DATE_FORMAT(STR_TO_DATE(tem.start_time, '%H:%i'), '%h:%i %p') AS start_time,
-        DATE_FORMAT(STR_TO_DATE(tem.end_time, '%H:%i'), '%h:%i %p') AS end_time
+        GROUP_CONCAT(
+            DISTINCT CONCAT(
+                DATE_FORMAT(tem.event_date, '%b %d, %Y'),
+                ' (',
+                DATE_FORMAT(tem.start_time, '%h:%i %p'),
+                ' – ',
+                DATE_FORMAT(tem.end_time, '%h:%i %p'),
+                ')'
+            ) ORDER BY tem.event_date SEPARATOR ', '
+        ) AS event_datetime
     FROM {$siteprefix}order_items oi
     JOIN {$siteprefix}training t 
         ON oi.training_id = t.training_id
@@ -250,7 +258,9 @@ $sql_items = "SELECT
         ON oi.item_id = tt.s
     LEFT JOIN {$siteprefix}training_event_dates tem
         ON t.training_id = tem.training_id
-    WHERE oi.order_id = '$ref'";
+    WHERE oi.order_id = '$ref'
+    GROUP BY oi.item_id
+";
 
 
 
@@ -262,15 +272,8 @@ $attachments = []; // initialize once outside loop
 while ($row = mysqli_fetch_assoc($sql_items_result)) {
     $training_id = $row['training_id'];
 
-    // Dates and Times
-    $date_time_str = '';
-    if (!empty($row['event_date'])) {
-        $date_time_str = $row['event_date'];
-        if (!empty($row['start_time']) && !empty($row['end_time'])) {
-            $date_time_str .= " ({$row['start_time']} – {$row['end_time']})";
-        }
-    }
-
+    // Dates and Times (already concatenated in SQL)
+    $date_time_str = $row['event_datetime'] ?? '';
 
     $format = ucfirst($row['delivery_format']);
     $details = '';
