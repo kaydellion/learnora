@@ -235,45 +235,40 @@ if (mysqli_query($con, $sql_update_order)) {
 $subject = "Order Confirmation";
 
 // === Fetch order items (grouping event dates into one row per training) ===
-$sql_items = "SELECT 
-    oi.*, 
-    t.*, 
-    tt.ticket_name,
-    tt.price,
-    tt.event_date AS ticket_event_date,
-    tt.start_time AS ticket_start_time,
-    tt.end_time AS ticket_end_time,
-    tem.event_date AS tem_event_date,
-    tem.start_time AS tem_start_time,
-    tem.end_time AS tem_end_time
-  FROM {$siteprefix}order_items oi
-  JOIN {$siteprefix}training t ON oi.training_id = t.training_id
-  LEFT JOIN {$siteprefix}training_tickets tt ON oi.item_id = tt.s
-  LEFT JOIN {$siteprefix}training_event_dates tem 
-    ON tt.training_id = tem.training_id 
-    AND tt.event_date = tem.event_date 
-    AND tt.start_time = tem.start_time
-  WHERE oi.order_id = '$ref'
-  GROUP BY oi.item_id";
-
+$sql_items = "SELECT
+        oi.*,
+        t.*,
+        tt.ticket_name,
+        tt.price,
+        DATE_FORMAT(tem.event_date, '%b %d, %Y') AS event_date,
+        DATE_FORMAT(STR_TO_DATE(tem.start_time, '%H:%i'), '%h:%i %p') AS start_time,
+        DATE_FORMAT(STR_TO_DATE(tem.end_time, '%H:%i'), '%h:%i %p') AS end_time
+    FROM {$siteprefix}order_items oi
+    JOIN {$siteprefix}training t 
+        ON oi.training_id = t.training_id
+    LEFT JOIN {$siteprefix}training_tickets tt 
+        ON oi.item_id = tt.s
+    LEFT JOIN {$siteprefix}training_event_dates tem
+        ON t.training_id = tem.training_id
+    WHERE oi.order_id = '$ref'";
 
 
 
 $sql_items_result = mysqli_query($con, $sql_items);
 
 $emailDetails = [];
-$attachments = [];
+$attachments = []; // initialize once outside loop
 
 while ($row = mysqli_fetch_assoc($sql_items_result)) {
     $training_id = $row['training_id'];
 
-    // Dates and Times (use ticket's event_date/start_time/end_time)
-     if (!empty($row['tem_event_date']) && !empty($row['tem_start_time']) && !empty($row['tem_end_time'])) {
-        $date_time_str = date('M d, Y', strtotime($row['tem_event_date'])) . ' (' .
-                         date('h:i A', strtotime($row['tem_start_time'])) . ' – ' .
-                         date('h:i A', strtotime($row['tem_end_time'])) . ')';
-    } else {
-        $date_time_str = 'To be scheduled';
+    // Dates and Times
+    $date_time_str = '';
+    if (!empty($row['event_date'])) {
+        $date_time_str = $row['event_date'];
+        if (!empty($row['start_time']) && !empty($row['end_time'])) {
+            $date_time_str .= " ({$row['start_time']} – {$row['end_time']})";
+        }
     }
 
 
