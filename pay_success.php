@@ -236,21 +236,22 @@ $subject = "Order Confirmation";
 
 // === Fetch order items (grouping event dates into one row per training) ===
 $sql_items = "
-    SELECT 
+    SELECT
         oi.*,
         t.*,
         tt.ticket_name,
         tt.price,
         GROUP_CONCAT(
-            DISTINCT CONCAT(
+            CONCAT(
                 DATE_FORMAT(tem.event_date, '%b %d, %Y'),
                 ' (',
-                DATE_FORMAT(tem.start_time, '%h:%i %p'),
+                DATE_FORMAT(STR_TO_DATE(tem.start_time, '%H:%i'), '%h:%i %p'),
                 ' – ',
-                DATE_FORMAT(tem.end_time, '%h:%i %p'),
+                DATE_FORMAT(STR_TO_DATE(tem.end_time, '%H:%i'), '%h:%i %p'),
                 ')'
-            ) ORDER BY tem.event_date SEPARATOR ', '
-        ) AS event_datetime
+            )
+            ORDER BY tem.event_date ASC SEPARATOR ', '
+        ) AS event_dates_times
     FROM {$siteprefix}order_items oi
     JOIN {$siteprefix}training t 
         ON oi.training_id = t.training_id
@@ -272,8 +273,9 @@ $attachments = []; // initialize once outside loop
 while ($row = mysqli_fetch_assoc($sql_items_result)) {
     $training_id = $row['training_id'];
 
-    // Dates and Times (already concatenated in SQL)
-    $date_time_str = $row['event_datetime'] ?? '';
+    // Dates and Times
+$date_time_str = $row['event_dates_times'];
+
 
     $format = ucfirst($row['delivery_format']);
     $details = '';
