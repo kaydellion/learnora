@@ -242,9 +242,9 @@ $sql_items = "SELECT
                     DISTINCT CONCAT(
                         DATE_FORMAT(tem.event_date, '%b %d, %Y'),
                         ' (',
-                        IFNULL(DATE_FORMAT(tem.start_time, '%h:%i %p'), 'N/A'),
+                        DATE_FORMAT(tem.start_time, '%h:%i %p'),
                         ' – ',
-                        IFNULL(DATE_FORMAT(tem.end_time, '%h:%i %p'), 'N/A'),
+                        DATE_FORMAT(tem.end_time, '%h:%i %p'),
                         ')'
                     )
                     ORDER BY tem.event_date SEPARATOR ', '
@@ -256,7 +256,7 @@ $sql_items = "SELECT
               LEFT JOIN {$siteprefix}training_event_dates tem 
                    ON t.training_id = tem.training_id
               LEFT JOIN {$siteprefix}training_tickets tt 
-                   ON oi.item_id = tt.s
+                   ON oi.item_id = tt.s   
               WHERE oi.order_id = '$ref'
               GROUP BY oi.item_id";
 
@@ -270,7 +270,7 @@ while ($row = mysqli_fetch_assoc($sql_items_result)) {
     $training_id = $row['training_id'];
 
     // Dates and Times
-$date_time_str = $row['event_datetime'] ?? '';
+     $date_time_str = $row['event_datetime'] ?? '';
 
     $format = ucfirst($row['delivery_format']);
     $details = '';

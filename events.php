@@ -533,7 +533,7 @@ while ($d = mysqli_fetch_assoc($dates_result)) {
           <div class="card-body">
             <!-- Nav tabs -->
             <ul class="nav nav-tabs tabb mb-3" id="courseTab" role="tablist">
-                   <?php if (!empty(trim($description))): ?>
+                   <?php if (!empty($description)): ?>
               <li class="nav-item" role="presentation">
                 <button class="nav-link active" id="info-tab" data-bs-toggle="tab" data-bs-target="#info" type="button" role="tab" aria-controls="info" aria-selected="true">
                   Course Info
@@ -602,11 +602,11 @@ while ($d = mysqli_fetch_assoc($dates_result)) {
             <!-- Tab panes -->
 
             <div class="tab-content" id="courseTabContent">
-
+			  <?php if (!empty($description)): ?>
 
               <div class="tab-pane fade show active" id="info" role="tabpanel" aria-labelledby="info-tab">
                 <div class="product-description mb-1">
-                  <?php if (!empty($description)): ?>
+                
                     <div class="accordion mb-3" id="benefitAccordion">
                       <div class="accordion-item">
                         <h2 class="accordion-header" id="headingBenefit">
@@ -656,11 +656,11 @@ while ($d = mysqli_fetch_assoc($dates_result)) {
                           </div>
                         </div>
                       </div>
-                    <?php endif; ?>
+                 
                     </div>
                 </div>
 				</div>
-
+   <?php endif; ?>
           
                 <div class="tab-pane fade" id="audience" role="tabpanel" aria-labelledby="audience-tab">
                   <div class="product-description mb-1">
