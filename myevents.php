@@ -64,6 +64,7 @@ WHERE t.user = '$user_id' GROUP BY t.training_id";
                 } else{
                 $i = 1;
                 while($row = mysqli_fetch_assoc($result)) {
+                  $ide = $row['s'];
                 $training_id = $row['training_id'];
         $title = $row['title'];
         $report_row = $row['s'];
@@ -92,7 +93,7 @@ WHERE t.user = '$user_id' GROUP BY t.training_id";
                   <td><span class="badge bg-<?php echo getBadgeColor($status); ?> me-1"><?php echo $status; ?></span></td>
                   <td>
                    <a href="edit-training.php?training=<?php echo $training_id; ?>" class="btn btn-sm btn-warning me-1"><i class="bx bx-edit-alt me-1"></i> Edit Report</a>
-                  <a  href="delete.php?action=delete&table=training&item=<?php echo $training_id; ?>&page=<?php echo $current_page; ?>" class="btn btn-sm btn-danger delete"><i class="bx bx-trash me-1"></i> Delete </a></td>
+                  <a  href="delete.php?action=delete&table=training&item=<?php echo $ide; ?>&page=<?php echo $current_page; ?>" class="btn btn-sm btn-danger delete"><i class="bx bx-trash me-1"></i> Delete </a></td>
                   </tr>
                   <?php $i++; }} ?>
                   </tbody>
