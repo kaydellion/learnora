@@ -239,14 +239,25 @@ $sql_items = "SELECT
     oi.*, 
     t.*, 
     tt.ticket_name,
-    tt.event_date,
-    tt.start_time,
-    tt.end_time
+    tt.price,
+    tt.event_date AS ticket_event_date,
+    tt.start_time AS ticket_start_time,
+    tt.end_time AS ticket_end_time,
+    tem.event_date AS tem_event_date,
+    tem.start_time AS tem_start_time,
+    tem.end_time AS tem_end_time
   FROM {$siteprefix}order_items oi
   JOIN {$siteprefix}training t ON oi.training_id = t.training_id
   LEFT JOIN {$siteprefix}training_tickets tt ON oi.item_id = tt.s
+  LEFT JOIN {$siteprefix}training_event_dates tem 
+    ON tt.training_id = tem.training_id 
+    AND tt.event_date = tem.event_date 
+    AND tt.start_time = tem.start_time
   WHERE oi.order_id = '$ref'
   GROUP BY oi.item_id";
+
+
+
 
 $sql_items_result = mysqli_query($con, $sql_items);
 
@@ -257,10 +268,10 @@ while ($row = mysqli_fetch_assoc($sql_items_result)) {
     $training_id = $row['training_id'];
 
     // Dates and Times (use ticket's event_date/start_time/end_time)
-    if (!empty($row['event_date']) && !empty($row['start_time']) && !empty($row['end_time'])) {
-        $date_time_str = date('M d, Y', strtotime($row['event_date'])) . ' (' .
-                         date('h:i A', strtotime($row['start_time'])) . ' – ' .
-                         date('h:i A', strtotime($row['end_time'])) . ')';
+     if (!empty($row['tem_event_date']) && !empty($row['tem_start_time']) && !empty($row['tem_end_time'])) {
+        $date_time_str = date('M d, Y', strtotime($row['tem_event_date'])) . ' (' .
+                         date('h:i A', strtotime($row['tem_start_time'])) . ' – ' .
+                         date('h:i A', strtotime($row['tem_end_time'])) . ')';
     } else {
         $date_time_str = 'To be scheduled';
     }
