@@ -11,10 +11,9 @@ $db_pass = "Y34GgwK(]h82Yg";
 $db_name = "projectr_learn";
 */
 
-
-$db_username = "projectr_learnorastore"; 
-$db_pass = "Y34GgwK(]h82Yg"; 
-$db_name = "projectr_learn";
+$db_username = "learnora_learnorastore"; 
+$db_pass = "7Ums6HDNrg)03*"; 
+$db_name = "learnora_learn";
 $conn = mysqli_connect ("$db_host","$db_username","$db_pass","$db_name");
 
 
