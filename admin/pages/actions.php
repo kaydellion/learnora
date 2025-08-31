@@ -1799,7 +1799,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['suspend_user'])) {
                     <p>This action has been taken to maintain the integrity and quality of our marketplace for all users.</p>
                     <p><strong>Reason for Suspension:</strong> $reason</p>
                     <p><strong>Duration:</strong> $duration_value $duration_type</p>
-                    <p>We kindly request that you review your account and take the necessary corrective steps. If you believe this suspension was made in error or would like to appeal the decision, please contact us at <a href='mailto:hello@projectreporthub.ng'>hello@projectreporthub.ng</a> with relevant details.</p>
+                    <p>We kindly request that you review your account and take the necessary corrective steps. If you believe this suspension was made in error or would like to appeal the decision, please contact us at <a href='mailto:hello@learnora.ng'>hello@learnora.ng</a> with relevant details.</p>
                     <p>Your cooperation is appreciated, and we look forward to resolving this matter promptly.</p>
                    
                 ";
