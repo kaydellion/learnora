@@ -424,8 +424,8 @@ $rating_data = calculateRating($training_id, $con, $siteprefix);
           }
         }
         else {
-        echo '<div class="alert alert-warning" role="alert">
-    No related products found. <a href="' . $siteurl . 'marketplace.php" class="alert-link">View more reports in marketplace</a>
+        echo '<div class="alert alert-warning text" role="alert">
+    No training found. <a href="' . $siteurl . 'marketplace.php" class="alert-link">View more reports in marketplace</a>
       </div>';
       }
         ?>
