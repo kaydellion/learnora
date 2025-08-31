@@ -371,7 +371,7 @@ while ($row = mysqli_fetch_assoc($result)) {
         LIMIT 10";
 
 $result = mysqli_query($con, $query);
-if ($result) {
+ if ($result && mysqli_num_rows($result) > 0) {
 while ($row = mysqli_fetch_assoc($result)) {
         $training_id = $row['training_id'];
         $title = $row['title'];
@@ -423,6 +423,11 @@ $rating_data = calculateRating($training_id, $con, $siteprefix);
             include "swiper-card.php"; // Use your existing product card template
           }
         }
+        else {
+        echo '<div class="alert alert-warning" role="alert">
+    No related products found. <a href="' . $siteurl . 'marketplace.php" class="alert-link">View more reports in marketplace</a>
+      </div>';
+      }
         ?>
       </div>
       <div class="recent-swiper-button-next swiper-button-next"></div>
