@@ -48,7 +48,7 @@
               </div>
               <!-- /Logo -->
               <p class="mb-4 text-center"><?php include "login.php"; ?></p>
-              <h4 class="mb-2">Welcome to Financial Models Store! 👋</h4>
+              <h4 class="mb-2">Welcome to Learnora, the training platform! 👋</h4>
               <p class="mb-4">Please sign-in to your account and start the adventure</p>
                                 <?php
                   if (isset($_GET['message'])) {

@@ -315,8 +315,9 @@ if (in_array($current_page, $excluded_pages)) {
               <li><a href="<?php echo $siteurl; ?>index.php" class="active">Home</a></li>
               <li><a href="<?php echo $siteurl; ?>about.php">About Us</a></li>
               <li><a href="<?php echo $siteurl; ?>blog.php">Blog</a></li>
-
-              <li><a href="<?php echo $siteurl; ?>create_ticket.php">Supports</a></li>
+               <?php if ($active_log == 0) { ?>
+              <li><a href="<?php echo $siteurl; ?>create_ticket.php">Support</a></li>
+              <?php } ?>
               <li><a href="<?php echo $siteurl; ?>loyalty-program.php">Loyalty Program</a></li>
 
 
