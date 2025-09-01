@@ -49,11 +49,11 @@
               <div class="row gy-4">
 
                 <div class="col-md-6">
-                  <input type="text" name="name" class="form-control" placeholder="Your Name" required="" value="<?php echo $display_name; ?>" readonly>
+                  <input type="text" name="name" class="form-control" placeholder="Your Name" required="" value="" readonly>
                 </div>
 
                 <div class="col-md-6 ">
-                  <input type="email" class="form-control" name="email" placeholder="Your Email" required=""  value="<?php echo $email_address ; ?>" readonly>
+                  <input type="email" class="form-control" name="email" placeholder="Your Email" required=""  value="" readonly>
                 </div>
 
                 <div class="col-md-12">

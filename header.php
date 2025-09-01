@@ -90,7 +90,6 @@ $excluded_pages = array(
   'my_orders.php',
   'manual_orders.php',
   'wallet.php',
-  'contact.php',
   'notifications.php',
   'sales.php',
   'reviews.php',
