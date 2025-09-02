@@ -65,6 +65,7 @@ $siteaccname= $row["account_name"];
 $site_bank= $row["site_bank"];
 $sitekeywords= $row["site_keywords"];
 $paymenturl = $row["payment_url"];
+$tinymce = $row["tinymce"];
 $google_map= $row["google_map"];} 
 
 $adminlink='admin'.$siteurl;

@@ -1488,6 +1488,7 @@ if(isset($_POST['settings'])){
     $google= $_POST['google_map'];
     $com_fee= $_POST['com_fee'];
     $affiliate_percentage= $_POST['affiliate_percentage'];
+    $tinymce= $_POST['tinymce'];
 
     $uploadDir = '../../uploads/';
     $fileKey='site_logo';
@@ -1501,12 +1502,9 @@ if(isset($_POST['settings'])){
         $logo = $siteimg; // Use the current picture  
     }
 
-
-    $update = mysqli_query($con,"UPDATE " . $siteprefix . "site_settings SET site_name='$name',site_bank='$site_bank', account_name='$account_name', affliate_percentage='$affiliate_percentage', commision_fee='$com_fee', account_number='$account_number', google_map='$google',  site_logo='$logo',  site_keywords='$keywords', site_url='$url', site_description='$description', site_mail='$email', site_number='$number', payment_url='$paymenturl', paystack_key='$apikey' WHERE s=1");
-
-
+    $update = mysqli_query($con,"UPDATE " . $siteprefix . "site_settings SET site_name='$name',site_bank='$site_bank', account_name='$account_name', affliate_percentage='$affiliate_percentage', commision_fee='$com_fee', account_number='$account_number', google_map='$google',  site_logo='$logo',  site_keywords='$keywords', site_url='$url', site_description='$description', site_mail='$email', site_number='$number', payment_url='$paymenturl', paystack_key='$apikey', tinymce='$tinymce' WHERE s=1");
     if($update){
-     $statusAction = "Successful";
+    $statusAction = "Successful";
     $statusMessage = "Settings Updated Successfully!";
     showSuccessModal2($statusAction, $statusMessage);
      header("refresh:2; url=settings.php");

@@ -71,7 +71,10 @@
                       <label class="form-label">Site Account Name</label>
                       <input type="text" name="account_name" class="form-control" value="<?php echo $siteaccname; ?>">
                     </div>
-
+                    <div class="mb-3">
+                      <label class="form-label">TinyMCE key</label>
+                      <input type="text" name="tinymce" class="form-control" value="<?php echo $tinymce; ?>">
+                    </div>
                     <div class="mb-3">
                       <label class="form-label">Google Map</label>
                       <input type="text" name="google_map" class="form-control" value="<?php echo $google_map; ?>">
