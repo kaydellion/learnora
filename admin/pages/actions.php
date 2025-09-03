@@ -2449,7 +2449,7 @@ if (isset($_POST['sendmessage'])) {
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['addforum'])) {
     $user_id = mysqli_real_escape_string($con, $_POST['user']);
     $title = mysqli_real_escape_string($con, $_POST['title']);
-    $article = mysqli_real_escape_string($con, $_POST['article']);
+    $article =  $_POST['article'];
     $categories = isset($_POST['category']) ? implode(',', array_map('intval', $_POST['category'])) : '';
     $created_at = date('Y-m-d H:i:s');
     $views = 0;
@@ -2526,7 +2526,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['editforum'])) {
     $forum_id = intval($_POST['forum_id']);
     $user_id = intval($_POST['user']);
     $title = mysqli_real_escape_string($con, $_POST['title']);
-    $article = mysqli_real_escape_string($con, $_POST['article']);
+    $article =  $_POST['article'];
     $categories = isset($_POST['category']) ? implode(',', array_map('intval', $_POST['category'])) : '';
     $updated_at = date('Y-m-d H:i:s');
     $message = "";

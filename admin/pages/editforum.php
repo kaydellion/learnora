@@ -9,7 +9,7 @@ if (isset($_GET['id'])) {
 
     // Prepare current values
     $current_title = htmlspecialchars($forum['title'] ?? '');
-    $current_article = htmlspecialchars($forum['article'] ?? '');
+    $current_article = $forum['article'];
     $current_categories = isset($forum['categories']) ? explode(',', $forum['categories']) : [];
     $current_image = $forum['featured_image'] ?? '';
 }
