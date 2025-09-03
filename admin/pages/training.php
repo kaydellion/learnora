@@ -43,7 +43,8 @@
                 $result = mysqli_query($con, $query);
                 $i = 1;
                 while($row = mysqli_fetch_assoc($result)) {
-                     $training_id = $row['training_id'];
+            $tid = $row['s'];
+          $training_id = $row['training_id'];
         $title = $row['title'];
         $alt_title = $row['alt_title'];
         $description = $row['description'];
@@ -82,7 +83,7 @@
                     </button>
                     <div class="dropdown-menu">
                     <a class="dropdown-item" href="edit-training.php?training=<?php echo $training_id; ?>"><i class="bx bx-edit-alt me-1"></i> Edit Training</a>
-                    <a class="dropdown-item delete" href="delete.php?action=delete&table=training&item=<?php echo $training_id; ?>&page=<?php echo $current_page; ?>"><i class="bx bx-trash me-1"></i> Delete</a>
+                    <a class="dropdown-item delete" href="delete.php?action=delete&table=training&item=<?php echo $tid; ?>&page=<?php echo $current_page; ?>"><i class="bx bx-trash me-1"></i> Delete</a>
                     </div>
                     </div>
                   </td>
