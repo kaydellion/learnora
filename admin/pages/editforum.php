@@ -59,7 +59,7 @@ if (isset($_GET['id'])) {
                     <div class="col-sm-12">
                         <div class="form-group">
                             <label class="form-label" for="editor">Enter Forum Details</label>
-                            <textarea class="form-control" id="editor" name="article"><?php echo $current_article; ?></textarea>
+                            <textarea class="editor" id="editor" name="article"><?php echo $current_article; ?></textarea>
                         </div>
                     </div>
 

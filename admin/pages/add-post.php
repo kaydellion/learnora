@@ -36,7 +36,7 @@
 
    <div class="col-sm-12">
    <div class="form-group">
-    <label class="form-label" for="editor">Article Content</label><textarea class="form-control editor" id="editor" name="article"></textarea>
+    <label class="form-label" for="editor">Article Content</label><textarea class="editor" id="editor" name="article"></textarea>
    </div></div>
 
   <input type="hidden" name="user" value="<?php echo $user_id; ?>">
