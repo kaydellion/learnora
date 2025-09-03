@@ -26,7 +26,7 @@ if (!$post) {
             <?php if (!empty($post['featured_image'])): ?>
                 <img src="<?php echo $imagePath . htmlspecialchars($post['featured_image']); ?>" class="img-fluid rounded mb-3" alt="Featured Image" />
             <?php endif; ?>
-            <p><?php echo nl2br(htmlspecialchars($post['article'])); ?></p>
+            <p><?php echo $post['article']; ?></p>
         </div>
     </div>
 
