@@ -89,7 +89,7 @@ else {
 
                 <div class="post-img">
 
-<img src="<?php echo $siteurl . $current_image; ?>" alt="Featured blog image" class="img-fluid" loading="lazy">
+<img src="<?php echo $siteurl . $current_image; ?>" alt="Featured blog image" class="img-fluid Featured-blog-image" loading="lazy">
                 </div>
 
                 <div class="article-content" data-aos="fade-up" data-aos-delay="100">

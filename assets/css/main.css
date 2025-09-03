@@ -10228,9 +10228,19 @@ padding:0 1rem;
 .recent-posts .title a:hover {
   color: var(--accent-color);
 }
+.Featured-blog-image{
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+}
+.post-author-image{
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
 
+}
 .recent-posts .post-author-img {
-
+  width: 50px;
   border-radius: 50%;
   margin-right: 15px;
 
