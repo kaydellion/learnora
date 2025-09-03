@@ -46,7 +46,7 @@ if (!empty($current_categories)) {
             $categoryNames[] = $catRow['category_name'];
         }
     }
-}
+} 
     $current_image = $imagePath.$forum['featured_image'] ?? '';
     $date = date('d M Y', strtotime($forum['created_at'] ?? ''));
 }
