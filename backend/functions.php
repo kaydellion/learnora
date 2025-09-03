@@ -41,7 +41,10 @@ function renderForumCommentsModern($parent_id, $forum_id, $con, $siteprefix, $im
     while ($comment = mysqli_fetch_assoc($comments)) {
         $userRes = mysqli_query($con, "SELECT display_name, profile_picture FROM {$siteprefix}users WHERE s='{$comment['user_id']}' LIMIT 1");
         $user = mysqli_fetch_assoc($userRes);
-        $avatar = !empty($user['profile_picture']) ? $imagePath . $user['profile_picture'] : $imagePath . 'user-avatar.png';
+     $avatar = !empty($user['profile_picture']) 
+    ? $siteurl . $imagePath . $user['profile_picture'] 
+    : $siteurl . $imagePath . 'user-avatar.png';
+
         $username = $user['display_name'] ?? 'User';
         $replyCountRes = mysqli_query($con, "SELECT COUNT(*) as cnt FROM ln_comments WHERE parent_comment_id='{$comment['s']}'");
         $replyCount = mysqli_fetch_assoc($replyCountRes)['cnt'];
