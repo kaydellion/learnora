@@ -10230,7 +10230,7 @@ padding:0 1rem;
 }
 .Featured-blog-image{
   width: 100%;
-  height: 300px;
+  height: auto;
   object-fit: cover;
 }
 .post-author-image{
