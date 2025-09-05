@@ -1365,6 +1365,7 @@ Participants attending training sessions abroad will need to obtain a visa indep
           $uploader = htmlspecialchars($row['display_name']);
           $alt_title = htmlspecialchars($row['slug']);
           $image_path = $imagePath . $row['featured_image'];
+           $views = htmlspecialchars($row['views']);
 
           // Fetch category names
           $catNames = [];
@@ -1382,6 +1383,11 @@ Participants attending training sessions abroad will need to obtain a visa indep
               }
             }
           }
+
+    $commentCountQuery = "SELECT COUNT(*) AS comment_count FROM ln_comments WHERE blog_id = '$s'";
+    $commentCountResult = mysqli_query($con, $commentCountQuery);
+    $commentCountRow = mysqli_fetch_assoc($commentCountResult);
+    $commentCount = $commentCountRow['comment_count'] ?? 0;
 
           include 'blog-card.php'; // Your card template
         }

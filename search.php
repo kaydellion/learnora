@@ -66,6 +66,30 @@ $total_result = mysqli_query($con, $total_query);
 $total_row = mysqli_fetch_assoc($total_result);
 $total_reports = $total_row['total'] ?? 0;
 $total_pages = ceil($total_reports / $limit);
+
+// Article (forum post) search
+$article_results = [];
+$article_term = mysqli_real_escape_string($con, $term);
+
+$article_sql = "SELECT fp.*, u.display_name
+    FROM {$siteprefix}forum_posts fp
+    LEFT JOIN {$siteprefix}users u ON fp.user_id = u.s
+    WHERE (
+        fp.title LIKE '%$article_term%' 
+        OR EXISTS (
+            SELECT 1 FROM {$siteprefix}categories c 
+            WHERE FIND_IN_SET(c.id, fp.categories) 
+              AND c.category_name LIKE '%$article_term%'
+        )
+      )
+    ORDER BY fp.created_at DESC
+    LIMIT $offset, $limit";
+
+$article_result = mysqli_query($con, $article_sql);
+$article_count = mysqli_num_rows($article_result);
+
+
+
 ?>
 
     <!-- Search Results Header Section -->
@@ -78,7 +102,7 @@ $total_pages = ceil($total_reports / $limit);
             <div class="col-lg-6 mb-4 mb-lg-0">
               <div class="results-count" data-aos="fade-right" data-aos-delay="200">
                 <h2>Search Results</h2>
-                <p>We found <span class="results-number"><?php echo $report_count; ?></span> results for <span class="search-term">"<?php echo $term; ?>"</span></p>
+                <p>We found <span class="results-number"><?php echo $report_count; ?></span> results for <span class="search-term">"<?php echo $term; ?>"</span> training</p>
               </div>
             </div>
                
@@ -216,6 +240,47 @@ $rating_data = calculateRating($training_id, $con, $siteprefix);
     </section><!-- /Category Pagination Section -->
 
 
+    <?php if ($article_count > 0): ?>
+<section id="article-results" class="article-results section">
+  <div class="container" data-aos="fade-up" data-aos-delay="100">
+    <h3>Articles matching "<?php echo htmlspecialchars($term); ?>"</h3>
+    <div class="row g-4">
+      <?php
+      while ($row = mysqli_fetch_assoc($article_result)) {
+          $s = $row['s'];
+          $title = htmlspecialchars($row['title']);
+          $date = date('d M Y', strtotime($row['created_at']));
+          $uploader = htmlspecialchars($row['display_name']);
+          $alt_title = htmlspecialchars($row['slug']);
+          $image_path = $imagePath.$row['featured_image'];
+          $views = htmlspecialchars($row['views']);
+
+          // Fetch category names
+          $catNames = [];
+          if (!empty($row['categories'])) {
+              $catIds = array_filter(array_map('intval', preg_split('/\s*,\s*/', trim($row['categories']))));
+              if (!empty($catIds)) {
+                  $catIdList = implode(',', $catIds);
+                  $catSql = "SELECT category_name FROM {$siteprefix}categories WHERE id IN ($catIdList)";
+                  $catRes = mysqli_query($con, $catSql);
+                  while ($catRow = mysqli_fetch_assoc($catRes)) {
+                      $catNames[] = $catRow['category_name'];
+                  }
+              }
+          }
+
+          $commentCountQuery = "SELECT COUNT(*) AS comment_count FROM ln_comments WHERE blog_id = '$s'";
+          $commentCountResult = mysqli_query($con, $commentCountQuery);
+          $commentCountRow = mysqli_fetch_assoc($commentCountResult);
+          $commentCount = $commentCountRow['comment_count'] ?? 0;
+
+          include 'blog-card.php'; // Your article card template
+      }
+      ?>
+    </div>
+  </div>
+</section>
+<?php endif; ?>
 
 </main>
 

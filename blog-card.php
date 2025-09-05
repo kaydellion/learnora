@@ -21,6 +21,10 @@
         </p>
       </div>
     </div>
+        <div class="post-stats d-flex justify-content-between mt-2">
+  <span class="views"><i class="bx bx-show"></i> <?php echo $views; ?> views</span>
+  <span class="comments"><i class="bx bx-comment"></i> <?php echo $commentCount; ?> comments</span>
+</div>
   </article>
   </a>
 </div>
