@@ -88,7 +88,7 @@ $article_sql = "SELECT fp.*, u.display_name
 $article_result = mysqli_query($con, $article_sql);
 $article_count = mysqli_num_rows($article_result);
 
-
+$total_results = $report_count + $article_count;
 
 ?>
 
@@ -102,7 +102,7 @@ $article_count = mysqli_num_rows($article_result);
             <div class="col-lg-6 mb-4 mb-lg-0">
               <div class="results-count" data-aos="fade-right" data-aos-delay="200">
                 <h2>Search Results</h2>
-                <p>We found <span class="results-number"><?php echo $report_count; ?></span> results for <span class="search-term">"<?php echo $term; ?>"</span> training</p>
+               <p>We found <span class="results-number"><?php echo $total_results; ?></span> results for <span class="search-term">"<?php echo $term; ?>  on Leanora.ng"</span> training and articles</p>
               </div>
             </div>
                
