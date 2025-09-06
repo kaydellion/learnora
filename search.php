@@ -241,7 +241,7 @@ $rating_data = calculateRating($training_id, $con, $siteprefix);
 
 
     <?php if ($article_count > 0): ?>
-<section id="article-results" class="article-results section">
+<section id="recent-posts" class="recent-posts section">
   <div class="container" data-aos="fade-up" data-aos-delay="100">
     <h3>Articles matching "<?php echo htmlspecialchars($term); ?>"</h3>
     <div class="row g-4">
