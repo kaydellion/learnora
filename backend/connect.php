@@ -66,7 +66,6 @@ $site_bank= $row["site_bank"];
 $sitekeywords= $row["site_keywords"];
 $paymenturl = $row["payment_url"];
 $tinymce = $row["tinymce"];
-$google_map= $row["google_map"];} 
 $default_keywords = $row['default_keywords'];
 $aboutkey        = $row['aboutkey'];
 $contactkey      = $row['contactkey'];
@@ -81,6 +80,8 @@ $statekey        = $row['statekey'];
 $monthkey        = $row['monthkey'];
 $countrykey      = $row['countrykey'];
 $formatkey       = $row['formatkey'];
+$google_map= $row["google_map"];} 
+
 
 $adminlink='admin'.$siteurl;
 
