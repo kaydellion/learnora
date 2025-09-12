@@ -1502,7 +1502,7 @@ if(isset($_POST['settings'])){
         $logo = $siteimg; // Use the current picture  
     }
 
-    $update = mysqli_query($con,"UPDATE " . $siteprefix . "site_settings SET site_name='$name',site_bank='$site_bank', account_name='$account_name', affliate_percentage='$affiliate_percentage', commision_fee='$com_fee', account_number='$account_number', google_map='$google',  site_logo='$logo',  site_keywords='$keywords', site_url='$url', site_description='$description', site_mail='$email', site_number='$number', payment_url='$paymenturl', paystack_key='$apikey', tinymce='$tinymce' WHERE s=1");
+    $update = mysqli_query($con,"UPDATE " . $siteprefix . "site_settings SET site_name='$name',site_bank='$site_bank',  default_keywords='$default_keywords', aboutkey='$aboutkey', contactkey='$contactkey', privacykey='$privacykey', cookiekey='$cookiekey', termskey='$termskey', whyuskey='$whyuskey', disclaimerkey='$disclaimerkey', blogkey='$blogkey', trainerskey='$trainerskey', statekey='$statekey', monthkey='$monthkey', countrykey='$countrykey', formatkey='$formatkey', account_name='$account_name', affliate_percentage='$affiliate_percentage', commision_fee='$com_fee', account_number='$account_number', google_map='$google',  site_logo='$logo',  site_keywords='$keywords', site_url='$url', site_description='$description', site_mail='$email', site_number='$number', payment_url='$paymenturl', paystack_key='$apikey', tinymce='$tinymce' WHERE s=1");
     if($update){
     $statusAction = "Successful";
     $statusMessage = "Settings Updated Successfully!";

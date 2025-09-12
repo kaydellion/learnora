@@ -67,6 +67,20 @@ $sitekeywords= $row["site_keywords"];
 $paymenturl = $row["payment_url"];
 $tinymce = $row["tinymce"];
 $google_map= $row["google_map"];} 
+$default_keywords = $row['default_keywords'];
+$aboutkey        = $row['aboutkey'];
+$contactkey      = $row['contactkey'];
+$privacykey      = $row['privacykey'];
+$cookiekey       = $row['cookiekey'];
+$termskey        = $row['termskey'];
+$whyuskey        = $row['whyuskey'];
+$disclaimerkey   = $row['disclaimerkey'];
+$blogkey         = $row['blogkey'];
+$trainerskey     = $row['trainerskey'];
+$statekey        = $row['statekey'];
+$monthkey        = $row['monthkey'];
+$countrykey      = $row['countrykey'];
+$formatkey       = $row['formatkey'];
 
 $adminlink='admin'.$siteurl;
 

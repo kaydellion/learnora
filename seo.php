@@ -17,8 +17,26 @@ $db_name = "learnora_learnorastore";
 $conn = mysqli_connect ("$db_host","$db_username","$db_pass","$db_name");
 
 
-$default_keywords = "Professional Training in Nigeria | Online Courses in Nigeria | Skill Development Programs in Nigeria | Corporate Training in Nigeria | Vocational Training in Nigeria";
-$meta_keywords = $default_keywords;
+// ✅ Fetch site settings (including keywords)
+$settings = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM ln_site_settings LIMIT 1"));
+
+$default_keywords = $settings['default_keywords'] ?? "Professional Training in Nigeria | Online Courses in Nigeria | Skill Development Programs in Nigeria | Corporate Training in Nigeria | Vocational Training in Nigeria";
+
+$aboutkey      = $settings['aboutkey']      ?? $default_keywords;
+$contactkey    = $settings['contactkey']    ?? $default_keywords;
+$privacykey    = $settings['privacykey']    ?? $default_keywords;
+$cookiekey     = $settings['cookiekey']     ?? $default_keywords;
+$termskey      = $settings['termskey']      ?? $default_keywords;
+$whyuskey      = $settings['whyuskey']      ?? $default_keywords;
+$disclaimerkey = $settings['disclaimerkey'] ?? $default_keywords;
+$blogkey       = $settings['blogkey']       ?? $default_keywords;
+$trainerskey   = $settings['trainerskey']   ?? $default_keywords;
+$statekey      = $settings['statekey']      ?? $default_keywords;
+$monthkey      = $settings['monthkey']      ?? $default_keywords;
+$countrykey    = $settings['countrykey']    ?? $default_keywords;
+$formatkey     = $settings['formatkey']     ?? $default_keywords;
+
+$meta_keywords   = $default_keywords;
 $meta_description = "Learnora offers professional training, online courses, corporate programs, skill development and vocational training across Nigeria.";
 $page_title = "Learnora";
 
@@ -55,21 +73,22 @@ if (isset($_GET['slugs']) || isset($_GET['slug'])) {
 } else {
     $current_page = $_SERVER['REQUEST_URI'];
 
+   
     $static_pages = [
-        "/" => ["Learnora - Professional Training & Online Courses in Nigeria", $default_keywords],
-        "/about" => ["About Us - Learnora", $default_keywords],
-        "/contact" => ["Contact Us - Learnora", $default_keywords],
-        "/privacy-policy" => ["Privacy Policy - Learnora", $default_keywords],
-        "/cookie-policy" => ["Cookie Policy - Learnora", $default_keywords],
-        "/terms" => ["Terms & Conditions - Learnora", $default_keywords],
-        "/why-us" => ["Why Choose Us - Learnora", $default_keywords],
-        "/disclaimer" => ["Disclaimer - Learnora", $default_keywords],
-        "/blog" => ["Learnora Blog - Training & Education in Nigeria", "Training and education blog in Nigeria | Skill development blog | Professional Training in Nigeria | Online Courses in Nigeria | Skill Development Programs in Nigeria | Corporate Training in Nigeria | Vocational Training in Nigeria"],
-        "/trainers" => ["Our Trainers - Learnora", $default_keywords],
-        "/events-by-state" => ["Events by State - Learnora", $default_keywords],
-        "/events-by-month" => ["Events by Month - Learnora", $default_keywords],
-        "/events-by-country" => ["Events by Country - Learnora", $default_keywords],
-        "/events-by-format" => ["Events by Format - Learnora", $default_keywords],
+        "/"                 => ["Learnora - Professional Training & Online Courses in Nigeria", $default_keywords],
+        "/about"            => ["About Us - Learnora", $aboutkey],
+        "/contact"          => ["Contact Us - Learnora", $contactkey],
+        "/privacy-policy"   => ["Privacy Policy - Learnora", $privacykey],
+        "/cookie-policy"    => ["Cookie Policy - Learnora", $cookiekey],
+        "/terms"            => ["Terms & Conditions - Learnora", $termskey],
+        "/why-us"           => ["Why Choose Us - Learnora", $whyuskey],
+        "/disclaimer"       => ["Disclaimer - Learnora", $disclaimerkey],
+        "/blog"             => ["Learnora Blog - Training & Education in Nigeria", $blogkey],
+        "/trainers"         => ["Our Trainers - Learnora", $trainerskey],
+        "/events-by-state"  => ["Events by State - Learnora", $statekey],
+        "/events-by-month"  => ["Events by Month - Learnora", $monthkey],
+        "/events-by-country"=> ["Events by Country - Learnora", $countrykey],
+        "/events-by-format" => ["Events by Format - Learnora", $formatkey],
     ];
 
     foreach ($static_pages as $path => $data) {
