@@ -1481,6 +1481,21 @@ if(isset($_POST['settings'])){
     $profilePicture = $_FILES['site_logo']['name'];
     $paymenturl = $_POST['paymenturl'];
     $apikey = $_POST['apikey'];
+    $default_keywords = $_POST['default_keywords'];
+    $aboutkey         = $_POST['aboutkey'];
+    $contactkey       = $_POST['contactkey'];
+    $privacykey       = $_POST['privacykey'];
+    $cookiekey        = $_POST['cookiekey'];
+    $termskey         = $_POST['termskey'];
+    $whyuskey         = $_POST['whyuskey'];
+    $disclaimerkey    = $_POST['disclaimerkey'];
+    $blogkey          = $_POST['blogkey'];
+    $trainerskey      = $_POST['trainerskey'];
+    $statekey         = $_POST['statekey'];
+    $monthkey         = $_POST['monthkey'];
+    $countrykey       = $_POST['countrykey'];
+    $formatkey        = $_POST['formatkey'];
+
 
     $site_bank= $_POST['site_bank'];
     $account_name= $_POST['account_name'];
