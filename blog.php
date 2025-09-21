@@ -107,17 +107,48 @@ while ($row = mysqli_fetch_assoc($result)) {
         </div>
       </div>
 
+
 <div class="pagination-container text-center mt-4">
   <?php if ($totalPages > 1): ?>
     <nav>
       <ul class="pagination justify-content-center">
-        <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-          <li class="page-item<?php if ($i == $page) echo ' active'; ?>">
-            <a class="page-link" href="?page=<?php echo $i; ?><?php if ($categoryFilter > 0) echo '&category=' . $categoryFilter; ?>">
-              <?php echo $i; ?>
-            </a>
-          </li>
-        <?php endfor; ?>
+        <?php
+        $adjacents = 2; // How many pages to show on each side of current
+        $start = ($page > $adjacents + 1) ? $page - $adjacents : 1;
+        $end = ($page + $adjacents < $totalPages) ? $page + $adjacents : $totalPages;
+
+        // Previous button
+        if ($page > 1) {
+          echo '<li class="page-item"><a class="page-link" href="?page='.($page-1).($categoryFilter > 0 ? '&category='.$categoryFilter : '').'">&laquo;</a></li>';
+        }
+
+        // First page
+        if ($start > 1) {
+          echo '<li class="page-item"><a class="page-link" href="?page=1'.($categoryFilter > 0 ? '&category='.$categoryFilter : '').'">1</a></li>';
+          if ($start > 2) {
+            echo '<li class="page-item disabled"><span class="page-link">...</span></li>';
+          }
+        }
+
+        // Page numbers
+        for ($i = $start; $i <= $end; $i++) {
+          $active = ($i == $page) ? ' active' : '';
+          echo '<li class="page-item'.$active.'"><a class="page-link" href="?page='.$i.($categoryFilter > 0 ? '&category='.$categoryFilter : '').'">'.$i.'</a></li>';
+        }
+
+        // Last page
+        if ($end < $totalPages) {
+          if ($end < $totalPages - 1) {
+            echo '<li class="page-item disabled"><span class="page-link">...</span></li>';
+          }
+          echo '<li class="page-item"><a class="page-link" href="?page='.$totalPages.($categoryFilter > 0 ? '&category='.$categoryFilter : '').'">'.$totalPages.'</a></li>';
+        }
+
+        // Next button
+        if ($page < $totalPages) {
+          echo '<li class="page-item"><a class="page-link" href="?page='.($page+1).($categoryFilter > 0 ? '&category='.$categoryFilter : '').'">&raquo;</a></li>';
+        }
+        ?>
       </ul>
     </nav>
   <?php endif; ?>
