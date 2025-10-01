@@ -138,7 +138,7 @@ AND EXISTS (
 )
 GROUP BY t.s 
 ORDER BY t.s DESC 
-LIMIT 20";
+LIMIT 8";
 
 $result = mysqli_query($con, $query);
 if ($result) {
@@ -373,7 +373,7 @@ while ($row = mysqli_fetch_assoc($result)) {
         )
         GROUP BY t.training_id
         ORDER BY o.date DESC 
-        LIMIT 10";
+        LIMIT 6";
 
 $result = mysqli_query($con, $query);
  if ($result && mysqli_num_rows($result) > 0) {
