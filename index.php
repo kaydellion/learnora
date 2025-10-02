@@ -40,7 +40,7 @@
                 <div class="col-lg-6 image-col" data-aos="fade-left" data-aos-delay="200">
                   <div class="sale-showcase">
                     <div class="main-product">
-                      <img src="<?php echo $siteurl; ?>assets/img/learnora-hero (2).png" alt="Sale Product">
+                      <img src="<?php echo $siteurl; ?>assets/img/learnora-hero (2).jpg" alt="Sale Product">
                       
                     </div>
                    
