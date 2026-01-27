@@ -1,0 +1,21 @@
+RewriteEngine On
+
+# Rewrite events URLs
+RewriteRule ^events/([^/]+)/?$ events.php?slug=$1 [L,QSA]
+
+# Rewrite event-type URLs  
+RewriteRule ^event-type/([^/]+)/?$ event-type.php?type=$1 [L,QSA]
+
+# Rewrite category URLs
+RewriteRule ^category/([^/]+)/?$ category.php?slug=$1 [L,QSA]
+
+# Rewrite trainers URLs
+RewriteRule ^trainers/?$ trainers.php [L,QSA]
+RewriteRule ^trainers/([^/]+)/?$ trainers.php?trainer=$1 [L,QSA]
+
+# Rewrite blog URLs
+RewriteRule ^blog/?$ blog.php [L,QSA]
+RewriteRule ^blog/([^/]+)/?$ view-blog.php?slug=$1 [L,QSA]
+
+# Rewrite marketplace URLs
+RewriteRule ^marketplace/?$ marketplace.php [L,QSA]

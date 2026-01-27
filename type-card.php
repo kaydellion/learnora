@@ -6,7 +6,7 @@
   <div class="promo-card card-2">
     <div class="promo-content">
       <p class="small-text"><?php echo $category_name; ?></p>
-      <a href="<?php echo $siteurl; ?>event-type/<?php echo $slugs; ?>" class="btn-shop">Shop Now</a>
+      <a href="<?php echo $siteurl; ?>event-type.php/<?php echo $slugs; ?>" class="btn-shop">Shop Now</a>
     </div>
     <div class="promo-image">
 

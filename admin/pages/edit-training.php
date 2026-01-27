@@ -128,7 +128,7 @@ if (!$training_data_set) {
                             <input type="hidden" id="training-id" name="training-id" class="form-control" value="<?php echo $training_id; ?>" readonly required>
                  <div id="preview1" class="preview-container">
                          <?php
-                         $sql3 = "SELECT * FROM ".$siteprefix."training_images WHERE training_id = '$training_id'";   
+                         $sql3 = "SELECT * FROM ".$siteprefix."training_images WHERE training_id = '$training_id' LIMIT 12";   
                          $sql4 = mysqli_query($con, $sql3);
                          if (!$sql4) {die("Query failed: " . mysqli_error($con)); }
                          while ($image_row = mysqli_fetch_array($sql4)) {
@@ -149,14 +149,9 @@ if (!$training_data_set) {
                         <label class="form-label" for="course-id">Training ID</label>
                         <input type="text" id="course-id" name="id" class="form-control" value="<?php echo $training_id; ?>" readonly required>
                     </div>
-                       <h6>Course Content Details</h6>
+                       <h6>Description</h6>
            
-              <textarea hidden class="form-control editor" name="course_description" rows="4"><?php echo $course_description; ?></textarea>
-         
-            <div class="mb-3">
-              <label class="form-label">Description</label>
-              <textarea class="form-control editor"  name="description" ><?php echo $description; ?></textarea>
-            </div>
+              <textarea class="form-control editor" name="description" rows="4"><?php echo $description; ?></textarea>
 
              <?php
 $event_datess = [];
@@ -236,7 +231,7 @@ while ($row = mysqli_fetch_assoc($result)) {
              <?php
 // Fetch event types from the database
 $eventTypes = [];
-$eventTypeQuery = mysqli_query($con, "SELECT s, name FROM {$siteprefix}event_types");
+$eventTypeQuery = mysqli_query($con, "SELECT s, name FROM {$siteprefix}event_types LIMIT 12");
 while ($row = mysqli_fetch_assoc($eventTypeQuery)) {
     $eventTypes[] = $row;
 }
@@ -279,7 +274,7 @@ while ($row = mysqli_fetch_assoc($eventTypeQuery)) {
   <?php
   $tickets = [];
   if ($pricing === 'paid') {
-      $ticketQuery = mysqli_query($con, "SELECT s, ticket_name, benefits, price, seats FROM {$siteprefix}training_tickets WHERE training_id = '$training_id'");
+      $ticketQuery = mysqli_query($con, "SELECT s, ticket_name, benefits, price, seats FROM {$siteprefix}training_tickets WHERE training_id = '$training_id' LIMIT 12");
       while ($row = mysqli_fetch_assoc($ticketQuery)) {
           $tickets[] = $row;
       }
@@ -334,7 +329,7 @@ while ($row = mysqli_fetch_assoc($eventTypeQuery)) {
           id="category-select" 
           multiple required>
     <?php
-      $sql = "SELECT * FROM {$siteprefix}categories WHERE parent_id IS NULL";
+      $sql = "SELECT * FROM {$siteprefix}categories WHERE parent_id IS NULL LIMIT 12";
       $sql2 = mysqli_query($con, $sql);
       while ($row = mysqli_fetch_array($sql2)) {
         $selected = in_array($row['id'], $selected_categories) ? 'selected' : '';
@@ -392,7 +387,7 @@ while ($row = mysqli_fetch_assoc($eventTypeQuery)) {
  <?php
     // Fetch instructors from the database
     $instructors = [];
-    $instructorQuery = mysqli_query($con, "SELECT s, name, photo FROM {$siteprefix}instructors");
+    $instructorQuery = mysqli_query($con, "SELECT s, name, photo FROM {$siteprefix}instructors LIMIT 12");
     while ($row = mysqli_fetch_assoc($instructorQuery)) {
         $instructors[] = $row;
     }
@@ -515,7 +510,7 @@ while ($row = mysqli_fetch_assoc($eventTypeQuery)) {
 <div id="textFields" style="display:none;">
   <div id="textModulesExisting">
 <?php
-$textResult = $con->query("SELECT * FROM {$siteprefix}training_texts_modules WHERE training_id = '{$training_id}' ORDER BY module_number ASC");
+$textResult = $con->query("SELECT * FROM {$siteprefix}training_texts_modules WHERE training_id = '{$training_id}' ORDER BY module_number ASC LIMIT 12");
 while ($row = $textResult->fetch_assoc()):
 ?>
   <div class="text-module mb-3 border p-3" data-module-id="<?php echo $row['id']; ?>">
@@ -619,7 +614,7 @@ while ($row = $textResult->fetch_assoc()):
 <ul class="list-group mb-4">
   <h5>Promo Videos</h5>
   <?php
-  $sql5 = "SELECT * FROM " . $siteprefix . "training_videos WHERE training_id = '$training_id' AND video_type = 'promo'";
+  $sql5 = "SELECT * FROM " . $siteprefix . "training_videos WHERE training_id = '$training_id' AND video_type = 'promo' LIMIT 12";
   $sql6 = mysqli_query($con, $sql5);
   if (!$sql6) {
     die("Query failed: " . mysqli_error($con));

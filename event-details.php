@@ -86,7 +86,7 @@ if (isset($_GET['slug'])) {
                 $course_description = $row['course_description'];
                 $image_paths = $imagePath . $row['event_image'];
                 $slug = $alt_title;
-                $training_video = $imagePath . $row['video_path'];
+                $training_video = !empty($row['video_path']) ? $imagePath . $row['video_path'] : '';
                 $event_type = $row['event_types'] ?? '';
                 $format = ucfirst($row['delivery_format']);
             }

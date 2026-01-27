@@ -10,68 +10,70 @@ $current_page = urlencode(pathinfo($_SERVER['PHP_SELF'], PATHINFO_FILENAME) . '?
 $code = "";
 if (isset($_COOKIE['userID'])) {
   $code = $_COOKIE['userID'];
+} elseif (isset($_SESSION['id'])) {
+  $code = $_SESSION['id'];
 }
-$check = "SELECT * FROM " . $siteprefix . "users WHERE s = '" . $code . "'";
-$query = mysqli_query($con, $check);
-if (mysqli_affected_rows($con) == 0) {
 
+$active_log = 0;
+$user_id = 0;
+$display_name = '';
+$profile_photo = '';
 
-  $active_log = 0;
-} else {
-  $sql = "SELECT * FROM " . $siteprefix . "users  WHERE s  = '" . $code . "'";
-  $sql2 = mysqli_query($con, $sql);
-  while ($row = mysqli_fetch_array($sql2)) {
-    $id = $row['s'];
-    $title                = $row['title'];
-    $display_name         = $row['display_name'];
-    $first_name           = $row['first_name'];
-    $middle_name          = $row['middle_name'];
-    $last_name            = $row['last_name'];
-    $company_name         = $row['company_name'];
-    $company_profile      = $row['company_profile'];
-    $company_logo         = $row['company_logo'];
-    $biography            = $row['biography'];
-    $loyalty_id           = $row['loyalty'];
-    $profile_photo        = $row['profile_photo'];
-    $age                  = $row['age'];
-    $gender               = $row['gender'];
-    $email_address        = $row['email_address'];
-    $phone_number         = $row['phone_number'];
-    $skills_hobbies       = $row['skills_hobbies'];
-    $language             = $row['language'];
-    $address              = $row['address'];
-    $bank_name = $row['bank_name'];
-    $bank_accname = $row['bank_accname'];
-    $bank_number = $row['bank_number'];
-    $proficiency          = $row['proficiency'];
-    $n_office_address     = $row['n_office_address'];
-    $f_office_address     = $row['f_office_address'];
-    $category             = $row['category'];
-    $subcategory          = $row['subcategory'];
-    $facebook             = $row['facebook'];
-    $last_login           = $row['last_login'];
-    $created_date         = $row['created_date'];
-    $instagram            = $row['instagram'];
-    $twitter              = $row['twitter'];
-    $linkedin             = $row['linkedin'];
-    $state                = $row['state'];
-    $lga                  = $row['lga'];
-    $country              = $row['country'];
-    $user_type            = $row['type'];
-    $wallet = $row['wallet'];
-    $trainer              = $row['trainer'];
-    $reset_token          = $row['reset_token'];
-    $reset_token_expiry   = $row['reset_token_expiry'];
-    // ...existing code... 
-    $_SESSION['user_role'] = $user_type;
-    $_SESSION['user_id'] = $id;
-    $_SESSION['user_trainer'] = $trainer;
+if (!empty($code)) {
+  $check = "SELECT * FROM " . $siteprefix . "users WHERE s = '" . mysqli_real_escape_string($con, $code) . "'";
+  $query = mysqli_query($con, $check);
+  if (mysqli_num_rows($query) > 0) {
+    while ($row = mysqli_fetch_array($query)) {
+      $id = $row['s'];
+      $title                = $row['title'];
+      $display_name         = $row['display_name'];
+      $first_name           = $row['first_name'];
+      $middle_name          = $row['middle_name'];
+      $last_name            = $row['last_name'];
+      $company_name         = $row['company_name'];
+      $company_profile      = $row['company_profile'];
+      $company_logo         = $row['company_logo'];
+      $biography            = $row['biography'];
+      $loyalty_id           = $row['loyalty'];
+      $profile_photo        = $row['profile_photo'];
+      $age                  = $row['age'];
+      $gender               = $row['gender'];
+      $email_address        = $row['email_address'];
+      $phone_number         = $row['phone_number'];
+      $bank_number          = $row['bank_number'];
+      $bank_name            = $row['bank_name'];
+      $bank_accname         = $row['bank_accname'];
+      $proficiency          = $row['proficiency'];
+      $n_office_address     = $row['n_office_address'];
+      $f_office_address     = $row['f_office_address'];
+      $address              = $row['address'];
+      $skills_hobbies       = $row['skills_hobbies'];
+      $category             = $row['category'];
+      $subcategory          = $row['subcategory'];
+      $facebook             = $row['facebook'];
+      $last_login           = $row['last_login'];
+      $created_date         = $row['created_date'];
+      $instagram            = $row['instagram'];
+      $twitter              = $row['twitter'];
+      $linkedin             = $row['linkedin'];
+      $state                = $row['state'];
+      $lga                  = $row['lga'];
+      $country              = $row['country'];
+      $user_type            = $row['type'];
+      $wallet = $row['wallet'];
+      $trainer              = $row['trainer'];
+      $reset_token          = $row['reset_token'];
+      $reset_token_expiry   = $row['reset_token_expiry'];
+      $_SESSION['user_role'] = $user_type;
+      $_SESSION['user_id'] = $id;
+      $_SESSION['user_trainer'] = $trainer;
 
-    $active_log = 1;
-    $user_id = $id;
-    $username = $display_name;
-    $user_reg_date = formatDateTime($created_date);
-    $user_lastseen = formatDateTime($last_login);
+      $active_log = 1;
+      $user_id = $id;
+      $username = $display_name;
+      $user_reg_date = formatDateTime($created_date);
+      $user_lastseen = formatDateTime($last_login);
+    }
   }
 }
 
@@ -185,7 +187,7 @@ if (in_array($current_page, $excluded_pages)) {
              style="background-color: #f36127; color: white; font-weight: bold; border-radius: 4px;">
             Trainers
           </a>
-          <a href="<?php echo $siteurl;?>marketplace" class="btn btn-sm me-2" 
+          <a href="<?php echo $siteurl;?>marketplace.php" class="btn btn-sm me-2" 
              style="background-color: #f36127; color: white; font-weight: bold; border-radius: 4px;">
             Marketplace
           </a>
@@ -243,13 +245,13 @@ if (in_array($current_page, $excluded_pages)) {
                     <p class="mb-0">Access account &amp; manage orders</p>
                 </div>
                 <div class="dropdown-footer">
-                  <a href="<?php echo $siteurl; ?>login" class="btn btn-primary w-100 mb-2">Sign In</a>
-                  <a href="<?php echo $siteurl; ?>register" class="btn btn-outline-primary w-100">Register</a>
+                  <a href="<?php echo $siteurl; ?>login.php" class="btn btn-primary w-100 mb-2">Sign In</a>
+                  <a href="<?php echo $siteurl; ?>register.php" class="btn btn-outline-primary w-100">Register</a>
                 </div>
               <?php } else { ?>
               </div>
               <div class="dropdown-body">
-                <a class="dropdown-item d-flex align-items-center" href="<?php echo $siteurl; ?>dashboard">
+                <a class="dropdown-item d-flex align-items-center" href="<?php echo $siteurl; ?>dashboard.php">
                   <i class="bi bi-person-circle me-2"></i>
                   <span>My Profile</span>
                 </a>
@@ -257,7 +259,7 @@ if (in_array($current_page, $excluded_pages)) {
                   <i class="bi bi-bag-check me-2"></i>
                   <span>My Orders</span>
                 </a>
-                <a class="dropdown-item d-flex align-items-center" href="<?php echo $siteurl; ?>my_wishlist">
+                <a class="dropdown-item d-flex align-items-center" href="<?php echo $siteurl; ?>my_wishlist.php">
                   <i class="bi bi-heart me-2"></i>
                   <span>My Wishlist</span>
                 </a>
@@ -280,7 +282,7 @@ if (in_array($current_page, $excluded_pages)) {
             if ($wishlist_count === null) $wishlist_count = 0;
           }
           ?>
-          <a href="<?php echo $siteurl; ?>my_wishlist" class="header-action-btn d-none d-md-block">
+          <a href="<?php echo $siteurl; ?>my_wishlist.php" class="header-action-btn d-none d-md-block">
             <i class="bi bi-heart"></i>
             <span class="action-text d-none d-md-inline-block">Wishlist</span>
             <span class="badge wishlist-count"><?php echo $wishlist_count; ?></span>

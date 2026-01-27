@@ -77,9 +77,9 @@ checkActiveLog($active_log);
                 <div class="form-header">
                   <h3>PERSONAL DETAILS</h3>
                  
+
                 </div>
             <form class="checkout-form-element" method="post" enctype="multipart/form-data">
-              <input type="hidden" name="action" value="">
   <!-- PERSONAL DETAILS -->
   <div class="row">
     <div class="col-md-3 form-group">
@@ -133,30 +133,41 @@ checkActiveLog($active_log);
       <input type="tel" class="form-control" name="phone" id="phone" placeholder="Your Phone Number" value="<?php echo $phone_number; ?>" required>
     </div>
   </div>
-<div class="row mt-3">
-					  <div class="col-md-6 form-group">
-					  <label>Password:</label>
-				   <div class="input-group">
-					<input type="password" class="form-control" id="password" name="password" placeholder="Password">
-					<div class="input-group-append">
-					<span class="input-group-text p-3" onclick="togglePasswordVisibility('password')">
-						<i class="bi bi-eye" id="togglePasswordIcon"></i>
-														</span>
-													</div>
-												</div>
-					</div>
-                   <div class="col-md-6 form-group">
-                  <label>Password:</label>
-                                  <div class="input-group">
-                                        <input type="password" class="form-control" id="retypePassword" name="retypePassword" placeholder="Password" >
-                                        <div class="input-group-append">
-                                            <span class="input-group-text p-3" onclick="togglePasswordVisibility('retypePassword')">
-                                                <i class="bi bi-eye" id="toggleRetypePasswordIcon"></i>
-                                            </span>
-                                        </div>
-                                    </div>
-                                  </div>
-                                </div>
+  <div class="row mt-3">
+    <div class="col-md-4 form-group">
+      <label>Old Password:</label>
+      <div class="input-group">
+        <input type="password" class="form-control" id="oldpassword" name="oldpassword" placeholder="Old Password">
+        <div class="input-group-append">
+          <span class="input-group-text p-3" onclick="togglePasswordVisibility('oldpassword')">
+            <i class="bi bi-eye" id="toggleOldPasswordIcon"></i>
+          </span>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4 form-group">
+      <label>New Password:</label>
+      <div class="input-group">
+        <input type="password" class="form-control" id="password" name="password" placeholder="New Password">
+        <div class="input-group-append">
+          <span class="input-group-text p-3" onclick="togglePasswordVisibility('password')">
+            <i class="bi bi-eye" id="togglePasswordIcon"></i>
+          </span>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4 form-group">
+      <label>Confirm Password:</label>
+      <div class="input-group">
+        <input type="password" class="form-control" id="retypePassword" name="retypePassword" placeholder="Confirm Password">
+        <div class="input-group-append">
+          <span class="input-group-text p-3" onclick="togglePasswordVisibility('retypePassword')">
+            <i class="bi bi-eye" id="toggleRetypePasswordIcon"></i>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
   <div class="form-group mt-3">
     <label for="skills">Skills and Hobbies</label>
     <textarea class="form-control editor" name="skills" id="skills" placeholder="List your skills and hobbies"><?php echo $skills_hobbies; ?></textarea>

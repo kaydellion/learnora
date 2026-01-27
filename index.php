@@ -162,7 +162,7 @@ while ($row = mysqli_fetch_assoc($result)) {
     
 
            // Fetch price variations for this report
-    $priceSql = "SELECT price FROM {$siteprefix}training_tickets WHERE training_id = '$training_id'";
+    $priceSql = "SELECT price FROM {$siteprefix}training_tickets WHERE training_id = '$training_id' LIMIT 12";
     $priceRes = mysqli_query($con, $priceSql);
     $prices = [];
     while ($priceRow = mysqli_fetch_assoc($priceRes)) {
@@ -180,7 +180,7 @@ while ($row = mysqli_fetch_assoc($result)) {
         $price = $minPrice; // Use min price for sorting or other logic
     }
 
-            $sql_resource_type = "SELECT name FROM {$siteprefix}event_types WHERE s = $event_type";
+            $sql_resource_type = "SELECT name FROM {$siteprefix}event_types WHERE s = $event_type LIMIT 12";
             $result_resource_type = mysqli_query($con, $sql_resource_type);
 
             while ($typeRow = mysqli_fetch_assoc($result_resource_type)) {
@@ -195,7 +195,7 @@ $rating_data = calculateRating($training_id, $con, $siteprefix);
 ?>
        </div>
   <div class="text-center mt-5" data-aos="fade-up">
-          <a href="<?php echo $siteurl; ?>marketplace" class="view-all-btn">View All Events <i class="bi bi-arrow-right"></i></a>
+          <a href="<?php echo $siteurl; ?>marketplace.php" class="view-all-btn">View All Events <i class="bi bi-arrow-right"></i></a>
 
 		  <?php } else {  echo 'No Events found.'; }?>
         </div>
@@ -213,7 +213,7 @@ $rating_data = calculateRating($training_id, $con, $siteprefix);
 
         <div class="row g-4">
                <?php
-                $query = "SELECT * FROM ".$siteprefix."event_types";
+                $query = "SELECT * FROM ".$siteprefix."event_types LIMIT 12";
                 $result = mysqli_query($con, $query);
                 if ($result) {
                     while ($row = mysqli_fetch_assoc($result)) {
@@ -277,14 +277,14 @@ while ($row = mysqli_fetch_assoc($result)) {
         $catIds = array_filter(array_map('intval', $catIds)); // convert to int & filter empty
         if (!empty($catIds)) {
             $catIdList = implode(',', $catIds);
-            $catSql = "SELECT id, category_name FROM {$siteprefix}categories WHERE id IN ($catIdList)";
+            $catSql = "SELECT id, category_name FROM {$siteprefix}categories WHERE id IN ($catIdList) LIMIT 12";
             $catRes = mysqli_query($con, $catSql);
             while ($catRow = mysqli_fetch_assoc($catRes)) {
                 $catNames[] = $catRow['category_name'];
             }
         }
     }
-          $commentCountQuery = "SELECT COUNT(*) AS comment_count FROM ln_comments WHERE blog_id = '$s'";
+          $commentCountQuery = "SELECT COUNT(*) AS comment_count FROM ln_comments WHERE blog_id = '$s' LIMIT 12";
     $commentCountResult = mysqli_query($con, $commentCountQuery);
     $commentCountRow = mysqli_fetch_assoc($commentCountResult);
     $commentCount = $commentCountRow['comment_count'] ?? 0;
@@ -397,7 +397,7 @@ while ($row = mysqli_fetch_assoc($result)) {
     
 
            // Fetch price variations for this report
-    $priceSql = "SELECT price FROM {$siteprefix}training_tickets WHERE training_id = '$training_id'";
+    $priceSql = "SELECT price FROM {$siteprefix}training_tickets WHERE training_id = '$training_id' LIMIT 12";
     $priceRes = mysqli_query($con, $priceSql);
     $prices = [];
     while ($priceRow = mysqli_fetch_assoc($priceRes)) {
@@ -415,7 +415,7 @@ while ($row = mysqli_fetch_assoc($result)) {
         $price = $minPrice; // Use min price for sorting or other logic
     }
 
-            $sql_resource_type = "SELECT name FROM {$siteprefix}event_types WHERE s = $event_type";
+            $sql_resource_type = "SELECT name FROM {$siteprefix}event_types WHERE s = $event_type LIMIT 12";
             $result_resource_type = mysqli_query($con, $sql_resource_type);
 
             while ($typeRow = mysqli_fetch_assoc($result_resource_type)) {

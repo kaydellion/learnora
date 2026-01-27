@@ -160,7 +160,7 @@ $total_pages = ceil($total_reports / $limit);
 
         
            // Fetch price variations for this report
-    $priceSql = "SELECT price FROM {$siteprefix}training_tickets WHERE training_id = '$training_id'";
+    $priceSql = "SELECT price FROM {$siteprefix}training_tickets WHERE training_id = '$training_id' LIMIT 12";
     $priceRes = mysqli_query($con, $priceSql);
     $prices = [];
     while ($priceRow = mysqli_fetch_assoc($priceRes)) {
@@ -180,7 +180,7 @@ $total_pages = ceil($total_reports / $limit);
 
     
 
-            $sql_resource_type = "SELECT name FROM {$siteprefix}event_types WHERE s = $event_type";
+            $sql_resource_type = "SELECT name FROM {$siteprefix}event_types WHERE s = $event_type LIMIT 12";
             $result_resource_type = mysqli_query($con, $sql_resource_type);
 
             while ($typeRow = mysqli_fetch_assoc($result_resource_type)) {

@@ -21,9 +21,12 @@ $db_name = "learnora_learnorastore";
 */
 
 
-$db_username = "learnora_learn"; 
-$db_pass = "7Ums6HDNrg)03*"; 
+$db_username = "root"; 
+$db_pass = ""; 
 $db_name = "learnora_learnorastore";
+/* $db_username = "learnora_learn"; 
+$db_pass = "7Ums6HDNrg)03*"; 
+$db_name = "learnora_learnorastore"; */
 
 
 $con = mysqli_connect ("$db_host","$db_username","$db_pass","$db_name");
@@ -82,6 +85,9 @@ $countrykey      = $row['countrykey'];
 $formatkey       = $row['formatkey'];
 $google_map= $row["google_map"];} 
 
+
+// Override for local development
+$siteurl = 'http://localhost/learnora/';
 
 $adminlink='admin'.$siteurl;
 

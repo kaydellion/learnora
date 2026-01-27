@@ -964,7 +964,7 @@ if ($instructor_id === 'add_new') {
     $uploadedFiles = [];
     foreach ($reportImages as $image) {
         $stmt = $con->prepare("INSERT INTO " . $siteprefix . "training_images (training_id, picture, updated_at) VALUES (?, ?, current_timestamp())");
-        $stmt->bind_param("ss", $training_id, $image);
+        $stmt->bind_param("is", $training_id, $image); // Change "ss" to "is" to correctly bind the integer training_id
         if ($stmt->execute()) {
             $uploadedFiles[] = $image;
         } else {
@@ -972,8 +972,6 @@ if ($instructor_id === 'add_new') {
         }
         $stmt->close();
     }
-
-   
 
     $insertTraining = mysqli_query($con, "INSERT INTO {$siteprefix}training (
         training_id, title, description, attendee, Language, certification, level, delivery_format,
@@ -994,38 +992,37 @@ if ($insertTraining) {
             showSuccessModal('Processed', $message);
             header("refresh:2; url=dashboard.php");
 } else {
-    $message .= "Error adding report: " . mysqli_error($con);
-            showErrorModal('Update Failed', $message);
-            header("refresh:2;");
+     $error = mysqli_error($con);
+     $message .= "Error adding training: " . $error;
+     showErrorModal('Error', $message);
+     echo "SQL Error: " . $error;
 }
-
-
 }
-
-
 //follow seller
    if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action'])) {
     $action = $_POST['action'];
-    $target_user_id = $_POST['seller_id'];
-      $user_id = $_POST['user_id']; // Replace with your session variable for user ID
+    // Check if required POST parameters exist before accessing them
+    if (isset($_POST['seller_id']) && isset($_POST['user_id'])) {
+        $target_user_id = $_POST['seller_id'];
+        $user_id = $_POST['user_id']; // Replace with your session variable for user ID
 
-    if ($action === 'follow') {
-        // Add a new follower
-        $followQuery = "INSERT INTO ".$siteprefix."followers (user_id, seller_id, followed_at, category_id, subcategory_id) VALUES (?, ?, NOW(), '', '')";
-        $stmt = $con->prepare($followQuery);
-        $stmt->bind_param("ii", $user_id, $target_user_id);
-        $stmt->execute();
+        if ($action === 'follow') {
+            // Add a new follower
+            $followQuery = "INSERT INTO ".$siteprefix."followers (user_id, seller_id, followed_at, category_id, subcategory_id) VALUES (?, ?, NOW(), '', '')";
+            $stmt = $con->prepare($followQuery);
+            $stmt->bind_param("ii", $user_id, $target_user_id);
+            $stmt->execute();
 
-        echo "<script>alert('You are now following the seller.');</script>";
-    } elseif ($action === 'unfollow') {
-        // Remove the follower
-        $unfollowQuery = "DELETE FROM {$siteprefix}followers WHERE user_id = ? AND seller_id = ?";
-        $stmt = $con->prepare($unfollowQuery);
-        $stmt->bind_param("ii", $user_id, $target_user_id);
-        $stmt->execute();
-        echo "<script>alert('You have unfollowed the seller.');</script>";
+            echo "<script>alert('You are now following the seller.');</script>";
+        } elseif ($action === 'unfollow') {
+            // Remove the follower
+            $unfollowQuery = "DELETE FROM {$siteprefix}followers WHERE user_id = ? AND seller_id = ?";
+            $stmt = $con->prepare($unfollowQuery);
+            $stmt->bind_param("ii", $user_id, $target_user_id);
+            $stmt->execute();
+            echo "<script>alert('You have unfollowed the seller.');</script>";
+        }
     }
-
 }
 
 
@@ -1152,7 +1149,7 @@ if (isset( $_POST['signin'])){
     $code= $_POST['email'];
     $password = $_POST['password'];
           
-   $sql = "SELECT * FROM ".$siteprefix."users WHERE type='user' AND status='active' AND email_address = '$code'";
+   $sql = "SELECT * FROM ".$siteprefix."users WHERE email_address = '$code'";
     $sql2 = mysqli_query($con,$sql);
     if (mysqli_affected_rows($con) == 0){
     $statusAction="Try Again!";
@@ -1647,9 +1644,6 @@ if(isset($_POST['update-profile'])){
     $foreignOffice = mysqli_real_escape_string($con, $_POST['foreign-office'] ?? '');
     $category = isset($_POST['category']) && is_array($_POST['category']) ? implode(',', $_POST['category']) : '';
     $subcategory = isset($_POST['subcategory']) && is_array($_POST['subcategory']) ? implode(',', $_POST['subcategory']) : '';
-    $password = $_POST['password'];
-    $retypePassword = $_POST['retypePassword'];
-
 
         // Address logic
     $is_nigerian = $_POST['is_nigerian'] ?? '';
@@ -1674,19 +1668,19 @@ if(isset($_POST['update-profile'])){
     }
 
     // Password change
-    $password = !empty($_POST['password']) ? trim($_POST['password']) : null;
-    $retypePassword = !empty($_POST['retypePassword']) ? trim($_POST['retypePassword']) : null;
-    $oldPassword = !empty($_POST['oldpassword']) ? trim($_POST['oldpassword']) : null;
+    $password = isset($_POST['password']) ? trim($_POST['password']) : '';
+    $retypePassword = isset($_POST['retypePassword']) ? trim($_POST['retypePassword']) : '';
+    $oldPassword = isset($_POST['oldpassword']) ? trim($_POST['oldpassword']) : '';
     $hashedPassword = null;
 
+    // Only validate passwords if user is trying to change password
     if (!empty($password) || !empty($retypePassword) || !empty($oldPassword)) {
         if (empty($password) || empty($retypePassword) || empty($oldPassword)) {
            echo "<script>
-            alert('All password fields (Password, Retype Password, and Old Password) must be filled out.');
+            alert('All password fields (Password, Retype Password, and Old Password) must be filled out when changing password.');
             window.history.back(); // Go back to previous form state
         </script>";
         exit;
-            
         }
         if ($password !== $retypePassword) {
             echo "<script>
