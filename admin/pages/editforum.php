@@ -9,7 +9,7 @@ if (isset($_GET['id'])) {
 
     // Prepare current values
     $current_title = htmlspecialchars($forum['title'] ?? '');
-    $current_article = htmlspecialchars($forum['article'] ?? '');
+    $current_article = $forum['article'];
     $current_categories = isset($forum['categories']) ? explode(',', $forum['categories']) : [];
     $current_image = $forum['featured_image'] ?? '';
 }
@@ -59,7 +59,7 @@ if (isset($_GET['id'])) {
                     <div class="col-sm-12">
                         <div class="form-group">
                             <label class="form-label" for="editor">Enter Forum Details</label>
-                            <textarea class="form-control" id="editor" name="article"><?php echo $current_article; ?></textarea>
+                            <textarea class="editor" id="editor" name="article"><?php echo $current_article; ?></textarea>
                         </div>
                     </div>
 

@@ -46,7 +46,7 @@ if (!empty($current_categories)) {
             $categoryNames[] = $catRow['category_name'];
         }
     }
-}
+} 
     $current_image = $imagePath.$forum['featured_image'] ?? '';
     $date = date('d M Y', strtotime($forum['created_at'] ?? ''));
 }
@@ -89,7 +89,7 @@ else {
 
                 <div class="post-img">
 
-<img src="<?php echo $siteurl . $current_image; ?>" alt="Featured blog image" class="img-fluid" loading="lazy">
+<img src="<?php echo $siteurl . $current_image; ?>" alt="Featured blog image" class="img-fluid Featured-blog-image" loading="lazy">
                 </div>
 
                 <div class="article-content" data-aos="fade-up" data-aos-delay="100">
@@ -415,6 +415,7 @@ while ($row = mysqli_fetch_assoc($result)) {
     $uploader = htmlspecialchars($row['display_name']);
     $alt_title = htmlspecialchars($row['slug']);
      $image_path = $imagePath.$row['featured_image'];
+      $views = htmlspecialchars($row['views']);
 
     // Fetch category names
     $catNames = [];
@@ -433,6 +434,10 @@ while ($row = mysqli_fetch_assoc($result)) {
             }
         }
     }
+          $commentCountQuery = "SELECT COUNT(*) AS comment_count FROM ln_comments WHERE blog_id = '$s'";
+    $commentCountResult = mysqli_query($con, $commentCountQuery);
+    $commentCountRow = mysqli_fetch_assoc($commentCountResult);
+    $commentCount = $commentCountRow['comment_count'] ?? 0;
     include 'blog-card.php'; // Include the blog post template
 }
 }else {

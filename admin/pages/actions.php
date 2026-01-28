@@ -1481,6 +1481,21 @@ if(isset($_POST['settings'])){
     $profilePicture = $_FILES['site_logo']['name'];
     $paymenturl = $_POST['paymenturl'];
     $apikey = $_POST['apikey'];
+    $default_keywords = $_POST['default_keywords'];
+    $aboutkey         = $_POST['aboutkey'];
+    $contactkey       = $_POST['contactkey'];
+    $privacykey       = $_POST['privacykey'];
+    $cookiekey        = $_POST['cookiekey'];
+    $termskey         = $_POST['termskey'];
+    $whyuskey         = $_POST['whyuskey'];
+    $disclaimerkey    = $_POST['disclaimerkey'];
+    $blogkey          = $_POST['blogkey'];
+    $trainerskey      = $_POST['trainerskey'];
+    $statekey         = $_POST['statekey'];
+    $monthkey         = $_POST['monthkey'];
+    $countrykey       = $_POST['countrykey'];
+    $formatkey        = $_POST['formatkey'];
+
 
     $site_bank= $_POST['site_bank'];
     $account_name= $_POST['account_name'];
@@ -1502,7 +1517,7 @@ if(isset($_POST['settings'])){
         $logo = $siteimg; // Use the current picture  
     }
 
-    $update = mysqli_query($con,"UPDATE " . $siteprefix . "site_settings SET site_name='$name',site_bank='$site_bank', account_name='$account_name', affliate_percentage='$affiliate_percentage', commision_fee='$com_fee', account_number='$account_number', google_map='$google',  site_logo='$logo',  site_keywords='$keywords', site_url='$url', site_description='$description', site_mail='$email', site_number='$number', payment_url='$paymenturl', paystack_key='$apikey', tinymce='$tinymce' WHERE s=1");
+    $update = mysqli_query($con,"UPDATE " . $siteprefix . "site_settings SET site_name='$name',site_bank='$site_bank',  default_keywords='$default_keywords', aboutkey='$aboutkey', contactkey='$contactkey', privacykey='$privacykey', cookiekey='$cookiekey', termskey='$termskey', whyuskey='$whyuskey', disclaimerkey='$disclaimerkey', blogkey='$blogkey', trainerskey='$trainerskey', statekey='$statekey', monthkey='$monthkey', countrykey='$countrykey', formatkey='$formatkey', account_name='$account_name', affliate_percentage='$affiliate_percentage', commision_fee='$com_fee', account_number='$account_number', google_map='$google',  site_logo='$logo',  site_keywords='$keywords', site_url='$url', site_description='$description', site_mail='$email', site_number='$number', payment_url='$paymenturl', paystack_key='$apikey', tinymce='$tinymce' WHERE s=1");
     if($update){
     $statusAction = "Successful";
     $statusMessage = "Settings Updated Successfully!";
@@ -2449,7 +2464,7 @@ if (isset($_POST['sendmessage'])) {
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['addforum'])) {
     $user_id = mysqli_real_escape_string($con, $_POST['user']);
     $title = mysqli_real_escape_string($con, $_POST['title']);
-    $article = mysqli_real_escape_string($con, $_POST['article']);
+    $article =  $_POST['article'];
     $categories = isset($_POST['category']) ? implode(',', array_map('intval', $_POST['category'])) : '';
     $created_at = date('Y-m-d H:i:s');
     $views = 0;
@@ -2526,7 +2541,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['editforum'])) {
     $forum_id = intval($_POST['forum_id']);
     $user_id = intval($_POST['user']);
     $title = mysqli_real_escape_string($con, $_POST['title']);
-    $article = mysqli_real_escape_string($con, $_POST['article']);
+    $article =  $_POST['article'];
     $categories = isset($_POST['category']) ? implode(',', array_map('intval', $_POST['category'])) : '';
     $updated_at = date('Y-m-d H:i:s');
     $message = "";

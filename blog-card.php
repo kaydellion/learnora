@@ -3,7 +3,7 @@
     <a href="<?php echo $siteurl; ?>view-blog/<?php echo $alt_title; ?>">
   <article class="post-item side-post">
     <div class="post-img">
-  <img src="<?php echo $siteurl.$image_path; ?>" alt="" class="img-fluid">
+  <img src="<?php echo $siteurl.$image_path; ?>" alt="" class="img-fluid post-author-image">
     <div class="category-container">
 <?php foreach ($catNames as $cat): ?>
         <span class="category"><?php echo htmlspecialchars($cat); ?></span>
@@ -21,6 +21,10 @@
         </p>
       </div>
     </div>
+        <div class="post-stats d-flex justify-content-between mt-2">
+  <span class="views"><i class="bx bx-show"></i> <?php echo $views; ?> views</span>
+  <span class="comments"><i class="bx bx-comment"></i> <?php echo $commentCount; ?> comments</span>
+</div>
   </article>
   </a>
 </div>

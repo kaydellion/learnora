@@ -40,7 +40,7 @@
                 <div class="col-lg-6 image-col" data-aos="fade-left" data-aos-delay="200">
                   <div class="sale-showcase">
                     <div class="main-product">
-                      <img src="<?php echo $siteurl; ?>assets/img/learnora-hero (2).png" alt="Sale Product">
+                      <img src="<?php echo $siteurl; ?>assets/img/learnora-hero (2).jpg" alt="Sale Product">
                       
                     </div>
                    
@@ -138,7 +138,7 @@ AND EXISTS (
 )
 GROUP BY t.s 
 ORDER BY t.s DESC 
-LIMIT 20";
+LIMIT 8";
 
 $result = mysqli_query($con, $query);
 if ($result) {
@@ -265,6 +265,7 @@ while ($row = mysqli_fetch_assoc($result)) {
     $uploader = htmlspecialchars($row['display_name']);
     $alt_title = htmlspecialchars($row['slug']);
      $image_path = $imagePath.$row['featured_image'];
+      $views = htmlspecialchars($row['views']);
 
     // Fetch category names
     $catNames = [];
@@ -283,6 +284,10 @@ while ($row = mysqli_fetch_assoc($result)) {
             }
         }
     }
+          $commentCountQuery = "SELECT COUNT(*) AS comment_count FROM ln_comments WHERE blog_id = '$s'";
+    $commentCountResult = mysqli_query($con, $commentCountQuery);
+    $commentCountRow = mysqli_fetch_assoc($commentCountResult);
+    $commentCount = $commentCountRow['comment_count'] ?? 0;
     include 'blog-card.php'; // Include the blog post template
 }
 ?>
@@ -368,7 +373,7 @@ while ($row = mysqli_fetch_assoc($result)) {
         )
         GROUP BY t.training_id
         ORDER BY o.date DESC 
-        LIMIT 10";
+        LIMIT 6";
 
 $result = mysqli_query($con, $query);
  if ($result && mysqli_num_rows($result) > 0) {
@@ -425,7 +430,7 @@ $rating_data = calculateRating($training_id, $con, $siteprefix);
         }
         else {
         echo '<div class="alert alert-warning text" role="alert">
-    No training found. <a href="' . $siteurl . 'marketplace.php" class="alert-link">View more reports in marketplace</a>
+    No training found. <a href="' . $siteurl . 'marketplace.php" class="alert-link">View more training in marketplace</a>
       </div>';
       }
         ?>

@@ -205,7 +205,7 @@ if (in_array($current_page, $excluded_pages)) {
         <div class="d-flex py-3 align-items-center justify-content-between">
 
           <!-- Logo -->
-          <a href="index" class="logo d-flex align-items-center">
+          <a href="<?php echo $siteurl; ?>" class="logo d-flex align-items-center">
             <!-- Uncomment the line below if you also wish to use an image logo -->
             <img src="<?php echo $siteurl . $imagePath . $siteimg; ?>" alt="">
 
@@ -214,7 +214,7 @@ if (in_array($current_page, $excluded_pages)) {
           <!-- Search -->
           <form class="search-form desktop-search-form" action="<?php echo $siteurl; ?>search.php" method="get">
             <div class="input-group">
-              <input type="text" class="form-control" placeholder="Search for events..." name="searchterm" id="search_input">
+              <input type="text" class="form-control" placeholder="Search for..." name="searchterm" id="search_input">
               <button class="btn search-btn" type="submit">
                 <i class="bi bi-search"></i>
               </button>
@@ -406,9 +406,9 @@ if (in_array($current_page, $excluded_pages)) {
     <!-- Mobile Search Form -->
     <div class="collapse" id="mobileSearch">
       <div class="container">
-        <form class="search-form">
+        <form class="search-form" action="<?php echo $siteurl; ?>search.php" method="get">
           <div class="input-group">
-            <input type="text" class="form-control" placeholder="Search for products">
+            <input type="text" class="form-control" placeholder="Search....." name="searchterm" id="search_input">
             <button class="btn" type="submit">
               <i class="bi bi-search"></i>
             </button>

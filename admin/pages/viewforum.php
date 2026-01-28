@@ -24,9 +24,12 @@ if (!$post) {
             <h4 class="card-title"><?php echo htmlspecialchars($post['title']); ?></h4>
             <div class="mb-2 text-muted"><?php echo date('d M Y H:i', strtotime($post['created_at'])); ?></div>
             <?php if (!empty($post['featured_image'])): ?>
-                <img src="<?php echo $imagePath . htmlspecialchars($post['featured_image']); ?>" class="img-fluid rounded mb-3" alt="Featured Image" />
+ <img src="<?php echo $siteurl . $imagePath . $post['featured_image']; ?>" 
+     class="img-fluid rounded mb-3" 
+     alt="Featured Image" />
+
             <?php endif; ?>
-            <p><?php echo nl2br(htmlspecialchars($post['article'])); ?></p>
+            <p><?php echo $post['article']; ?></p>
         </div>
     </div>
 
