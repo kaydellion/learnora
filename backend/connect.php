@@ -41,12 +41,10 @@ $admindocumentPath='../../documents/';
 $sitecurrency="₦";
 $sitecurrencyCode="&#8358;";
 $documentPath='documents/';
-$affiliateurl='https://learnora.affiliate.projectreporthub.ng/';
-$adminurl='https://learnora.admin.projectreporthub.ng/';
-/*
+//$affiliateurl='https://learnora.affiliate.projectreporthub.ng/';
+$adminurl='https://admin.learnora.ng/';
 $affiliateurl='https://affiliate.learnora.ng/';
 
-*/
 
 $sql = "SELECT * from ".$siteprefix."site_settings";
 $sql2 = mysqli_query($con,$sql);
@@ -85,7 +83,7 @@ $google_map= $row["google_map"];}
 
 
 // Override for local development
-$siteurl = 'http://localhost/learnora/';
+//$siteurl = 'http://localhost/learnora/';
 
 $adminlink='admin'.$siteurl;
 
