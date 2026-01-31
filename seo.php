@@ -12,8 +12,8 @@ $db_name = "projectr_learn";
 */
 
 $db_host = "localhost";
-$db_username = "learnora_learn"; 
-$db_pass = "7Ums6HDNrg)03*"; 
+$db_username = "root"; 
+$db_pass = ""; 
 $db_name = "learnora_learnorastore";
 
 /*
