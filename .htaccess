@@ -1,5 +1,10 @@
 RewriteEngine On
 
+# Add CORS headers for font files
+<FilesMatch "\.(woff|woff2|ttf|otf|eot)$">
+    Header set Access-Control-Allow-Origin "*"
+</FilesMatch>
+
 # Rewrite events URLs
 RewriteRule ^events/([^/]+)/?$ events.php?slug=$1 [L,QSA]
 

@@ -3,24 +3,22 @@ session_start(); ob_start();
 
 error_reporting(E_ALL); ini_set('display_errors', 1); ini_set('log_errors', 1);
 
-
-$db_host = "localhost"; 
-
 /*
-
+$db_host = "localhost"; 
 $db_username = "root"; 
 $db_pass = ""; 
 $db_name = "learnora";
 $db_username = "projectr_learnorastore"; 
 $db_pass = "Y34GgwK(]h82Yg"; 
-$db_name = "projectr_learn";
+$db_name = "projectr_learn";*/
+
+$db_host = "localhost"; 
 $db_username = "learnora_learn"; 
 $db_pass = "7Ums6HDNrg)03*"; 
 $db_name = "learnora_learnorastore";
 
-*/
 
-
+/*
 $db_username = "root"; 
 $db_pass = ""; 
 $db_name = "learnora_learnorastore";
@@ -43,12 +41,10 @@ $admindocumentPath='../../documents/';
 $sitecurrency="₦";
 $sitecurrencyCode="&#8358;";
 $documentPath='documents/';
-$affiliateurl='https://learnora.affiliate.projectreporthub.ng/';
-$adminurl='https://learnora.admin.projectreporthub.ng/';
-/*
+//$affiliateurl='https://learnora.affiliate.projectreporthub.ng/';
+$adminurl='https://admin.learnora.ng/';
 $affiliateurl='https://affiliate.learnora.ng/';
 
-*/
 
 $sql = "SELECT * from ".$siteprefix."site_settings";
 $sql2 = mysqli_query($con,$sql);
@@ -87,7 +83,7 @@ $google_map= $row["google_map"];}
 
 
 // Override for local development
-$siteurl = 'http://localhost/learnora/';
+//$siteurl = 'http://localhost/learnora/';
 
 $adminlink='admin'.$siteurl;
 
