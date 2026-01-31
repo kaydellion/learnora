@@ -1,6 +1,12 @@
 
 
 <?php include "header.php"; ?>
+<script>
+// Disable TinyMCE on this page
+if (typeof tinymce !== 'undefined') {
+  tinymce.remove('.editor');
+}
+</script>
 <style>
 .modal {
   position: fixed;
@@ -38,7 +44,7 @@
           <h4 class="mb-0">Add New Training Listings</h4>
         </div>
         <div class="card-body">
-          <form method="POST" enctype="multipart/form-data">
+          <form id="addTrainingForm" method="POST" enctype="multipart/form-data">
 
             <h6>Event Details</h6>
             <div class="mb-3">
@@ -55,7 +61,7 @@
             </div>
             <div class="mb-3">
               <label class="form-label">Description</label>
-              <textarea class="form-control editor" name="description" ></textarea>
+              <textarea class="form-control" name="description" ></textarea>
             </div>
               <input type="hidden" class="form-control" name="who_should_attend" placeholder="E.g. Beginners, Entrepreneurs, etc.">
             <div class="mb-3">
@@ -148,7 +154,7 @@
   <label class="form-label">Ticket Name</label>
   <input type="text" class="form-control mb-2" name="ticket_name[]" placeholder="e.g. General Admission">
   <label class="form-label">Benefits</label>
-  <textarea class="mb-2 editor" name="ticket_benefits[]" placeholder="e.g. Certificate, Lunch, Materials"></textarea>
+  <textarea class="mb-2 form-control" name="ticket_benefits[]" placeholder="e.g. Certificate, Lunch, Materials"></textarea>
   <label class="form-label">Price</label>
   <input type="number" class="form-control mb-2" name="ticket_price[]" min="0" step="0.01" placeholder="e.g. 5000">
   <label class="form-label">Number of Seats Available</label>
@@ -207,19 +213,19 @@
             <h6>Course Content Details</h6>
            <div class="mb-3">
               <label class="form-label">Who Should Attend & Target Audience</label>
-              <textarea class="form-control editor" name="target_audience" placeholder='E.g. "Beginners in Python", "Entrepreneurs", etc.'></textarea>
+              <textarea class="form-control" name="target_audience" placeholder='E.g. "Beginners in Python", "Entrepreneurs", etc.'></textarea>
             </div>
 
               <textarea  name="course_description" rows="4" hidden></textarea>
           
             <div class="mb-3">
               <label class="form-label">Learning Objectives / Outcomes</label>
-              <textarea class="form-control editor" name="learning_objectives" rows="3" placeholder="List what the learner will be able to do after completing the course."></textarea>
+              <textarea class="form-control" name="learning_objectives" rows="3" placeholder="List what the learner will be able to do after completing the course."></textarea>
             </div>
           
             <div class="mb-3">
               <label class="form-label">Course Requirements / Prerequisites</label>
-              <textarea class="form-control editor" name="prerequisites" rows="2" placeholder="Any knowledge, tools, or skills needed before starting."></textarea>
+              <textarea class="form-control" name="prerequisites" rows="2" placeholder="Any knowledge, tools, or skills needed before starting."></textarea>
             </div>
           
             <div class="mb-3">
@@ -253,7 +259,7 @@
         <!-- Option 1: Text Entry -->
         <div id="quizText" style="display:none;">
           <label>Text Entry:</label>
-          <textarea name="quiz_text[]" placeholder="e.g., Write a short essay on the impact of AI on job markets..." class="form-control editor"></textarea>
+          <textarea name="quiz_text[]" placeholder="e.g., Write a short essay on the impact of AI on job markets..." class="form-control"></textarea>
         </div>
 
         <!-- Option 2: File Upload -->
@@ -275,14 +281,14 @@
 <div id="quizBuilderModal">
   <div class="mb-3">
     <label>Instructions:</label>
-    <textarea name="quiz_instructions" placeholder="Quiz Instructions" class="form-control mb-2 editor"></textarea>
+    <textarea name="quiz_instructions" placeholder="Quiz Instructions" class="form-control mb-2"></textarea>
   </div>
 
   <!-- Template to clone -->
   <div class="question-block">
     <div class="mb-3">
       <label>Question:</label>
-      <textarea name="questions[]" class="form-control mb-2 editor" placeholder="Question"></textarea>
+      <textarea name="questions[]" class="form-control mb-2" placeholder="Question"></textarea>
     </div>
     <div class="mb-3">
       <input type="text" name="option_a[]" placeholder="Option A">
@@ -385,7 +391,7 @@
       </div>
       <div class="mb-3">
       <label>Description/Notes:</label>
-      <textarea class="form-control editor" name="video_module_desc[]"></textarea>
+      <textarea class="form-control" name="video_module_desc[]"></textarea>
       </div>
       <div class="mb-3">
       <label>Total Duration:</label>
@@ -431,7 +437,7 @@
 
       <div class="mb-3">
       <label>Description/Notes:</label>
-      <textarea class="form-control editor" name="text_module_desc[]"></textarea>
+      <textarea class="form-control" name="text_module_desc[]"></textarea>
       </div>
 
       <div class="mb-3">
@@ -490,7 +496,7 @@
  <!---  <label class="form-label">Instructor Email</label>--->
   <input type="hidden" class="form-control mb-2" name="new_instructor_email" placeholder="Enter instructor email">
   <label class="form-label">Instructor Bio</label> 
-  <textarea class="form-control mb-2 editor" name="new_instructor_bio" placeholder="Enter instructor bio"></textarea>
+  <textarea class="form-control mb-2" name="new_instructor_bio" placeholder="Enter instructor bio"></textarea>
   <label class="form-label">Instructor Photo</label>
   <input type="file" class="form-control" name="new_instructor_photo" accept="image/*">
   <input type="hidden" name="user_id" value="<?php echo $user_id; ?>">
@@ -503,7 +509,7 @@
 
 <div class="mb-3">
   <label class="form-label">Additional Instructions or Notes</label>
-  <textarea class="form-control editor" name="additional_notes" rows="3"></textarea>
+  <textarea class="form-control" name="additional_notes" rows="3"></textarea>
 </div>
 
 
@@ -525,7 +531,10 @@
          
                         
             <div class="mb-3">
-              <button type="submit" name="add_event" class="btn btn-primary">Add Event / Course</button>
+              <button id="addTrainingSubmitBtn" type="submit" name="add_event" class="btn btn-primary">
+                <span id="addTrainingSubmitSpinner" class="spinner-border spinner-border-sm me-2 d-none" role="status" aria-hidden="true"></span>
+                <span id="addTrainingSubmitText">Add Event / Course</span>
+              </button>
             </div>
           </form>
         </div>
@@ -540,6 +549,19 @@
     <script>
 function toggleDropdown(type) {
   document.getElementById(`${type}-dropdown`).classList.toggle('show');
+}
+
+const addTrainingForm = document.getElementById('addTrainingForm');
+const addTrainingSubmitBtn = document.getElementById('addTrainingSubmitBtn');
+const addTrainingSubmitSpinner = document.getElementById('addTrainingSubmitSpinner');
+const addTrainingSubmitText = document.getElementById('addTrainingSubmitText');
+
+if (addTrainingForm && addTrainingSubmitBtn && addTrainingSubmitSpinner && addTrainingSubmitText) {
+  addTrainingForm.addEventListener('submit', function () {
+    addTrainingSubmitBtn.disabled = true;
+    addTrainingSubmitSpinner.classList.remove('d-none');
+    addTrainingSubmitText.textContent = 'Uploading...';
+  });
 }
 
 function filterOptions(input, containerId) {

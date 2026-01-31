@@ -64,7 +64,13 @@ if (mysqli_affected_rows($con) == 0) {
 
 }}
 
-if ($active_log == 0 && $user_type != 'admin') {
+if ($active_log == 0) {
+  header("location: ../../index.php");
+  exit;
+}
+
+// Check if user is admin or sub-admin for admin pages
+if ($active_log == 1 && $user_type != 'admin' && $user_type != 'sub-admin') {
   header("location: ../../index.php");
   exit;
 }

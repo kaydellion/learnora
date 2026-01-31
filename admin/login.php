@@ -21,13 +21,11 @@ if (isset($_POST['login'])){
     $type = $row['type'];
     }
 
-    if($type!="admin"||$type!="sub-admin"){
-    echo'Unauthotrized user!';
+    if($type!="admin" && $type!="sub-admin"){
+    echo'Unauthorized user!';
     }
 
     else if (!checkPassword($password, $hashedPassword)) {
-    }
-    if (!checkPassword($password, $hashedPassword)) {
     echo'Incorrect Password for this account! <a href="forgetpassword.php" style="color:red;">Forgot password? Recover here</a>';
     }
                 
@@ -47,7 +45,7 @@ if (isset($_POST['login'])){
     $previousPage = $_SESSION['previous_page'];
     header("location: $previousPage");
     } else {
-    header("location: pages/");
+    header("location: dashboard.php");
     }} 
     }}
 

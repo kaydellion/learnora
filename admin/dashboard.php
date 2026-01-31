@@ -1,4 +1,4 @@
-<?php include "header.php"; ?>
+<?php include "pages/header.php"; ?>
 
 <div class="container">
           <div class="page-inner">
