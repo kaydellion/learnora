@@ -1,26 +1,26 @@
 <?php
 /*
-
-
+$db_host = "localhost"; 
 $db_username = "root"; 
 $db_pass = ""; 
 $db_name = "learnora";
-$db_host = "localhost";
 $db_username = "projectr_learnorastore"; 
 $db_pass = "Y34GgwK(]h82Yg"; 
-$db_name = "projectr_learn";
-*/
+$db_name = "projectr_learn";*/
 
-$db_host = "localhost";
-$db_username = "root"; 
-$db_pass = ""; 
+$db_host = "localhost"; 
+$db_username = "learnora_learn"; 
+$db_pass = "7Ums6HDNrg)03*"; 
 $db_name = "learnora_learnorastore";
+
 
 /*
 $db_username = "root"; 
 $db_pass = ""; 
 $db_name = "learnora_learnorastore";
-$db_host = "localhost";*/
+/* $db_username = "learnora_learn"; 
+$db_pass = "7Ums6HDNrg)03*"; 
+$db_name = "learnora_learnorastore"; */
 
 $conn = mysqli_connect ("$db_host","$db_username","$db_pass","$db_name");
 
